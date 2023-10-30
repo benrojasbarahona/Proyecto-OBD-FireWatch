@@ -1,4 +1,3 @@
-HOLA
 # Proyecto-OBD-FireWatch
 
 La Organización de Defensa del Bosque (OBD-FireWatch) tiene como objetivo principal la protección y preservación de los recursos forestales, con un enfoque especial en los bosques nativos. Este proyecto se enmarca en colaboración con ODB y busca desarrollar un programa en Python que almacene información sobre los rodales y sus relaciones de colindancia, permitiendo identificar los rodales en riesgo de incendio una vez que se declare un incendio en uno de ellos. Además, el sistema proporcionará una interfaz gráfica amigable para los usuarios.
