@@ -1,5 +1,5 @@
 import os
-import funciones as val
+import validar as val
 
 def ingresar_rodal(ids_rodales):
     id_rodal = input("Ingrese el ID del rodal: ")

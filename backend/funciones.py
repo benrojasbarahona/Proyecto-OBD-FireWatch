@@ -1,4 +1,4 @@
-from logica import *
+from main import *
 #valida los porcentajes de bosque nativo y bosque plantado
 def validar_id_rodal(id_rodal, ids_rodales):
     #Verifica que no se haya ingresado un id_rodal vacío, que el primer caracter sea una R o r y que el resto sean números
@@ -34,56 +34,3 @@ def validar_colindancias(colindancias):
         return True
     else:
         return False
-    
-ids_rodales = []
-
-def agregar_rodal():
-    ...
-
-def calcular_hect():
-    ...
-
-def traducir_rango():
-    ...
-
-def consulta_rango_rodales():
-    ...
-
-def consultar_colindantes():
-    ...
-
-def obtener_bosque():
-    ...
-
-def obtener_colindantes():
-    ...
-
-def consultar_hect():
-    ...
-
-def consultar_hect_propietario():
-    ...
-
-def consultar_propietario():
-    ...
-
-def consulta_rango_rodales():
-    ...
-
-def escribir_archivo():
-    ...
-
-def leer_archivo():
-    ...
-
-def obtener_propietario():
-    ...
-
-def rodales_propietario():
-    ...
-
-def simular_incendio():
-    ...
-
-def colindantes_en_riesgo():
-    ...
