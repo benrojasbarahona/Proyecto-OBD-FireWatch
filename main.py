@@ -38,7 +38,7 @@ def main():
     else:
         with open("colindancias.csv", 'w'):
             pass
-    
+        
     while True:
         try:
             while True:
@@ -76,7 +76,9 @@ def main():
                     while val.validar_colindancias(colindancias) == False:
                         colindancias = input("Colindancias: ")
                     colindancias = colindancias.split(",")
-                    diccionario_rodal = {"ID": id_rodal, "Porcentaje de bosque nativo": porcentaje_bosque_nativo, "Porcentaje de bosque exótico": porcentaje_bosque_exotico, "Nombre del propietario": nombre_propietario, "Colindancias": colindancias}
+                    diccionario_rodal = {"ID": id_rodal, "Porcentaje de bosque nativo": porcentaje_bosque_nativo, 
+                                         "Porcentaje de bosque exótico": porcentaje_bosque_exotico, "Nombre del propietario": nombre_propietario, 
+                                         "Colindancias": colindancias}
                     listas_dicts_rodales.append(diccionario_rodal)
                     with open("rodales.csv", 'a') as archivo:
                         archivo.write(id_rodal + "," + porcentaje_bosque_nativo + "," + porcentaje_bosque_exotico + "," + nombre_propietario + "\n")
