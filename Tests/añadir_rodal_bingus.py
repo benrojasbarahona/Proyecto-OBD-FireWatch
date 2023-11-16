@@ -65,19 +65,19 @@ def guardar_en_archivo(rodales: list):
 def main():
     # Inicializar archivos, en caso que no existan agregar headers
     try:
-        with open('Simultaneo/rodales.csv', 'r'): existe_rodales = True
+        with open('Tests/rodales.csv', 'r'): existe_rodales = True
     except FileNotFoundError: existe_rodales = False
 
     try:
-        with open('Simultaneo/colindancias.csv', 'r'): existe_colindancias = True
+        with open('Tests/colindancias.csv', 'r'): existe_colindancias = True
     except FileNotFoundError: existe_colindancias = False
 
     if not existe_rodales:
-        with open('Simultaneo/rodales.csv', 'w') as headers:
+        with open('Tests/rodales.csv', 'w') as headers:
             headers.write("ID, Nombre_Propietario, %_Bosque_nativo, %_Bosque_exotico")
     
     if not existe_colindancias:
-        with open('Simultaneo/colindancias.csv', 'w') as headers:
+        with open('Tests/colindancias.csv', 'w') as headers:
             headers.write("ID, norte, noreste, noroeste, sur, sureste, suroeste")
 
     mensaje = """<<< OBD Firewatch >>>\n
