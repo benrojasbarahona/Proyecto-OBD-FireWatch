@@ -1,4 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Esta es la capa del main, es decir, acá está main() y
+# todo lo relacionado a tkinter, es lo que el USUARIO ve.
+
 import tkinter as tk
+import tkinter.messagebox as msgbox
+import tkinter.ttk as ttk
+import logica as log # se imoorta la capa de negocio
 
 class Ventana(tk.Tk):
     def __init__(self):
