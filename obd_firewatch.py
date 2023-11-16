@@ -1,44 +1,90 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Esta es la capa del main, es decir, acá está main() y
+# Esta es la capa de , es decir, acá está main() y
 # todo lo relacionado a tkinter, es lo que el USUARIO ve.
+
+import logica as log # se imoorta la capa de negocio
+import tkinter as tk
+import tkinter.messagebox as msgbox
+import tkinter.ttk as ttk
+
 
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
-import logica as log # se imoorta la capa de negocio
 
-class Ventana(tk.Tk):
-    def __init__(self):
-        super().__init__()
+def main():
+    root = tk.Tk() # crea ventana principal
+    root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize = 50, weight = 1)
+    root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
+    root.title('OBD Firewatch - Consultar') # título de la aplicación
+    img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
+    img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
+    img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
+    img_background = tk.PhotoImage(file = "assets/iconos/fondo_verde.png")
+    label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
+    img_nube = tk.PhotoImage(file = "assets/iconos/nube.png").subsample(25,25)
 
-        # Configuración de la ventana
-        self.title("Redimensionar Pantalla")
-        self.geometry("600x400")
+    boton_guardar = ttk.Button(root, image=img_nube).grid(row=0,column=0)
+    boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:ventana_ingresar()).grid(row=1,column=1)
+    boton_incendio = ttk.Button(root, image=img_incendio, command=lambda:ventana_incendio()).grid(row=1,column=3)
+    boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:ventana_consulta()).grid(row=1,column=5)
 
-        # Configuración de los pesos de las filas y columnas
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+    def ventana_ingresar():
+        ventana_ingr = tk.Toplevel() # crea ventana ingresar rodales
 
-        # Crear botones con colores
-        boton1 = tk.Button(self, text="Botón 1", bg="red", padx=10, pady=10)
-        boton2 = tk.Button(self, text="Botón 2", bg="green", padx=10, pady=10)
-        boton3 = tk.Button(self, text="Botón 3", bg="blue", padx=10, pady=10)
+    def ventana_incendio():
+        ventana_inc = tk.Toplevel() # crea ventana simulación incendio
 
-        # Ubicar botones en la ventana con espaciado
-        boton1.grid(row=0, column=0, padx=(20, 10), pady=(40, 0), sticky="nsew")
-        boton2.grid(row=0, column=1, padx=10, pady=(40, 0), sticky="nsew")
-        boton3.grid(row=0, column=2, padx=(10, 20), pady=(40, 0), sticky="nsew")
+    def ventana_consulta():
+        ventana_cons = tk.Toplevel() # crea ventana consulta
+        ventana_cons.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
+        ventana_cons.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
+        ventana_cons.title('OBD Firewatch - Consultar') # título de la ventana
+        img_background = tk.PhotoImage(file = "assets/iconos/fondo_verde.png")
+        #label_bg = tk.Label(ventana_cons, image=img_background).place(x=-0,y=0)
 
-        # Configurar el peso de las columnas para que se redimensionen
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1)
+        boton_guardar = ttk.Button(ventana_cons, image=img_nube).grid(row=0,column=0)
 
-        # Configurar el peso de las filas para que se redimensionen
-        self.rowconfigure(0, weight=1)
+        #Configuro entry con texto temporal
+        def temp_text(e):
+            entrada_busqueda.delete(0,"end")
+
+        entrada_busqueda = tk.Entry(ventana_cons, width = 30, borderwidth = 2)
+        #Considerar mover el .bind a otro lado, actualmente borra texto si cambio el foco a otro lado, quizas otro evento, no focusin
+        entrada_busqueda.bind("<FocusIn>", temp_text)
+        entrada_busqueda.grid(row=1,column=1,sticky="w")
+        entrada_busqueda.insert(0,"Ejemplo: R1")
+
+        #Configuro Radiobuttons de consulta
+        consulta = tk.StringVar()
+        consulta.set("Rodal")
+
+        def sel(): #Handler, cambia el texto temporal, fuerza foco a la ventana para que vuelva a funcionar el texto temporal
+            entrada_busqueda.delete(0,"end")
+            if consulta.get() == "Propietario":
+                texto2 = "Seleccione el Propietario"
+                texto_temporal = "Seleccione el Propietario"
+            if consulta.get() == "Bosque":
+                texto2 = "Ingrese el rango de rodales"
+                texto_temporal = "Ejemplo: R1, R9-R14, R4"
+            if consulta.get() == "Rodal":
+                texto2= "Ingrese el rodal"
+                texto_temporal = "Ejemplo: R1"
+            texto = texto2 + " que desea consultar"
+            mensaje.config(text = texto)
+            entrada_busqueda.insert(0,texto_temporal)
+            ventana_cons.focus_set()
+
+        tk.Radiobutton(ventana_cons, text = "Rodal", variable = consulta,
+                       value = "Rodal", command=sel).grid(row=2,column=1,sticky="w")
+        tk.Radiobutton(ventana_cons, text = "Hectáreas y tipo de bosque", variable = consulta,
+                       value = "Bosque", command=sel).grid(row=3,column=1,sticky="w")
+        tk.Radiobutton(ventana_cons, text = "Propietario", variable = consulta,
+                       value = "Propietario", command=sel).grid(row=4,column=1,sticky="w")
+
+        mensaje = tk.Label(ventana_cons, text = "Ingrese el rodal que desea")
+        mensaje.grid(row=0,column=1,sticky="w")
+
+    root.mainloop()
 
 if __name__ == "__main__":
-    app = Ventana()
-    app.mainloop()
+    main()
