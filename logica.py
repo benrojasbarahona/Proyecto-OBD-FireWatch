@@ -5,7 +5,11 @@
 
 import archivos as ar # se importa la capa de datos
 
+<<<<<<< Updated upstream
 global D
+=======
+global A
+>>>>>>> Stashed changes
 global NOMBRE_BD
 NOMBRE_BD = 'clientes.csv'
 
