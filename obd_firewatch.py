@@ -6,21 +6,21 @@ class Ventana(tk.Tk):
 
         # Configuración de la ventana
         self.title("Redimensionar Pantalla")
-        self.geometry("400x300")
+        self.geometry("600x400")
 
         # Configuración de los pesos de las filas y columnas
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        # Crear rectángulos
-        rectangulo1 = tk.Frame(self, bg="red")
-        rectangulo2 = tk.Frame(self, bg="green")
-        rectangulo3 = tk.Frame(self, bg="blue")
+        # Crear botones con colores
+        boton1 = tk.Button(self, text="Botón 1", bg="red", padx=10, pady=10)
+        boton2 = tk.Button(self, text="Botón 2", bg="green", padx=10, pady=10)
+        boton3 = tk.Button(self, text="Botón 3", bg="blue", padx=10, pady=10)
 
-        # Ubicar rectángulos en la ventana
-        rectangulo1.grid(row=0, column=0, sticky="nsew")
-        rectangulo2.grid(row=0, column=1, sticky="nsew")
-        rectangulo3.grid(row=0, column=2, sticky="nsew")
+        # Ubicar botones en la ventana con espaciado
+        boton1.grid(row=0, column=0, padx=(20, 10), pady=(40, 0), sticky="nsew")
+        boton2.grid(row=0, column=1, padx=10, pady=(40, 0), sticky="nsew")
+        boton3.grid(row=0, column=2, padx=(10, 20), pady=(40, 0), sticky="nsew")
 
         # Configurar el peso de las columnas para que se redimensionen
         self.columnconfigure(0, weight=1)
