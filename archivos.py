@@ -11,5 +11,13 @@ def escribe_rodales(file_clientes:str, DICC_RODALES: dict) -> bool:
     # correctamente, este booleano se usa en la nube
     ...
 
+ 
+
+ #hola
+
+def test():
+    # Esta función prueba las funciones de este módulo
+    ...
+
 if __name__ == "__main__":
     test()
