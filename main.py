@@ -1,5 +1,5 @@
 import os
-import validar as val
+import funciones as val
 def ingresar_rodal(ids_rodales):
     id_rodal = input("Ingrese el ID del rodal: ")
     while id_rodal in ids_rodales:
