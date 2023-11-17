@@ -4,7 +4,8 @@ import archivos as ar # se importa la capa de datos
 
 global DICC_RODALES 
 
-ARCHIVO = 'rodales.csv'
+ARCHIVO_R = 'rodales.csv'
+ARCHIVO_C = 'colindancias.csv'
 
 def validar_rodal():
     ...

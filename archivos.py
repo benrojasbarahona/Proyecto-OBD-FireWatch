@@ -13,7 +13,6 @@ def escribe_rodales(file_clientes:str, DICC_RODALES: dict) -> bool:
 
  
 
- #hola
 
 def test():
     # Esta función prueba las funciones de este módulo
