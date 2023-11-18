@@ -20,22 +20,14 @@ def main():
     root.geometry("800x600")
     root.minsize(800, 600)
 
-    # Cargar imagen del logo
-
-    # Widget Label para mostrar el logo en la parte superior y centrada
-
-    img_logo = tk.PhotoImage(file="assets/logo.png")
     img_consulta = tk.PhotoImage(file="assets/iconos/consultare.png").subsample(2, 2)
     img_ingresar = tk.PhotoImage(file="assets/iconos/1.png").subsample(2, 2)
     img_incendio = tk.PhotoImage(file="assets/iconos/2.png").subsample(2, 2)
     img_background = tk.PhotoImage(file="assets/iconos/fondo_verde.png")
     label_bg = tk.Label(root, image=img_background).place(x=-0, y=0)
     #img_nube = tk.PhotoImage(file="assets/iconos/nube.png").subsample(25, 25)
-    #boton_guardar = ttk.Button(root, image=img_nube).grid(row=0, column=0)
 
-    label_logo = tk.Label(root, image=img_logo, bg="#675F2A")
-    label_logo.grid(row=0, column=1, columnspan=5, pady=(10, 0))
-    
+    #boton_guardar = ttk.Button(root, image=img_nube).grid(row=0, column=0)
     boton_ingresar = ttk.Button(root, image=img_ingresar, command=lambda: ventana_ingresar()).grid(row=1, column=1)
     boton_incendio = ttk.Button(root, image=img_incendio, command=lambda: ventana_incendio()).grid(row=1, column=3)
     boton_consulta = ttk.Button(root, image=img_consulta, command=lambda: ventana_consulta()).grid(row=1, column=5)
