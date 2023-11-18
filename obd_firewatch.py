@@ -6,11 +6,6 @@ import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
 
-
-import tkinter as tk
-import tkinter.messagebox as msgbox
-import tkinter.ttk as ttk
-
 def main():
     root = tk.Tk()
     root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize=50, weight=1)
@@ -19,26 +14,30 @@ def main():
     #dimensiones de la pantalla principal para no poder achicarla
     root.geometry("800x600")
     root.minsize(800, 600)
+    root.configure(bg="#675F2A") # Cambia el color de fondo de la ventana
 
-    # Cargar imagen del logo
+    # Configuración de imágenes y pantalla principal
+    img_background = tk.PhotoImage(file="assets/iconos/background.png")
+    canvas_bg = tk.Canvas(root, width=root.winfo_reqwidth(), height=root.winfo_reqheight(), bg="#675F2A")
+    canvas_bg.pack(fill="both", expand=True)
+    canvas_bg.create_image(0, 0, anchor="nw", image=img_background)
 
-    # Widget Label para mostrar el logo en la parte superior y centrada
-
-    img_logo = tk.PhotoImage(file="assets/logo.png")
+    img_logo = tk.PhotoImage(file="assets/iconos/logo.png")
     img_consulta = tk.PhotoImage(file="assets/iconos/consultare.png").subsample(2, 2)
     img_ingresar = tk.PhotoImage(file="assets/iconos/1.png").subsample(2, 2)
     img_incendio = tk.PhotoImage(file="assets/iconos/2.png").subsample(2, 2)
-    img_background = tk.PhotoImage(file="assets/iconos/fondo_verde.png")
-    label_bg = tk.Label(root, image=img_background).place(x=-0, y=0)
-    #img_nube = tk.PhotoImage(file="assets/iconos/nube.png").subsample(25, 25)
-    #boton_guardar = ttk.Button(root, image=img_nube).grid(row=0, column=0)
 
     label_logo = tk.Label(root, image=img_logo, bg="#675F2A")
-    label_logo.grid(row=0, column=1, columnspan=5, pady=(10, 0))
-    
-    boton_ingresar = ttk.Button(root, image=img_ingresar, command=lambda: ventana_ingresar()).grid(row=1, column=1)
-    boton_incendio = ttk.Button(root, image=img_incendio, command=lambda: ventana_incendio()).grid(row=1, column=3)
-    boton_consulta = ttk.Button(root, image=img_consulta, command=lambda: ventana_consulta()).grid(row=1, column=5)
+    #label_logo.grid(row=0, column=1, columnspan=5,)
+
+    boton_ingresar = ttk.Button(root, image=img_ingresar, command=lambda: ventana_ingresar())
+    boton_ingresar.grid(row=1, column=1)
+
+    boton_incendio = ttk.Button(root, image=img_incendio, command=lambda: ventana_incendio())
+    boton_incendio.grid(row=1, column=3)
+
+    boton_consulta = ttk.Button(root, image=img_consulta, command=lambda: ventana_consulta())
+    boton_consulta.grid(row=1, column=5)
 
     def ventana_ingresar():
         ventana_ingr = tk.Toplevel() # crea ventana ingresar rodales
@@ -47,20 +46,22 @@ def main():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
 
     def ventana_consulta():
-        #DIMENSIONES DE LA VENTANA
+        # DIMENSIONES DE LA VENTANA
         ventana_cons = tk.Toplevel()
         ventana_cons.geometry("650x250")
         ventana_cons.minsize(650, 250)
         ventana_cons.configure(bg="#675F2A")  # Cambia el color de fondo de la ventana
-        ventana_cons.columnconfigure([0, 1, 2, 3, 4], minsize=25, weight=1)
-        ventana_cons.rowconfigure([0, 1, 2, 3, 4], minsize=25, weight=1)
         ventana_cons.title('OBD Firewatch - Consultar')
+
+        # Crear un Frame dentro de la ventana_cons
+        frame_consulta = tk.Frame(ventana_cons, bg="#675F2A")
+        frame_consulta.pack(expand=True, fill="both")
 
         # Configuro entry con texto temporal
         def temp_text(e):
             entrada_busqueda.delete(0, "end")
 
-        entrada_busqueda = tk.Entry(ventana_cons, width=30, borderwidth=2, bg="white", fg="black")  # Establece el color de fondo y letra
+        entrada_busqueda = tk.Entry(frame_consulta, width=30, borderwidth=2, bg="white", fg="black")
         entrada_busqueda.bind("<FocusIn>", temp_text)
         entrada_busqueda.grid(row=1, column=1, sticky="w")
         entrada_busqueda.insert(0, "Ejemplo: R1")
