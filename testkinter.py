@@ -24,6 +24,11 @@ def main():
 
     def ventana_ingresar():
         ventana_ingr = tk.Toplevel() # crea ventana ingresar rodales
+        #ventana_ingr.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
+        #ventana_ingr.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1) 
+        boton_guardar = ttk.Button(ventana_ingr, image=img_nube).grid(row=0,column=0)
+        tk.Label(ventana_ingr, text = "ID del Rodal").grid(row=1,column=1,sticky="w",columnspan=3)
+
 
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
@@ -76,7 +81,7 @@ def main():
                        value = "Propietario", command=sel).grid(row=4,column=1,sticky="w")
 
         mensaje = tk.Label(ventana_cons, text = "Ingrese el rodal que desea")
-        mensaje.grid(row=0,column=1,sticky="w")
+        mensaje.grid(row=0,column=1,sticky="w",columnspan=3)
 
     root.mainloop()
 
