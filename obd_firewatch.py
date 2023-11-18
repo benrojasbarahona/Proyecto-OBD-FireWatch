@@ -28,7 +28,7 @@ def main():
     img_incendio = tk.PhotoImage(file="assets/iconos/2.png").subsample(2, 2)
 
     label_logo = tk.Label(root, image=img_logo, bg="#675F2A")
-    #label_logo.grid(row=0, column=1, columnspan=5,)
+    label_logo.grid(row=0, column=1, columnspan=5)
 
     boton_ingresar = ttk.Button(root, image=img_ingresar, command=lambda: ventana_ingresar())
     boton_ingresar.grid(row=1, column=1)
@@ -81,21 +81,23 @@ def main():
             entrada_busqueda.insert(0, texto_temporal)
             ventana_cons.focus_set()
 
-        tk.Radiobutton(ventana_cons, text="Rodal", variable=consulta,
-                        value="Rodal", command=sel, bg="#675F2A", fg="white").grid(row=2, column=1, sticky="w")  # Cambia el color de fondo y letra
-        tk.Radiobutton(ventana_cons, text="Hectáreas y tipo de bosque", variable=consulta,
-                        value="Bosque", command=sel, bg="#675F2A", fg="white").grid(row=3, column=1, sticky="w")  # Cambia el color de fondo y letra
-        tk.Radiobutton(ventana_cons, text="Propietario", variable=consulta,
-                        value="Propietario", command=sel, bg="#675F2A", fg="white").grid(row=4, column=1, sticky="w")  # Cambia el color de fondo y letra
+        tk.Radiobutton(frame_consulta, text="Rodal", variable=consulta,
+                value="Rodal", command=sel, bg="#675F2A", fg="white").grid(row=2, column=1, sticky="w")
 
-        mensaje = tk.Label(ventana_cons, text="Consultar por", bg="#675F2A", fg="white")  # Cambia el color de fondo y letra
-        mensaje.grid(row=0, column=1, sticky="w", padx=(10, 0))  # Ajusta el margen izquierdo de mensaje
+        tk.Radiobutton(frame_consulta, text="Hectáreas y tipo de bosque", variable=consulta,
+                        value="Bosque", command=sel, bg="#675F2A", fg="white").grid(row=3, column=1, sticky="w")
+
+        tk.Radiobutton(frame_consulta, text="Propietario", variable=consulta,
+                        value="Propietario", command=sel, bg="#675F2A", fg="white").grid(row=4, column=1, sticky="w")
+
+        mensaje = tk.Label(frame_consulta, text="Consultar por", bg="#675F2A", fg="white")
+        mensaje.grid(row=0, column=1, sticky="w", padx=(10, 0))
 
         # Columna al lado de consultar, con texto que explique cómo consultar
-        info_frame = tk.Frame(ventana_cons, borderwidth=2, relief="groove", bg="#675F2A")  # Cambia el color de fondo del marco
+        info_frame = tk.Frame(frame_consulta, borderwidth=2, relief="groove", bg="#675F2A")
         info_frame.grid(row=0, column=2, rowspan=5, sticky="nsew", padx=(10, 10), pady=(10, 10))
 
-        info_explicativo = tk.Label(info_frame, text="¿Cómo consultar?", bg="#675F2A", fg="white")  # Cambia el color de fondo y letra
+        info_explicativo = tk.Label(info_frame, text="¿Cómo consultar?", bg="#675F2A", fg="white")
         info_explicativo.grid(row=0, column=0, sticky="w", padx=(10, 10), pady=(10, 10))
 
         # Nuevo texto explicativo
@@ -106,7 +108,7 @@ def main():
                             "y un guion, si es que desea además, preguntar sobre un determinado rango de rodales. Por ejemplo, "
                             "si usted escribe \"R1, R3-R6, R9\" en pantalla obtendrá la información de los rodales R1, R3, R4, R5, R6 y R9.")
 
-        info_explicativo = tk.Label(info_frame, text=texto_explicativo, wraplength=300, justify="left", bg="#675F2A", fg="white")  # Cambia el color de fondo y letra
+        info_explicativo = tk.Label(info_frame, text=texto_explicativo, wraplength=300, justify="left", bg="#675F2A", fg="white")
         info_explicativo.grid(row=1, column=0, sticky="w", padx=(10, 10), pady=(10, 10))
 
 
