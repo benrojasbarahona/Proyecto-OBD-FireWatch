@@ -1,5 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# Esta es la capa de , es decir, acá está main() y
+# todo lo relacionado a tkinter, es lo que el USUARIO ve.
+
+import logica as log # se imoorta la capa de negocio
+import tkinter as tk
+import tkinter.messagebox as msgbox
+import tkinter.ttk as ttk
+
 
 import tkinter as tk
 import tkinter.messagebox as msgbox
