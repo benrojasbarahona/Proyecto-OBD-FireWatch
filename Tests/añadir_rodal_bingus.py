@@ -86,6 +86,17 @@ def main():
  2. Salir y guardar
  3. Salir sin guardar
  > """
+    
+    # Variables colindancias
+    norte, noreste, noroeste, sur, sureste, suroeste = ["none", "none", "none", "none", "none", "none"]
+    referencia_coordenadas = {
+        "N" : "S",
+        "NE" : "SW",
+        "NW" : "SE",
+        "S" : "N",
+        "SE" : "NW",
+        "SW" : "NE"
+    }
 
     # Main loop
     loop = True
@@ -152,7 +163,41 @@ def main():
                 print(f'Bosque Nativo: %{pb_nativo}\nBosque Exótico: %{pb_exotico}\n')
 
                 # Colindancias (ohno)
-                ...
+                colin_loop = True
+                while colin_loop:
+                    while True:
+                        try:
+                            opcion = int(input(f"\n> Asigne las colindancias del rodal:\n1. Norte -> {norte}\n2. Noreste -> {noreste}\n3. Noroeste -> {noroeste}\n4. Suroeste -> {suroeste}\n5. Sureste -> {sureste}\n6. Sur -> {sur}\n7. Listo\n> "))
+                            if opcion not in [1, 2, 3, 4, 5, 6, 7]:
+                                raise ValorInvalidoError
+                            break
+                        except ValueError: print("< Ingrese un caracter válido >")
+                        except ValorInvalidoError: print("< Ingrese un valor válido >")
+                    
+                    # Asignar colindancias
+                    match opcion:
+                        # Norte
+                        case 1:
+                            ...
+                        # Noreste
+                        case 2:
+                            ...
+                        # Noroeste
+                        case 3:
+                            ...
+                        # Suroeste
+                        case 4:
+                            ...
+                        # Sureste
+                        case 5:
+                            ...
+                        # Sur
+                        case 6:
+                            ...
+                        # Salir
+                        case 7:
+                            colin_loop = False
+                            print(f"\nResumen del rodal ingresado:\nID: {id_rodal}\nPropietario: {propietario}\n% Bosque nativo: {pb_nativo}\n% Bosque exótico: {pb_exotico}\n")
 
             # 2. SALIR Y GUARDAR
             case 2:
