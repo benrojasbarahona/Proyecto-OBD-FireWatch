@@ -1,18 +1,16 @@
 import tkinter as tk
 
-
 root = tk.Tk()
 
-def create_top():
-    win = tk.Toplevel(root)
-    f1 = tk.Frame(win)
-    f1.grid(row=0, column=0)
-    f2 = tk.Frame(win)
-    f2.grid(row=1, column=1)
-    tk.Label(f1, text="FRAME 1").grid()
-    tk.Label(f2, text="FRAME 2").grid()
+user_input = tk.StringVar(root)
+answer = 3
 
-tk.Button(root, text="ABC", command=create_top).grid(column=0, row=0)
-tk.Label(root, text="FOO").grid(column=1, row=1)
+def verify():
+    print(int(user_input.get()) == answer)  # calling get() here!
+
+entry = tk.Entry(root, textvariable=user_input)
+entry.pack()
+check = tk.Button(root, text='check 3', command=verify)
+check.pack()
 
 root.mainloop()

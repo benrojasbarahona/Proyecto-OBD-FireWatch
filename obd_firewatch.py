@@ -6,6 +6,35 @@ import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
 
+def validar_id_rodal(id_rodal, ids_rodales):
+    #Verifica que no se haya ingresado un id_rodal vacío, que el primer caracter sea una R o r y que el resto sean números
+    while True:
+        while id_rodal == "" or id_rodal == " ":
+            id_rodal = input("¡Error! La primera letra debe ser una 'R' seguido de números: ")
+        while id_rodal[0] != "R" and id_rodal[0] != "r":
+            id_rodal = input("¡Error! La primera letra debe ser una 'R' seguido de números: ")
+        while not id_rodal[1:].isdigit():
+            id_rodal = input("¡Error! La primera letra debe ser una 'R' seguido de números: ")
+        id_rodal = id_rodal.upper()
+        while id_rodal in ids_rodales:
+            id_rodal = input("¡Error! Ese ID ya rodal ya está registrado. Ingrese otro: ")
+            id_rodal = validar_id_rodal(id_rodal)
+        return id_rodal
+    
+def cadena_no_vacia(cadena):
+    #Verifica que la cadena no esté vacía o sean solamente espacios
+    while cadena == "" or cadena.isspace():
+        cadena = input("¡Error! No puede estar vacío: ")
+    return cadena
+
+
+def validar_porcentajes(porcentaje_bosque_nativo, porcentaje_bosque_exotico):
+    if porcentaje_bosque_nativo + porcentaje_bosque_exotico == 100:
+        return True
+    else:
+        return False
+
+
 def main():
     root = tk.Tk() # crea ventana principal
     root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize = 50, weight = 1)
@@ -18,23 +47,67 @@ def main():
     label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
     img_nube = tk.PhotoImage(file = "assets/iconos/nube.png").subsample(25,25)
 
-    boton_guardar = ttk.Button(root, image=img_nube).grid(row=0,column=0)
+    def guardar_archivo():
+            """Handler boton guardar archivo"""
+            print("estoy guardando wiiiiiiiiiii")
+
+    boton_guardar = ttk.Button(root, image=img_nube, command=guardar_archivo).grid(row=0,column=0)
     boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:ventana_ingresar()).grid(row=1,column=1)
     boton_incendio = ttk.Button(root, image=img_incendio, command=lambda:ventana_incendio()).grid(row=1,column=3)
     boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:ventana_consulta()).grid(row=1,column=5)
+
+    def ventana_error_ingreso(msg:str):
+        ventana_erorr_ing = tk.Toplevel()
+        ventana_erorr_ing.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
+        ventana_erorr_ing.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
+        tk.Label(ventana_erorr_ing, text = msg).grid(row=1,column=2,sticky="w")
+        boton_cerrar= ttk.Button(ventana_erorr_ing, text = "OK", command = ventana_erorr_ing.destroy)
+        boton_cerrar.grid(row=3,column=2)
+
+    def ventana_ingreso_correcto():
+        ventana_ing_correcto = tk.Toplevel()
+        ventana_ing_correcto.columnconfigure([0, 1, 2], minsize = 250, weight = 1)
+        ventana_ing_correcto.rowconfigure([0, 1, 2], minsize = 250, weight = 1)
+
 
     def ventana_ingresar():
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
         ventana_ingr.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         ventana_ingr.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        
+
         panel_izquierdo=tk.Frame(ventana_ingr)
         panel_izquierdo.grid(row=1,column=1)
         panel_derecho=tk.Frame(ventana_ingr,highlightbackground="black", highlightthickness=1)
         panel_derecho.grid(row=1,column=3)
         panel_abajo=tk.Frame(ventana_ingr,relief="raised")
         panel_abajo.grid(row=2,column=1,rowspan=2)
-        boton_guardar = ttk.Button(ventana_ingr, image=img_nube).grid(row=0,column=0,sticky="N")
+
+        def validaciones_entradas(entradas: list) -> bool:
+            class ErrorIngreso (Exception):
+                pass
+            try:
+                ...
+            except ErrorIngreso as mensaje:
+                ventana_error_ingreso(mensaje)
+        
+        boton_guardar = ttk.Button(ventana_ingr, image=img_nube, command=guardar_archivo).grid(row=0,column=0,sticky="N")
+        
+        def boton_entrada_rodal():
+            """Handler validaciones archivo"""
+            print("primero valido, despues retorno o tiro error")
+            try:
+                id_rodal = str(entrada_rodal.get())
+                nativo = int(entrada_nativo.get())
+                exotico = int(entrada_exotico.get())
+                propietario = str(entrada_propietario.get())
+                
+            except AttributeError:
+                ventana_error_ingreso("Error, casillas vacias")
+                
+            datos_rodal = [id_rodal, nativo, exotico, propietario]
+            if validaciones_entradas(datos_rodal) == False:
+                ventana_error_ingreso()
+
 
         #Entrada Rodal
         tk.Label(panel_izquierdo, text = "ID del Rodal").grid(row=1,column=1,sticky="w")
@@ -44,20 +117,20 @@ def main():
         #Entrada Bosque Nativo
         tk.Label(panel_izquierdo, text = "% Bosque Nativo").grid(row=4,column=1,sticky="w")
         tk.Label(panel_izquierdo, text = "(Ejemplo: 80)",fg="grey").grid(row=4,column=2,sticky="w")
-        entrada_rodal = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2).grid(row=5,column=1,columnspan=3)
+        entrada_nativo = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2).grid(row=5,column=1,columnspan=3)
 
         #Entrada Bosque Exótico
         tk.Label(panel_izquierdo, text = "% Bosque Exótico").grid(row=7,column=1,sticky="w")
         tk.Label(panel_izquierdo, text = "(Ejemplo: 20)",fg="grey").grid(row=7,column=2,sticky="w")
-        entrada_rodal = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2).grid(row=8,column=1,columnspan=3)
+        entrada_exotico = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2).grid(row=8,column=1,columnspan=3)
 
         #Entrada Propietario
         tk.Label(panel_izquierdo, text = "Nombre del Propietario").grid(row=10,column=1,sticky="w")
         tk.Label(panel_izquierdo, text = "(Ejemplo: Inv. Rojas)",fg="grey").grid(row=10,column=2,sticky="w")
-        entrada_rodal = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2).grid(row=11,column=1,columnspan=3)
+        entrada_propietario = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2).grid(row=11,column=1,columnspan=3)
 
         #Boton Añadir Rodal
-        boton_rodal = ttk.Button(panel_abajo, text = "Añadir Rodal").grid(row=1,column=1)
+        boton_rodal = ttk.Button(panel_abajo, text = "Añadir Rodal", command=boton_entrada_rodal).grid(row=1,column=1)
 
         tk.Label(panel_derecho, text = "Colindancias").grid(row=0,column=2,sticky="w")
 
