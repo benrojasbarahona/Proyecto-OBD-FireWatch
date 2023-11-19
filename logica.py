@@ -2,7 +2,8 @@
 
 import archivos as ar # se importa la capa de datos
 
-global DICC_RODALES 
+global DICC_RODALES
+global DICC_
 
 ARCHIVO_R = 'rodales.csv'
 ARCHIVO_C = 'colindancias.csv'
