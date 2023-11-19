@@ -19,33 +19,11 @@ Para inicializar (crear) un rodal:
 
             rodal.propietario = "Simultaneo Manzanita"
             print(rodal.propietario) // printea Simultaneo Manzanita
-
-
 """
-class Rodal:
-    """ Para crear un rodal:\n 
-        Rodal(Id, propietario, bosque_nativo, bosque_exotico, colindancias...)"""
-    
-    def __init__(self,
-            id_rodal: str, propietario: str, nativo: int, exotico: int,
-            col_N = 0, col_NW = 0, col_NE = 0, 
-            col_S = 0, col_SW = 0, col_SE = 0): # Por defecto es colindante a 0, osea a nada
-        # Datos
-        self.id = id_rodal
-        self.propietario = propietario
-        self.bosque_nativo = nativo
-        self.bosque_exotico = exotico
-
-        # Colindancias
-        self.colin_norte = col_N
-        self.colin_noreste = col_NE
-        self.colin_noroeste = col_NW
-        self.colin_sur = col_S
-        self.colin_sureste = col_SE
-        self.colin_suroeste = col_SW
 
 class OpcionInvalidaError(Exception): pass
 class ValorInvalidoError(Exception): pass
+class RodalYaExistenteError(Exception): pass
 
 # Funciones que ojalá se puedan reciclar
 def generar_rodal(
@@ -53,32 +31,69 @@ def generar_rodal(
         propietario: str, 
         nativo: int, 
         exotico: int,
-        colin_N = 0, colin_NW = 0, colin_NE = 0, 
-        colin_S = 0, colin_SW = 0, colin_SE = 0
+        colin_N = "none", colin_NW = "none", colin_NE = "none", 
+        colin_S = "none", colin_SW = "none", colin_SE = "none"
         ):
-    ...
+    global dicc_rodales
 
-def guardar_en_archivo(rodales: list):
+    colindancias = {
+        'N' : colin_N,
+        'NW' : colin_NW,
+        'NE' : colin_NE,
+        'S' : colin_S,
+        'SE' : colin_SE,
+        'SW' : colin_SW
+    }
+
+    datos_rodal = {
+        'propietario' : propietario,
+        'b_nativo' : nativo,
+        'b_exotico' : exotico,
+        'colindancias' : colindancias
+    }
+
+    dicc_rodales[id_rodal] = datos_rodal
+
+
+def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str):
+    referencia_coordenadas = {
+        "N" : "S",
+        "NE" : "SW",
+        "NW" : "SE",
+        "S" : "N",
+        "SE" : "NW",
+        "SW" : "NE"}
+    
+    if not rodal_colindante == "none":
+        # Asignar colindancia opuesta
+        dicc_rodales[rodal_colindante]["colindancias"][referencia_coordenadas[direccion]] = rodal_entregado
+
+def leer_en_archivo():
+    # Inicializar archivos, en caso que no existan agregar headers
+    try:
+        with open('Tests/info_rodales.csv', 'r'): existe_rodales = True
+    except FileNotFoundError: existe_rodales = False
+
+    try:
+        with open('Tests/info_colindancias.csv', 'r'): existe_colindancias = True
+    except FileNotFoundError: existe_colindancias = False
+
+    if not existe_rodales:
+        with open('Tests/info_rodales.csv', 'w') as headers:
+            headers.write("ID, Nombre_Propietario, %_Bosque_nativo, %_Bosque_exotico")
+    
+    if not existe_colindancias:
+        with open('Tests/info_colindancias.csv', 'w') as headers:
+            headers.write("ID, norte, noreste, noroeste, sur, sureste, suroeste")
+
+
+def guardar_en_archivo():
     ...
 
 # Programa
 def main():
-    # Inicializar archivos, en caso que no existan agregar headers
-    try:
-        with open('Tests/rodales.csv', 'r'): existe_rodales = True
-    except FileNotFoundError: existe_rodales = False
-
-    try:
-        with open('Tests/colindancias.csv', 'r'): existe_colindancias = True
-    except FileNotFoundError: existe_colindancias = False
-
-    if not existe_rodales:
-        with open('Tests/rodales.csv', 'w') as headers:
-            headers.write("ID, Nombre_Propietario, %_Bosque_nativo, %_Bosque_exotico")
-    
-    if not existe_colindancias:
-        with open('Tests/colindancias.csv', 'w') as headers:
-            headers.write("ID, norte, noreste, noroeste, sur, sureste, suroeste")
+    # Guardar todos los datos en variables
+    leer_en_archivo()
 
     mensaje = """<<< OBD Firewatch >>>\n
  Opciones:
@@ -87,16 +102,12 @@ def main():
  3. Salir sin guardar
  > """
     
+    global dicc_rodales
+    dicc_rodales = dict()
+    
     # Variables colindancias
-    norte, noreste, noroeste, sur, sureste, suroeste = ["none", "none", "none", "none", "none", "none"]
-    referencia_coordenadas = {
-        "N" : "S",
-        "NE" : "SW",
-        "NW" : "SE",
-        "S" : "N",
-        "SE" : "NW",
-        "SW" : "NE"
-    }
+    colin_norte,colin_noroeste,colin_noreste,colin_sur,colin_sureste,colin_suroeste = [0, 0, 0, 0, 0, 0]
+    rodal_colindante = "none"
 
     # Main loop
     loop = True
@@ -119,8 +130,11 @@ def main():
                     try:
                         id_rodal = int(input("\n> Ingrese el ID del rodal:\nEjemplo: R1, R2...\n> R"))
                         id_rodal = "R" + str(id_rodal)
+                        if id_rodal in dicc_rodales:
+                            raise RodalYaExistenteError
                         break
                     except ValueError: print("< Ingrese un caracter válido >")
+                    except RodalYaExistenteError: print("< El rodal ya existe >")
 
                 # Preguntar por el propietario
                 propietario = input("\n> Ingrese el nombre del propietario:\n> ")
@@ -162,42 +176,113 @@ def main():
 
                 print(f'Bosque Nativo: %{pb_nativo}\nBosque Exótico: %{pb_exotico}\n')
 
-                # Colindancias (ohno)
-                colin_loop = True
+                # Colindancias
+                if not dicc_rodales: colin_loop = False
+                else: colin_loop = True
+
                 while colin_loop:
-                    while True:
-                        try:
-                            opcion = int(input(f"\n> Asigne las colindancias del rodal:\n1. Norte -> {norte}\n2. Noreste -> {noreste}\n3. Noroeste -> {noroeste}\n4. Suroeste -> {suroeste}\n5. Sureste -> {sureste}\n6. Sur -> {sur}\n7. Listo\n> "))
-                            if opcion not in [1, 2, 3, 4, 5, 6, 7]:
-                                raise ValorInvalidoError
-                            break
-                        except ValueError: print("< Ingrese un caracter válido >")
-                        except ValorInvalidoError: print("< Ingrese un valor válido >")
+                    try:
+                        opcion = int(input(f"\n> Asigne las colindancias del rodal:\n1. Norte\n2. Noreste\n3. Noroeste\n4. Suroeste\n5. Sureste\n6. Sur\n> "))
+                        if opcion not in [1, 2, 3, 4, 5, 6]:
+                            raise ValorInvalidoError
+                        break
+                    except ValueError: print("< Ingrese un caracter válido >")
+                    except ValorInvalidoError: print("< Ingrese un valor válido >")
                     
-                    # Asignar colindancias
+                # Asignar colindancias
+                if colin_loop:
                     match opcion:
                         # Norte
                         case 1:
-                            ...
+                            while True:
+                                try: 
+                                    rodal_colindante = int(input("\n> Rodal al norte:\n> R"))
+                                    rodal_colindante = "R" + str(rodal_colindante)
+                                    if rodal_colindante not in dicc_rodales:
+                                        raise OpcionInvalidaError
+                                    colin_norte = rodal_colindante
+                                    info_colin = "N"
+                                    break
+                                except ValueError: print("< Ingrese un caracter válido >")
+                                except OpcionInvalidaError: print("< El rodal no existe >")
                         # Noreste
                         case 2:
-                            ...
+                            while True:
+                                try: 
+                                    rodal_colindante = int(input("\n> Rodal al noreste:\n> R"))
+                                    rodal_colindante = "R" + str(rodal_colindante)
+                                    if rodal_colindante not in dicc_rodales:
+                                        raise OpcionInvalidaError
+                                    colin_noreste = rodal_colindante
+                                    info_colin = "NE"
+                                    break
+                                except ValueError: print("< Ingrese un caracter válido >")
+                                except OpcionInvalidaError: print("< El rodal no existe >")
                         # Noroeste
                         case 3:
-                            ...
+                            while True:
+                                try: 
+                                    rodal_colindante = int(input("\n> Rodal al noroeste:\n> R"))
+                                    rodal_colindante = "R" + str(rodal_colindante)
+                                    if rodal_colindante not in dicc_rodales:
+                                        raise OpcionInvalidaError
+                                    colin_noroeste = rodal_colindante
+                                    info_colin = "NW"
+                                    break
+                                except ValueError: print("< Ingrese un caracter válido >")
+                                except OpcionInvalidaError: print("< El rodal no existe >")
                         # Suroeste
                         case 4:
-                            ...
+                            while True:
+                                try: 
+                                    rodal_colindante = int(input("\n> Rodal al suroeste:\n> R"))
+                                    rodal_colindante = "R" + str(rodal_colindante)
+                                    if rodal_colindante not in dicc_rodales:
+                                        raise OpcionInvalidaError
+                                    colin_suroeste = rodal_colindante
+                                    info_colin = "SW"
+                                    break
+                                except ValueError: print("< Ingrese un caracter válido >")
+                                except OpcionInvalidaError: print("< El rodal no existe >")
                         # Sureste
                         case 5:
-                            ...
+                            while True:
+                                try: 
+                                    rodal_colindante = int(input("\n> Rodal al sureste:\n> R"))
+                                    rodal_colindante = "R" + str(rodal_colindante)
+                                    if rodal_colindante not in dicc_rodales:
+                                        raise OpcionInvalidaError
+                                    colin_sureste = rodal_colindante
+                                    info_colin = "SE"
+                                    break
+                                except ValueError: print("< Ingrese un caracter válido >")
+                                except OpcionInvalidaError: print("< El rodal no existe >")
                         # Sur
                         case 6:
-                            ...
-                        # Salir
-                        case 7:
-                            colin_loop = False
-                            print(f"\nResumen del rodal ingresado:\nID: {id_rodal}\nPropietario: {propietario}\n% Bosque nativo: {pb_nativo}\n% Bosque exótico: {pb_exotico}\n")
+                            while True:
+                                try: 
+                                    rodal_colindante = int(input("\n> Rodal al sur:\n> R"))
+                                    rodal_colindante = "R" + str(rodal_colindante)
+                                    if rodal_colindante not in dicc_rodales:
+                                        raise OpcionInvalidaError
+                                    colin_sur = rodal_colindante
+                                    info_colin = "S"
+                                    break
+                                except ValueError: print("< Ingrese un caracter válido >")
+                                except OpcionInvalidaError: print("< El rodal no existe >")
+                    
+                    # Pendiente: Validar que el rodal referencia no tenga un rodal existente en la misma posición
+                    # Implementar función recursiva
+                    asignar_colindancias(id_rodal, rodal_colindante, info_colin)
+                    
+                print(f"\nResumen del rodal ingresado:\nID: {id_rodal}\nPropietario: {propietario}\n% Bosque nativo: {pb_nativo}\n% Bosque exótico: {pb_exotico}\n")
+                generar_rodal(
+                    id_rodal, propietario, pb_nativo, pb_exotico,
+                    colin_N = colin_norte, colin_NE = colin_noreste, colin_NW = colin_noroeste,
+                    colin_S = colin_sur, colin_SE = colin_sureste, colin_SW = colin_suroeste
+                )
+                print(dicc_rodales)
+                #print(f"N : {colin_norte}, NE : {colin_noreste}, NW : {colin_noroeste}, S : {colin_sur}, SE : {colin_sureste}, SW : {colin_suroeste}, Col : {rodal_colindante}")
 
             # 2. SALIR Y GUARDAR
             case 2:
