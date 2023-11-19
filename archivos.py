@@ -35,8 +35,7 @@ def escribe_colindancias(archivo_colindancias:str) -> dict:
 
 
 def test():
-    # Esta función prueba las funciones de este módulo
-    ...
+   ...
 
 if __name__ == "__main__":
     test()
