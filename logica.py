@@ -2,10 +2,23 @@
 
 import archivos as ar # se importa la capa de datos
 
-global DICC_RODALES 
+global DICC_RODALES
+global DICC_COLINDANCIAS
 
 ARCHIVO_R = 'rodales.csv'
 ARCHIVO_C = 'colindancias.csv'
+
+def lee_archivo_rodales():
+    global DICC_RODALES
+    """invoca la lectura de archivo en la capa de datos, deja datos 
+    la variable local DICC_RODALES"""
+    DICC_RODALES = ar.lee_rodales(ARCHIVO_R)
+
+def lee_archivo_colindancias():
+    global DICC_COLINDANCIAS
+    """invoca la lectura de archivo en la capa de datos, deja datos 
+    la variable local DICC_COLINDANCIAS"""
+    DICC_COLINDANCIAS = ar.lee_colindancias(ARCHIVO_C)
 
 def validar_rodal():
     ...
@@ -43,3 +56,10 @@ def consultar_hect_propietario():
     ...
 def consulta_rango_rodales():
     ...
+
+def test():
+    lee_archivo_rodales()
+    lee_archivo_colindancias()
+
+if __name__ == "__main__":
+    test()
