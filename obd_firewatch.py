@@ -24,12 +24,36 @@ def main():
     boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:ventana_consulta()).grid(row=1,column=5)
 
     def ventana_ingresar():
-        ventana_ingr = tk.Toplevel() # crea ventana ingresar rodales
+        ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
         #ventana_ingr.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         #ventana_ingr.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1) 
         boton_guardar = ttk.Button(ventana_ingr, image=img_nube).grid(row=0,column=0)
-        tk.Label(ventana_ingr, text = "ID del Rodal").grid(row=1,column=1,sticky="w",columnspan=3)
+        #Entrada Rodal
+        tk.Label(ventana_ingr, text = "ID del Rodal").grid(row=1,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: R1)",fg="grey").grid(row=1,column=2,sticky="w")
+        entrada_rodal = tk.Entry(ventana_ingr, width = 40, borderwidth = 2).grid(row=2,column=1,columnspan=3)
+        #Entrada Bosque Nativo
+        tk.Label(ventana_ingr, text = "% Bosque Nativo").grid(row=4,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: 80)",fg="grey").grid(row=4,column=2,sticky="w")
+        entrada_rodal = tk.Entry(ventana_ingr, width = 40, borderwidth = 2).grid(row=5,column=1,columnspan=3)
+        #Entrada Bosque Exótico
+        tk.Label(ventana_ingr, text = "% Bosque Exótico").grid(row=7,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: 20)",fg="grey").grid(row=7,column=2,sticky="w")
+        entrada_rodal = tk.Entry(ventana_ingr, width = 40, borderwidth = 2).grid(row=8,column=1,columnspan=3)
+        #Entrada Propietario
+        tk.Label(ventana_ingr, text = "Nombre del Propietario").grid(row=10,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: Inv. Rojas)",fg="grey").grid(row=10,column=2,sticky="w")
+        entrada_rodal = tk.Entry(ventana_ingr, width = 40, borderwidth = 2).grid(row=11,column=1,columnspan=3)
+        #Boton Añadir Rodal
+        boton_rodal = ttk.Button(ventana_ingr, text = "Añadir Rodal").grid(row=12,column=2,sticky="w")
+        
+        palen_lado=tk.Frame(ventana_ingr,relief="raised",background="#99fb99").grid(row=1,column=5,rowspan=12,columnspan=3)
 
+        r1=tk.Label(palen_lado, text = "ID del Rodal")
+        r1.grid(row=1,column=1,sticky="w")
+        r2=tk.Label(palen_lado, text = "(Ejemplo: R1)",fg="grey")
+        r2.grid(row=1,column=2,sticky="w")
+        entrada_rodal = tk.Entry(palen_lado, width = 40, borderwidth = 2).grid(row=2,column=1,columnspan=3)
 
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
