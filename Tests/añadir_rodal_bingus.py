@@ -351,20 +351,22 @@ def main():
                         #print(f"{id_rodal} : {rodal_colindante} : {info_colin}")
                     
                 print(f"\nResumen del rodal ingresado:\nID: {id_rodal}\nPropietario: {propietario}\n% Bosque nativo: {pb_nativo}\n% Bosque exótico: {pb_exotico}")
-                try: 
-                    print(f"Se encuentra al {referencia_coordenadas[info_colin]} de {rodal_colindante}\n")
-                    asignar_colindancias(id_rodal, rodal_colindante, info_colin)
-                except UnboundLocalError: pass
-                #print(f"N : {colin_norte}, NE : {colin_noreste}, NW : {colin_noroeste}, S : {colin_sur}, SE : {colin_sureste}, SW : {colin_suroeste}, Col : {rodal_colindante}")
-
+                # Primero se debe generar el rodal para que exista en el diccionario, luego se pueden actualizar las colindancias
                 generar_rodal(
                     id_rodal, propietario, pb_nativo, pb_exotico,
                     colin_N = colin_norte, colin_NE = colin_noreste, colin_NW = colin_noroeste,
                     colin_S = colin_sur, colin_SE = colin_sureste, colin_SW = colin_suroeste
                 )
+                # Luego se imprime la colindancia y se actualiza gracias a la funcion recursiva
+                try: 
+                    # Dentro de una excepcion en caso de que info_colin no exista
+                    print(f"Se encuentra al {referencia_coordenadas[info_colin]} de {rodal_colindante}\n")
+                    asignar_colindancias(id_rodal, rodal_colindante, info_colin)
+                except UnboundLocalError: pass
 
+                # -------------- debug --------------
                 for key,value in dicc_rodales.items():
-                    print(f"{key}   :   {value}")
+                    print(f"{key}   : {value}")
 
             # 2. SALIR Y GUARDAR
             case 2:
@@ -385,7 +387,5 @@ def main():
                 if seguro in ["n", "no"]:
                     print()
                 
-
-
 if __name__ == '__main__':
     main()
