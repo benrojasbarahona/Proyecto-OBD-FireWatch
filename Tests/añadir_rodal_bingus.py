@@ -108,7 +108,7 @@ def leer_en_archivo():
     
     if not existe_colindancias:
         with open('Tests/info_colindancias.csv', 'w') as headers:
-            headers.write("ID, norte, noreste, noroeste, sur, sureste, suroeste")
+            headers.write("ID, rodal colindante, direccion colindancia")
 
     # Rearmar dicc_rodales desde lo almacenado en el archivo
 
@@ -348,7 +348,7 @@ def main():
                                     except EspacioNoValidoError:
                                         print("\n< El espacio ya está siendo ocupado por otro rodal >") 
                                         invalido = True; break
-                        print(f"{id_rodal} : {rodal_colindante} : {info_colin}")
+                        #print(f"{id_rodal} : {rodal_colindante} : {info_colin}")
                     
                 print(f"\nResumen del rodal ingresado:\nID: {id_rodal}\nPropietario: {propietario}\n% Bosque nativo: {pb_nativo}\n% Bosque exótico: {pb_exotico}")
                 try: 
