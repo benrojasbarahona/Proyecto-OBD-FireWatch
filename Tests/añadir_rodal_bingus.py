@@ -33,17 +33,31 @@ coordenada_opuesta = {
 }
 # El value de cada key es para saber la vuelta por la que está pasando
 referencias_subprocesos = { 
-    "N" : {"NE": 1, "NW": 2},
-    "NE" : {"SE": 1, "N": 2},
-    "NW" : {"N": 1, "SW": 2},
-    "S" : {"SE": 1, "SW": 2},
-    "SE" : {"S": 1, "NE": 2},
-    "SW" : {"NW": 1, "S": 2}
+    "N" : ["NE", "NW"],
+    "NE" : ["SE", "N"],
+    "NW" : ["N", "SW"],
+    "S" : ["SE", "SW"],
+    "SE" : ["S", "NE"],
+    "SW" : ["NW", "S"]
 }
 # Referencia dependiendo de vuelta horaria o antihoraria
-referencia_horario = {}
+referencia_horario = {
+    "N": "SE",
+    "NE": "S",
+    "NW": "NE",
+    "S": "NW",
+    "SE": "SW",
+    "SW": "N"
+}
 
-referencia_antihorario = {}
+referencia_antihorario = {
+    "N": "SW",
+    "NE": "NW",
+    "NW": "S",
+    "S": "NE",
+    "SE": "N",
+    "SW": "SE"
+}
 
 # Funciones que ojalá se puedan reciclar
 def generar_rodal(
@@ -75,11 +89,17 @@ def generar_rodal(
     dicc_rodales[id_rodal] = datos_rodal
 
 
-def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str, Subproceso_innecesario = "none"):
+def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str):
+    """Actualiza todas las colindancias de los rodales en base a los rodales 
+    que se están agregando"""
 
+    # Asignar colindancia opuesta
     if not rodal_colindante == "none":
-        # Asignar colindancia opuesta
         dicc_rodales[rodal_colindante]["colindancias"][coordenada_opuesta[direccion]] = rodal_entregado
+    
+    # Comenzar el proceso de búsqueda de rodales vecinos
+    for subproceso in referencias_subprocesos[coordenada_opuesta[direccion]]:
+        print(subproceso)
 
 
 def validar_rodal(rodal_colindante: str, direccion: str) -> bool:
