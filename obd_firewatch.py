@@ -5,6 +5,7 @@ import logica as log # se imoorta la capa de negocio
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
+import añadir_rodal_bingus as bingus
 
 def validar_id_rodal(id_rodal, ids_rodales):
     #Verifica que no se haya ingresado un id_rodal vacío, que el primer caracter sea una R o r y que el resto sean números
@@ -20,13 +21,6 @@ def validar_id_rodal(id_rodal, ids_rodales):
             id_rodal = input("¡Error! Ese ID ya rodal ya está registrado. Ingrese otro: ")
             id_rodal = validar_id_rodal(id_rodal)
         return id_rodal
-    
-def cadena_no_vacia(cadena):
-    #Verifica que la cadena no esté vacía o sean solamente espacios
-    while cadena == "" or cadena.isspace():
-        cadena = input("¡Error! No puede estar vacío: ")
-    return cadena
-
 
 def validar_porcentajes(porcentaje_bosque_nativo, porcentaje_bosque_exotico):
     if porcentaje_bosque_nativo + porcentaje_bosque_exotico == 100:
@@ -98,22 +92,30 @@ def main():
         
         def boton_entrada_rodal():
             """Handler validaciones archivo"""
-            class ErrorEntradaVacia (Exception):
-                pass
-
+            datos_rodal = {}
             print("primero valido, despues retorno o tiro error")
             try:
-                id_rodal = entrada_rodal.get()
-                nativo = entrada_nativo.get()
-                exotico = entrada_exotico.get()
-                propietario = entrada_propietario.get() #llegar a diccionario
-                datos_rodal = [id_rodal, nativo, exotico, propietario]
-                for dato in datos_rodal:
-                    if dato == "":
-                        raise ErrorEntradaVacia("Error, alguna de las casillas esta vacia")
-                    
-            except ErrorEntradaVacia as msj:
-                ventana_error_ingreso(msj)
+                id_rodal = str(entrada_rodal.get())
+                nativo = int(entrada_nativo.get())
+                exotico = int(entrada_exotico.get())
+                propietario = str(entrada_propietario.get()) #llegar a diccionario de diccionario
+                datos_rodal[id_rodal] = {"propietario":propietario, "b_nativo":nativo,"b_exotico": exotico}
+                #dicc[id_rodal]'propietario' : propietario,
+                #'b_nativo' : nativo,'b_exotico' : exotico,'colindancias' : colindancias
+                #colindancias = {
+                                #'N' : colin_N,
+                                #'NW' : colin_NW,
+                                #'NE' : colin_NE,
+                                #'S' : colin_S,
+                                #'SE' : colin_SE,
+                                #'SW' : colin_SW
+                            #}
+                #Colindancias  0  o "" si no hay
+
+                msgbox.showinfo("Rodal","Rodal añadido correctamente")
+                
+            except ValueError:
+                ventana_error_ingreso("Error alguno de los valores esta vacio o es incorrecto")
 
             #ventana_ingreso_correcto()                
 
@@ -144,27 +146,27 @@ def main():
         tk.Label(panel_derecho, text = "Colindancias").grid(row=0,column=2,sticky="w")
 
         tk.Label(panel_derecho, text = "Norte").grid(row=1,column=1,sticky="w",padx=10)
-        entrada_norte = tk.Entry(panel_derecho, width = 40, borderwidth = 2)
+        entrada_norte = ttk.Combobox(panel_derecho, state = "readonly", values = ["","R1"])
         entrada_norte.grid(row=2,column=1,columnspan=3,padx=10)
 
         tk.Label(panel_derecho, text = "Noreste").grid(row=3,column=1,sticky="w",padx=10)
-        entrada_noreste = tk.Entry(panel_derecho, width = 40, borderwidth = 2)
+        entrada_noreste = ttk.Combobox(panel_derecho, state = "readonly",values = ["","R3"])
         entrada_noreste.grid(row=4,column=1,columnspan=3)
 
         tk.Label(panel_derecho, text = "Noroeste").grid(row=5,column=1,sticky="w",padx=10)
-        entrada_noroeste = tk.Entry(panel_derecho, width = 40, borderwidth = 2)
+        entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_noroeste.grid(row=6,column=1,columnspan=3)
 
         tk.Label(panel_derecho, text = "Sur").grid(row=7,column=1,sticky="w",padx=10)
-        entrada_sur = tk.Entry(panel_derecho, width = 40, borderwidth = 2)
+        entrada_sur = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_sur.grid(row=8,column=1,columnspan=3)
 
         tk.Label(panel_derecho, text = "Sureste").grid(row=9,column=1,sticky="w",padx=10)
-        entrada_sureste = tk.Entry(panel_derecho, width = 40, borderwidth = 2)
+        entrada_sureste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_sureste.grid(row=10,column=1,columnspan=3)
 
         tk.Label(panel_derecho, text = "Suroeste").grid(row=11,column=1,sticky="w",padx=10)
-        entrada_suroeste = tk.Entry(panel_derecho, width = 40, borderwidth = 2)
+        entrada_suroeste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_suroeste.grid(row=12,column=1,columnspan=3,pady=10)
 
         #Boton Añadir Rodal
