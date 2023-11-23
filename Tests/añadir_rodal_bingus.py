@@ -22,6 +22,29 @@ class ValorInvalidoError(Exception): pass
 class RodalYaExistenteError(Exception): pass
 class EspacioNoValidoError(Exception): pass
 
+# Metes una coordenada y te devuelve la opuesta
+coordenada_opuesta = {
+    "N" : "S",
+    "NE" : "SW",
+    "NW" : "SE",
+    "S" : "N",
+    "SE" : "NW",
+    "SW" : "NE"
+}
+# El value de cada key es para saber la vuelta por la que está pasando
+referencias_subprocesos = { 
+    "N" : {"NE": 1, "NW": 2},
+    "NE" : {"SE": 1, "N": 2},
+    "NW" : {"N": 1, "SW": 2},
+    "S" : {"SE": 1, "SW": 2},
+    "SE" : {"S": 1, "NE": 2},
+    "SW" : {"NW": 1, "S": 2}
+}
+# Referencia dependiendo de vuelta horaria o antihoraria
+referencia_horario = {}
+
+referencia_antihorario = {}
+
 # Funciones que ojalá se puedan reciclar
 def generar_rodal(
         id_rodal: str, 
@@ -52,27 +75,11 @@ def generar_rodal(
     dicc_rodales[id_rodal] = datos_rodal
 
 
-def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str):
+def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str, Subproceso_innecesario = "none"):
 
-    referencia_coordenadas = {
-        "N" : "S",
-        "NE" : "SW",
-        "NW" : "SE",
-        "S" : "N",
-        "SE" : "NW",
-        "SW" : "NE"
-    }
-    referencias_subprocesos = {
-        "N" : ["NE", "NW"],
-        "NE" : ["N", "SE"],
-        "NW" : ["N", "SW"],
-        "S" : ["SE", "SW"],
-        "SE" : ["S", "NE"],
-        "SW" : ["S", "NW"]
-    }
     if not rodal_colindante == "none":
         # Asignar colindancia opuesta
-        dicc_rodales[rodal_colindante]["colindancias"][referencia_coordenadas[direccion]] = rodal_entregado
+        dicc_rodales[rodal_colindante]["colindancias"][coordenada_opuesta[direccion]] = rodal_entregado
 
 
 def validar_rodal(rodal_colindante: str, direccion: str) -> bool:
