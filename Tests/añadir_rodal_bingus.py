@@ -33,30 +33,30 @@ coordenada_opuesta = {
 }
 # El value de cada key es para saber la vuelta por la que está pasando
 referencias_subprocesos = { 
-    "N" : ["NE", "NW"],
-    "NE" : ["SE", "N"],
-    "NW" : ["N", "SW"],
-    "S" : ["SE", "SW"],
-    "SE" : ["S", "NE"],
-    "SW" : ["NW", "S"]
+    "N" : {1: "NW",2: "NE"},
+    "NE" : {1: "N",2: "SE"},
+    "NW" : {1: "SW",2: "N"},
+    "S" : {1: "SE",2: "SW"},
+    "SE" : {1: "NE",2: "S"},
+    "SW" : {1: "S",2: "NW"}
 }
 # Referencia dependiendo de vuelta horaria o antihoraria
-referencia_horario = {
-    "N": "SE",
-    "NE": "S",
-    "NW": "NE",
-    "S": "NW",
-    "SE": "SW",
-    "SW": "N"
+vuelta_1_horario = {
+    "N": "NE",
+    "NE": "SE",
+    "NW": "N",
+    "S": "SW",
+    "SE": "S",
+    "SW": "NW"
 }
 
-referencia_antihorario = {
-    "N": "SW",
-    "NE": "NW",
-    "NW": "S",
-    "S": "NE",
-    "SE": "N",
-    "SW": "SE"
+vuelta_2_antihorario = {
+    "N": "NW",
+    "NE": "N",
+    "NW": "SW",
+    "S": "SE",
+    "SE": "NE",
+    "SW": "S"
 }
 
 # Funciones que ojalá se puedan reciclar
@@ -89,17 +89,54 @@ def generar_rodal(
     dicc_rodales[id_rodal] = datos_rodal
 
 
-def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str):
+def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str, origen: str):
     """Actualiza todas las colindancias de los rodales en base a los rodales 
     que se están agregando"""
-
+    print(f' --- INICIA SUBPROCESO EN {rodal_colindante} ---')
+    
     # Asignar colindancia opuesta
     if not rodal_colindante == "none":
         dicc_rodales[rodal_colindante]["colindancias"][coordenada_opuesta[direccion]] = rodal_entregado
+        dicc_rodales[rodal_entregado]["colindancias"][direccion] = rodal_colindante
+
+    print(f' A {rodal_colindante} le asigno {rodal_entregado} en {coordenada_opuesta[direccion]}')
+    print(f' A {rodal_entregado} le asigno {rodal_colindante} en {direccion}')
+
+    '''# Comenzar el proceso de búsqueda de rodales vecinos
+    ejec_vuelta1, ejec_vuelta2 = [False, False]
+    # DEBO PASARLE LA DIRECCIÓN OPUESTA Y REVISAR EN REFERENCIA AL COLINDANTE
+    for vuelta, subproceso in referencias_subprocesos[coordenada_opuesta[direccion]].items():
+        if dicc_rodales[rodal_colindante]["colindancias"][subproceso] != 0:
+            siguiente_rodal = dicc_rodales[rodal_colindante]["colindancias"][subproceso]
+
+            if siguiente_rodal == origen:
+                return
+            
+            if vuelta == 1:
+                ejec_vuelta1 = True 
+                direccion_v1 = vuelta_1_horario[direccion]
+                siguiente_rodal_1 = dicc_rodales[rodal_colindante]["colindancias"][subproceso]
+            else: ejec_vuelta1 = False
+
+            if vuelta == 2: 
+                ejec_vuelta2 = True; 
+                direccion_v2 = vuelta_2_antihorario[direccion]
+                siguiente_rodal_2 = dicc_rodales[rodal_colindante]["colindancias"][subproceso]
+            else: ejec_vuelta2 = False
+
+            print(f' --- Vuelta {vuelta}, {rodal_colindante} encontró a {siguiente_rodal} en {subproceso} --- ')
     
-    # Comenzar el proceso de búsqueda de rodales vecinos
-    for subproceso in referencias_subprocesos[coordenada_opuesta[direccion]]:
-        print(subproceso)
+    if ejec_vuelta1 and ejec_vuelta2:
+        return asignar_colindancias(rodal_entregado, siguiente_rodal_1, direccion_v1, origen), asignar_colindancias(rodal_entregado, siguiente_rodal_2, direccion_v2, origen)
+
+    elif ejec_vuelta1 and not ejec_vuelta2:
+        return asignar_colindancias(rodal_entregado, siguiente_rodal_1, direccion_v1, origen)
+
+    elif not ejec_vuelta1 and ejec_vuelta2:
+        return asignar_colindancias(rodal_entregado, siguiente_rodal_2, direccion_v2, origen)
+
+    else:
+        return'''
 
 
 def validar_rodal(rodal_colindante: str, direccion: str) -> bool:
@@ -167,10 +204,6 @@ def main():
     
     global dicc_rodales
     dicc_rodales = dict()
-    
-    # Variables colindancias
-    colin_norte,colin_noroeste,colin_noreste,colin_sur,colin_sureste,colin_suroeste = [0, 0, 0, 0, 0, 0]
-    rodal_colindante = "none"
 
     # Main loop
     loop = True
@@ -238,6 +271,10 @@ def main():
                             except ValorInvalidoError: print("< Ingrese un valor válido >")
 
                 print(f'Bosque Nativo: %{pb_nativo}\nBosque Exótico: %{pb_exotico}\n')
+
+                # IMPORTANTE RESETEAR LAS VARIABLES CADA VEZ QUE SE VAYA A AGREGAR UN NUEVO RODAL
+                colin_norte,colin_noroeste,colin_noreste,colin_sur,colin_sureste,colin_suroeste = [0, 0, 0, 0, 0, 0]
+                rodal_colindante = "none"
 
                 # Colindancias
                 if not dicc_rodales: invalido = False
@@ -388,7 +425,7 @@ def main():
                 try: 
                     # Dentro de una excepcion en caso de que info_colin no exista
                     print(f"Se encuentra al {referencia_coordenadas[info_colin]} de {rodal_colindante}\n")
-                    asignar_colindancias(id_rodal, rodal_colindante, info_colin)
+                    asignar_colindancias(id_rodal, rodal_colindante, info_colin, rodal_colindante)
                 except UnboundLocalError: pass
 
                 # -------------- debug --------------
