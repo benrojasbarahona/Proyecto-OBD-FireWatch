@@ -12,13 +12,13 @@
 
 """#    @shyupss_    #
 
-def main():
+def consultar_(archivo__: str) -> dict:
 
     def promedio(arreglo_de_numeros: list) -> float: #funcion de promedio
         return (round((sum(arreglo_de_numeros))/len(arreglo_de_numeros), 2))
     
     #lectura del archivo csv...
-    with open('rodales.csv', 'r') as info:
+    with open(archivo__, 'r') as info:
         lineas_rodales_info = info.readlines()
 
     propietario_key = {}; rodal_key = {} # <--- "data_pack"
@@ -27,6 +27,9 @@ def main():
     for linea in lineas_rodales_info:
         rodal, propieario, nativo, exotico = linea.strip('\n').split(', ')
         #  guardo los datos en los distintos "data_pack"
+        propieario = propieario.lower().replace(' ', '_')
+        #filtrar el str de propietario
+
         #  <--------------------------------------------------------------------------------------->
         if propieario not in propietario_key:
             propietario_key[propieario] = {'rodales': rodal, 'nativo': float(nativo), 'exotico': float(exotico),
@@ -43,8 +46,26 @@ def main():
         else:
             ... #el pepe
         # <--------------------------------------------------------------------------------------->
-    print("propietarios lista:\n", propietario_key),
-    print('<----------------------------------->')
-    print("propietarios lista:\n", rodal_key)
+    for prop in propietario_key:                            #limpio datos innecesarios
+        propietario_key[prop].pop('array_nativo'), propietario_key[prop].pop('array_exotico')
 
-main()
+    return(propietario_key, rodal_key)
+
+def por_propietario(propietario:str) -> str:
+
+    propietario_ = propietario.lower().replace(' ', '_')    # se filtra el str del input del usuario
+    dict_propietario, _ = consultar_('rodales.csv')         # llamo el dato necesario
+
+    if propietario_ not in dict_propietario:                # si no esta el propietario..., de lo contrario...
+
+        print('no esta po wons, coloca otro') # ALSDKJALÑSDJKLÑASKDLÑASKLÑDKALÑSD POR DEFINIRR XDDDDD
+
+    else:                                                   # de lo contrario...
+        rodales_prop, natividad, exotico = dict_propietario[propietario_].values()
+        return (rodales_prop, natividad, exotico)           # devuelvo los datos en forma de tupla
+
+def por_rodal(rodal:str):
+    _, dict_rodal = consultar_('rodales.csv')
+    ...
+
+print(por_propietario('simu lacro'))
