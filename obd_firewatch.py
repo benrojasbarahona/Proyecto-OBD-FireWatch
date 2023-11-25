@@ -37,7 +37,7 @@ def main():
     img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
     img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
     img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
-    img_background = tk.PhotoImage(file = "assets/iconos/fondo_verde.png")
+    img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
     label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
     img_nube = tk.PhotoImage(file = "assets/iconos/nube.png").subsample(25,25)
 
@@ -72,21 +72,18 @@ def main():
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
         ventana_ingr.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         ventana_ingr.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
+        ventana_ingr.wm_attributes('-transparentcolor', '#ab23ff')
+        label_bg = tk.Label(ventana_ingr, image=img_background)
+        label_bg.place(x=-0,y=0)
 
-        panel_izquierdo=tk.Frame(ventana_ingr)
+        panel_izquierdo=tk.Frame(ventana_ingr, bg = "#675F2A",)
         panel_izquierdo.grid(row=1,column=1)
-        panel_derecho=tk.Frame(ventana_ingr,highlightbackground="black", highlightthickness=1)
+        panel_derecho=tk.Frame(ventana_ingr, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        #,highlightbackground="black", highlightthickness=1
+        panel_derecho.columnconfigure([1, 2], minsize = 25, weight = 1)
         panel_derecho.grid(row=1,column=3)
         panel_abajo=tk.Frame(ventana_ingr,relief="raised")
         panel_abajo.grid(row=2,column=1,rowspan=2)
-
-        def validaciones_entradas(entradas: list) -> bool:
-            class ErrorIngreso (Exception):
-                pass
-            try:
-                ...
-            except ErrorIngreso as mensaje:
-                ventana_error_ingreso(mensaje)
         
         boton_guardar = ttk.Button(ventana_ingr, image=img_nube, command=guardar_archivo).grid(row=0,column=0,sticky="N")
         
@@ -95,22 +92,17 @@ def main():
             datos_rodal = {}
             print("primero valido, despues retorno o tiro error")
             try:
-                id_rodal = str(entrada_rodal.get())
-                nativo = int(entrada_nativo.get())
-                exotico = int(entrada_exotico.get())
-                propietario = str(entrada_propietario.get()) #llegar a diccionario de diccionario
-                datos_rodal[id_rodal] = {"propietario":propietario, "b_nativo":nativo,"b_exotico": exotico}
-                #dicc[id_rodal]'propietario' : propietario,
-                #'b_nativo' : nativo,'b_exotico' : exotico,'colindancias' : colindancias
-                #colindancias = {
-                                #'N' : colin_N,
-                                #'NW' : colin_NW,
-                                #'NE' : colin_NE,
-                                #'S' : colin_S,
-                                #'SE' : colin_SE,
-                                #'SW' : colin_SW
-                            #}
-                #Colindancias  0  o "" si no hay
+                datos_rodal[str(entrada_rodal.get())] = {"propietario":str(entrada_propietario.get()), 
+                                                        "b_nativo":int(entrada_nativo.get()),
+                                                        "b_exotico": int(entrada_exotico.get()),
+                                                        "colindancias" : {'N' : entrada_norte.get(),
+                                                        'NW' : entrada_noroeste.get(),
+                                                        'NE' : entrada_noreste.get(),
+                                                        'S' : entrada_sur.get(),
+                                                        'SE' : entrada_sureste.get(),
+                                                        'SW' : entrada_suroeste.get()}}
+                
+                #Aqui se lo doy a logica para validar lo mas probable
 
                 msgbox.showinfo("Rodal","Rodal añadido correctamente")
                 
@@ -120,54 +112,59 @@ def main():
             #ventana_ingreso_correcto()                
 
         #Entrada Rodal
-        tk.Label(panel_izquierdo, text = "ID del Rodal").grid(row=1,column=1,sticky="w")
-        tk.Label(panel_izquierdo, text = "(Ejemplo: R1)",fg="grey").grid(row=1,column=2,sticky="w")
-        entrada_rodal = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2)
+        tk.Label(panel_izquierdo, text = "ID del Rodal", fg ="#EFD1D1", bg = "#675F2A").grid(row=1,column=1,sticky="w")
+        tk.Label(panel_izquierdo, text = "(Ejemplo: R1)",fg="#EFD1D1", bg = "#675F2A").grid(row=1,column=2,sticky="w")
+        entrada_rodal = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
         entrada_rodal.grid(row=2,column=1,columnspan=3)
 
         #Entrada Bosque Nativo
-        tk.Label(panel_izquierdo, text = "% Bosque Nativo").grid(row=4,column=1,sticky="w")
-        tk.Label(panel_izquierdo, text = "(Ejemplo: 80)",fg="grey").grid(row=4,column=2,sticky="w")
-        entrada_nativo = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, textvariable = int)
+        tk.Label(panel_izquierdo, text = "% Bosque Nativo",fg = "#EFD1D1", bg = "#675F2A").grid(row=4,column=1,sticky="w", pady = 10)
+        tk.Label(panel_izquierdo, text = "(Ejemplo: 80)",fg="#EFD1D1").grid(row=4,column=2,sticky="w")
+        entrada_nativo = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
         entrada_nativo.grid(row=5,column=1,columnspan=3)
 
         #Entrada Bosque Exótico
-        tk.Label(panel_izquierdo, text = "% Bosque Exótico").grid(row=7,column=1,sticky="w")
-        tk.Label(panel_izquierdo, text = "(Ejemplo: 20)",fg="grey").grid(row=7,column=2,sticky="w")
-        entrada_exotico = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, textvariable = int)
+        tk.Label(panel_izquierdo, text = "% Bosque Exótico", fg ="#EFD1D1", bg = "#675F2A").grid(row=7,column=1,sticky="w", pady = 10)
+        tk.Label(panel_izquierdo, text = "(Ejemplo: 20)",fg="#EFD1D1").grid(row=7,column=2,sticky="w")
+        entrada_exotico = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
         entrada_exotico.grid(row=8,column=1,columnspan=3)
 
         #Entrada Propietario
-        tk.Label(panel_izquierdo, text = "Nombre del Propietario").grid(row=10,column=1,sticky="w")
-        tk.Label(panel_izquierdo, text = "(Ejemplo: Inv. Rojas)",fg="grey").grid(row=10,column=2,sticky="w")
-        entrada_propietario = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, textvariable = str)
+        tk.Label(panel_izquierdo, text = "Nombre del Propietario", fg = "#EFD1D1", bg = "#675F2A").grid(row=10,column=1,sticky="w", pady = 10)
+        tk.Label(panel_izquierdo, text = "(Ejemplo: Inv. Rojas)",fg="#EFD1D1").grid(row=10,column=2,sticky="w")
+        entrada_propietario = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
         entrada_propietario.grid(row=11,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Colindancias").grid(row=0,column=2,sticky="w")
+        #Setuo Colindancias Combobox
+        tk.Label(panel_derecho, text = "Colindancias").grid(row=0,column=1,sticky="e")
+
+        style= ttk.Style()
+        style.theme_use('clam')
+        style.configure("TCombobox", fieldbackground= "#FFEA9E", background= "#EBD792")
 
         tk.Label(panel_derecho, text = "Norte").grid(row=1,column=1,sticky="w",padx=10)
         entrada_norte = ttk.Combobox(panel_derecho, state = "readonly", values = ["","R1"])
         entrada_norte.grid(row=2,column=1,columnspan=3,padx=10)
 
-        tk.Label(panel_derecho, text = "Noreste").grid(row=3,column=1,sticky="w",padx=10)
+        tk.Label(panel_derecho, text = "Noreste").grid(row=3,column=1,sticky="w",padx=10, pady = 10)
         entrada_noreste = ttk.Combobox(panel_derecho, state = "readonly",values = ["","R3"])
         entrada_noreste.grid(row=4,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Noroeste").grid(row=5,column=1,sticky="w",padx=10)
+        tk.Label(panel_derecho, text = "Noroeste").grid(row=5,column=1,sticky="w",padx=10, pady = 10)
         entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_noroeste.grid(row=6,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Sur").grid(row=7,column=1,sticky="w",padx=10)
+        tk.Label(panel_derecho, text = "Sur").grid(row=7,column=1,sticky="w",padx=10, pady = 10)
         entrada_sur = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_sur.grid(row=8,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Sureste").grid(row=9,column=1,sticky="w",padx=10)
+        tk.Label(panel_derecho, text = "Sureste").grid(row=9,column=1,sticky="w",padx=10, pady = 10)
         entrada_sureste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
         entrada_sureste.grid(row=10,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Suroeste").grid(row=11,column=1,sticky="w",padx=10)
+        tk.Label(panel_derecho, text = "Suroeste").grid(row=11,column=1,sticky="w",padx=10, pady = 10)
         entrada_suroeste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
-        entrada_suroeste.grid(row=12,column=1,columnspan=3,pady=10)
+        entrada_suroeste.grid(row=12,column=1,columnspan=3)
 
         #Boton Añadir Rodal
         boton_rodal = ttk.Button(panel_abajo, text = "Añadir Rodal", command=boton_entrada_rodal).grid(row=1,column=1)
@@ -180,8 +177,8 @@ def main():
         ventana_cons.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         ventana_cons.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         ventana_cons.title('OBD Firewatch - Consultar') # título de la ventana
-        img_background = tk.PhotoImage(file = "assets/iconos/fondo_verde.png")
-        #label_bg = tk.Label(ventana_cons, image=img_background).place(x=-0,y=0)
+        img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
+        label_bg = tk.Label(ventana_cons, image=img_background).place(x=-0,y=0)
 
         boton_guardar = ttk.Button(ventana_cons, image=img_nube).grid(row=0,column=0)
 
