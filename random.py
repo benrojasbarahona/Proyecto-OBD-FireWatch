@@ -1,16 +1,5 @@
-import tkinter as tk
-
-root = tk.Tk()
-
-user_input = tk.StringVar(root)
-answer = 3
-
-def verify():
-    print(int(user_input.get()) == answer)  # calling get() here!
-
-entry = tk.Entry(root, textvariable=user_input)
-entry.pack()
-check = tk.Button(root, text='check 3', command=verify)
-check.pack()
-
+from tkinter import Tk # or(from Tkinter import Tk) on Python 2.x
+root = Tk()
+root.wait_visibility(root)
+root.wm_attributes('-alpha',0.3)
 root.mainloop()

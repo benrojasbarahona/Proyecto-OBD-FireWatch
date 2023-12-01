@@ -7,6 +7,11 @@ import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
 import añadir_rodal_bingus as bingus
 
+contador_id = 0
+contador_exo = 0
+contador_nat = 0
+contador_prop = 0
+
 def validar_id_rodal(id_rodal, ids_rodales):
     #Verifica que no se haya ingresado un id_rodal vacío, que el primer caracter sea una R o r y que el resto sean números
     while True:
@@ -31,9 +36,9 @@ def validar_porcentajes(porcentaje_bosque_nativo, porcentaje_bosque_exotico):
 
 def main():
     root = tk.Tk() # crea ventana principal
+    root.title('OBD Firewatch - Consultar') # título de la aplicación
     root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize = 50, weight = 1)
     root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
-    root.title('OBD Firewatch - Consultar') # título de la aplicación
     img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
     img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
     img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
@@ -62,34 +67,72 @@ def main():
         ventana_ing_correcto = tk.Toplevel()
         ventana_ing_correcto.columnconfigure([0, 1, 2], minsize = 250, weight = 1)
         ventana_ing_correcto.rowconfigure([0, 1, 2], minsize = 250, weight = 1)
-        tk.Label(ventana_ingreso_correcto, text = "Su rodal ha sido ingresado correctamente !").grid(row=1,column=2,sticky="w")
-        boton_cerrar= ttk.Button(ventana_ingreso_correcto, text = "OK", command = ventana_ingreso_correcto.destroy)
+        tk.Label(ventana_ing_correcto, text = "Su rodal ha sido ingresado correctamente !").grid(row=1,column=2,sticky="w")
+        boton_cerrar= ttk.Button(ventana_ing_correcto, text = "OK", command = ventana_ingreso_correcto.destroy)
         boton_cerrar.grid(row=3,column=2)
 
 
 
     def ventana_ingresar():
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
-        ventana_ingr.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        ventana_ingr.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        ventana_ingr.wm_attributes('-transparentcolor', '#ab23ff')
+        ventana_ingr.columnconfigure([0, 4, 5, 6, 7], minsize = 25, weight = 1)
+        ventana_ingr.rowconfigure([0, 15], minsize = 25, weight = 1)
         label_bg = tk.Label(ventana_ingr, image=img_background)
         label_bg.place(x=-0,y=0)
 
-        panel_izquierdo=tk.Frame(ventana_ingr, bg = "#675F2A",)
-        panel_izquierdo.grid(row=1,column=1)
-        panel_derecho=tk.Frame(ventana_ingr, bd=7, bg = "#675F2A", relief=tk.RAISED)
-        #,highlightbackground="black", highlightthickness=1
+        F_entrada = ("Clear Sans", 14, "bold") #tuplas de fuente para usar mas abajo
+        F_entry = ("Clear Sans", 12, "bold")
+        F_ejemplo = ("Clear Sans", 9, "bold")
+        F_col = ("Clear Sans", 10, "bold")
+
+        panel_derecho=tk.Frame(ventana_ingr, bd=7, bg = "#675F2A", relief=tk.RAISED) #panel derecho para colindancias
         panel_derecho.columnconfigure([1, 2], minsize = 25, weight = 1)
-        panel_derecho.grid(row=1,column=3)
-        panel_abajo=tk.Frame(ventana_ingr,relief="raised")
-        panel_abajo.grid(row=2,column=1,rowspan=2)
+        panel_derecho.rowconfigure([3,6,9,12,15,18], minsize = 10, weight = 1)
+        panel_derecho.grid(row=1,column=6,rowspan=14)
         
         boton_guardar = ttk.Button(ventana_ingr, image=img_nube, command=guardar_archivo).grid(row=0,column=0,sticky="N")
-        
+
+        def temp_rodal(e):
+            global contador_id
+            if contador_id == 0:
+                entrada_rodal.delete(0,"end")
+                contador_id +=1
+            else:
+                pass
+
+        def temp_exotico(e):
+            global contador_exo
+            if contador_exo == 0:
+                entrada_exotico.delete(0,"end")
+                contador_exo +=1
+            else:
+                pass
+
+        def temp_nativo(e):
+            global contador_nat
+            if contador_nat == 0:
+                entrada_nativo.delete(0,"end")
+                contador_nat +=1
+            else:
+                pass
+
+        def temp_propietario(e):
+            global contador_prop
+            if contador_prop == 0:
+                entrada_propietario.delete(0,"end")
+                contador_prop +=1
+            else:
+                pass
+
         def boton_entrada_rodal():
             """Handler validaciones archivo"""
+            global contador_id
+            global contador_exo
+            global contador_nat
+            global contador_prop
+
             datos_rodal = {}
+
             print("primero valido, despues retorno o tiro error")
             try:
                 datos_rodal[str(entrada_rodal.get())] = {"propietario":str(entrada_propietario.get()), 
@@ -103,8 +146,13 @@ def main():
                                                         'SW' : entrada_suroeste.get()}}
                 
                 #Aqui se lo doy a logica para validar lo mas probable
+                contador_id = 0
+                contador_exo = 0
+                contador_nat = 0
+                contador_prop = 0
 
-                msgbox.showinfo("Rodal","Rodal añadido correctamente")
+                ventana_ingreso_correcto()
+                msgbox.showinfo("Ingreso Correcto wujuuuuuuuuuu")
                 
             except ValueError:
                 ventana_error_ingreso("Error alguno de los valores esta vacio o es incorrecto")
@@ -112,62 +160,71 @@ def main():
             #ventana_ingreso_correcto()                
 
         #Entrada Rodal
-        tk.Label(panel_izquierdo, text = "ID del Rodal", fg ="#EFD1D1", bg = "#675F2A").grid(row=1,column=1,sticky="w")
-        tk.Label(panel_izquierdo, text = "(Ejemplo: R1)",fg="#EFD1D1", bg = "#675F2A").grid(row=1,column=2,sticky="w")
-        entrada_rodal = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
-        entrada_rodal.grid(row=2,column=1,columnspan=3)
+        tk.Label(ventana_ingr, text = "ID del Rodal", fg ="#EFD1D1", bg = "#675F2A",font = F_entrada).grid(row=1,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: R1)",fg="#EFD1D1", bg = "#675F2A", font = F_ejemplo).grid(row=1,column=2,sticky="w")
+        entrada_rodal = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, bg = "#FFEA9E", font = F_entry)
+        entrada_rodal.grid(row=2,column=1,columnspan=3, sticky = "nw")
+        entrada_rodal.bind("<FocusIn>", temp_rodal)
+        entrada_rodal.insert(0,"Ejemplo: R1")
 
         #Entrada Bosque Nativo
-        tk.Label(panel_izquierdo, text = "% Bosque Nativo",fg = "#EFD1D1", bg = "#675F2A").grid(row=4,column=1,sticky="w", pady = 10)
-        tk.Label(panel_izquierdo, text = "(Ejemplo: 80)",fg="#EFD1D1").grid(row=4,column=2,sticky="w")
-        entrada_nativo = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
-        entrada_nativo.grid(row=5,column=1,columnspan=3)
+        tk.Label(ventana_ingr, text = "% Bosque Nativo",fg = "#EFD1D1", bg = "#675F2A", font = F_entrada).grid(row=4,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: 80)",fg="#EFD1D1",bg = "#675F2A", font = F_ejemplo).grid(row=4,column=2,sticky="w")
+        entrada_nativo = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, bg = "#FFEA9E", font = F_entry)
+        entrada_nativo.grid(row=5,column=1,columnspan=3, sticky = "nw")
+        entrada_nativo.bind("<FocusIn>", temp_nativo)
+        entrada_nativo.insert(0,"Ejemplo: 80")
 
         #Entrada Bosque Exótico
-        tk.Label(panel_izquierdo, text = "% Bosque Exótico", fg ="#EFD1D1", bg = "#675F2A").grid(row=7,column=1,sticky="w", pady = 10)
-        tk.Label(panel_izquierdo, text = "(Ejemplo: 20)",fg="#EFD1D1").grid(row=7,column=2,sticky="w")
-        entrada_exotico = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
-        entrada_exotico.grid(row=8,column=1,columnspan=3)
+        tk.Label(ventana_ingr, text = "% Bosque Exótico", fg ="#EFD1D1", bg = "#675F2A", font = F_entrada).grid(row=7,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: 20)",fg="#EFD1D1",bg = "#675F2A", font = F_ejemplo).grid(row=7,column=2,sticky="w")
+        entrada_exotico = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, bg = "#FFEA9E", font = F_entry)
+        entrada_exotico.grid(row=8,column=1,columnspan=3, sticky = "nw")
+        entrada_exotico.bind("<FocusIn>", temp_exotico)
+        entrada_exotico.insert(0, "Ejemplo: 20")
 
         #Entrada Propietario
-        tk.Label(panel_izquierdo, text = "Nombre del Propietario", fg = "#EFD1D1", bg = "#675F2A").grid(row=10,column=1,sticky="w", pady = 10)
-        tk.Label(panel_izquierdo, text = "(Ejemplo: Inv. Rojas)",fg="#EFD1D1").grid(row=10,column=2,sticky="w")
-        entrada_propietario = tk.Entry(panel_izquierdo, width = 40, borderwidth = 2, bg = "#FFEA9E")
-        entrada_propietario.grid(row=11,column=1,columnspan=3)
+        tk.Label(ventana_ingr, text = "Nombre del Propietario", fg = "#EFD1D1", bg = "#675F2A", font = F_entrada).grid(row=10,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: Inv. Rojas)", fg = "#EFD1D1", bg = "#675F2A", font = F_ejemplo).grid(row=10,column=2,sticky="w")
+        entrada_propietario = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, bg = "#FFEA9E", font = F_entry)
+        entrada_propietario.grid(row=11, column=1, columnspan=3, sticky = "nw")
+        entrada_propietario.bind("<FocusIn>", temp_propietario)
+        entrada_propietario.insert(0, "Ejemplo: Inv. Rojas")
 
         #Setuo Colindancias Combobox
-        tk.Label(panel_derecho, text = "Colindancias").grid(row=0,column=1,sticky="e")
+        tk.Label(panel_derecho, text = "Colindancias", fg = "#EFD1D1", bg = "#675F2A", font = F_entry).grid(row=0,column=1,sticky="e")
 
         style= ttk.Style()
         style.theme_use('clam')
         style.configure("TCombobox", fieldbackground= "#FFEA9E", background= "#EBD792")
 
-        tk.Label(panel_derecho, text = "Norte").grid(row=1,column=1,sticky="w",padx=10)
+        tk.Label(panel_derecho, text = "Norte", fg = "#EFD1D1", bg = "#675F2A", font = F_col).grid(row=1,column=1,sticky="w",padx=10)
         entrada_norte = ttk.Combobox(panel_derecho, state = "readonly", values = ["","R1"])
         entrada_norte.grid(row=2,column=1,columnspan=3,padx=10)
 
-        tk.Label(panel_derecho, text = "Noreste").grid(row=3,column=1,sticky="w",padx=10, pady = 10)
+        tk.Label(panel_derecho, text = "Noreste", fg = "#EFD1D1", bg = "#675F2A", font = F_col).grid(row=4,column=1,sticky="w",padx=10)
         entrada_noreste = ttk.Combobox(panel_derecho, state = "readonly",values = ["","R3"])
-        entrada_noreste.grid(row=4,column=1,columnspan=3)
+        entrada_noreste.grid(row=5,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Noroeste").grid(row=5,column=1,sticky="w",padx=10, pady = 10)
+        tk.Label(panel_derecho, text = "Noroeste", fg = "#EFD1D1", bg = "#675F2A", font = F_col).grid(row=7,column=1,sticky="w",padx=10)
         entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
-        entrada_noroeste.grid(row=6,column=1,columnspan=3)
+        entrada_noroeste.grid(row=8,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Sur").grid(row=7,column=1,sticky="w",padx=10, pady = 10)
+        tk.Label(panel_derecho, text = "Sur",  fg = "#EFD1D1", bg = "#675F2A", font = F_col).grid(row=10,column=1,sticky="w",padx=10)
         entrada_sur = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
-        entrada_sur.grid(row=8,column=1,columnspan=3)
+        entrada_sur.grid(row=11,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Sureste").grid(row=9,column=1,sticky="w",padx=10, pady = 10)
+        tk.Label(panel_derecho, text = "Sureste", fg = "#EFD1D1", bg = "#675F2A", font = F_col).grid(row=13,column=1,sticky="w",padx=10)
         entrada_sureste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
-        entrada_sureste.grid(row=10,column=1,columnspan=3)
+        entrada_sureste.grid(row=14,column=1,columnspan=3)
 
-        tk.Label(panel_derecho, text = "Suroeste").grid(row=11,column=1,sticky="w",padx=10, pady = 10)
+        tk.Label(panel_derecho, text = "Suroeste", fg = "#EFD1D1", bg = "#675F2A", font = F_col).grid(row=16,column=1,sticky="w",padx=10)
         entrada_suroeste = ttk.Combobox(panel_derecho,state = "readonly", values = ["","R1","R2","R3"])
-        entrada_suroeste.grid(row=12,column=1,columnspan=3)
+        entrada_suroeste.grid(row=17,column=1,columnspan=3)
 
         #Boton Añadir Rodal
-        boton_rodal = ttk.Button(panel_abajo, text = "Añadir Rodal", command=boton_entrada_rodal).grid(row=1,column=1)
+        boton_rodal = tk.Button(ventana_ingr, text = "Añadir Rodal", fg = "#343434", bg = "#C4A11E", font = F_entrada, command=boton_entrada_rodal)
+        boton_rodal.grid(row=12,column=2,pady=20)
 
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
