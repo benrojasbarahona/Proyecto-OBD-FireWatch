@@ -93,50 +93,15 @@ def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion:
     """Actualiza todas las colindancias de los rodales en base a los rodales 
     que se están agregando"""
     print(f' --- INICIA SUBPROCESO EN {rodal_colindante} ---')
-    
+
     # Asignar colindancia opuesta
-    if not rodal_colindante == "none":
-        dicc_rodales[rodal_colindante]["colindancias"][coordenada_opuesta[direccion]] = rodal_entregado
-        dicc_rodales[rodal_entregado]["colindancias"][direccion] = rodal_colindante
+    dicc_rodales[rodal_colindante]["colindancias"][coordenada_opuesta[direccion]] = rodal_entregado
+    dicc_rodales[rodal_entregado]["colindancias"][direccion] = rodal_colindante
 
     print(f' A {rodal_colindante} le asigno {rodal_entregado} en {coordenada_opuesta[direccion]}')
-    print(f' A {rodal_entregado} le asigno {rodal_colindante} en {direccion}')
+    print(f' A {rodal_entregado} le asigno {rodal_colindante} en {direccion}\n')
 
-    '''# Comenzar el proceso de búsqueda de rodales vecinos
-    ejec_vuelta1, ejec_vuelta2 = [False, False]
-    # DEBO PASARLE LA DIRECCIÓN OPUESTA Y REVISAR EN REFERENCIA AL COLINDANTE
-    for vuelta, subproceso in referencias_subprocesos[coordenada_opuesta[direccion]].items():
-        if dicc_rodales[rodal_colindante]["colindancias"][subproceso] != 0:
-            siguiente_rodal = dicc_rodales[rodal_colindante]["colindancias"][subproceso]
-
-            if siguiente_rodal == origen:
-                return
-            
-            if vuelta == 1:
-                ejec_vuelta1 = True 
-                direccion_v1 = vuelta_1_horario[direccion]
-                siguiente_rodal_1 = dicc_rodales[rodal_colindante]["colindancias"][subproceso]
-            else: ejec_vuelta1 = False
-
-            if vuelta == 2: 
-                ejec_vuelta2 = True; 
-                direccion_v2 = vuelta_2_antihorario[direccion]
-                siguiente_rodal_2 = dicc_rodales[rodal_colindante]["colindancias"][subproceso]
-            else: ejec_vuelta2 = False
-
-            print(f' --- Vuelta {vuelta}, {rodal_colindante} encontró a {siguiente_rodal} en {subproceso} --- ')
-    
-    if ejec_vuelta1 and ejec_vuelta2:
-        return asignar_colindancias(rodal_entregado, siguiente_rodal_1, direccion_v1, origen), asignar_colindancias(rodal_entregado, siguiente_rodal_2, direccion_v2, origen)
-
-    elif ejec_vuelta1 and not ejec_vuelta2:
-        return asignar_colindancias(rodal_entregado, siguiente_rodal_1, direccion_v1, origen)
-
-    elif not ejec_vuelta1 and ejec_vuelta2:
-        return asignar_colindancias(rodal_entregado, siguiente_rodal_2, direccion_v2, origen)
-
-    else:
-        return'''
+    # MEJORAR CASOS BASE, ES MEJOR LA RECURSIVA, PERO HAY QUE HACERLA BIEN
 
 
 def validar_rodal(rodal_colindante: str, direccion: str) -> bool:
