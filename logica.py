@@ -4,8 +4,21 @@ import archivos as ar # se importa la capa de datos
 
 global DICC_RODALES 
 
+DICC_RODALES = {"R1":{"hola"},
+                "R2":{"Chao"}
+
+}
+DICC_RODALES["R3"] = "ADIOS"
+
 ARCHIVO_R = 'rodales.csv'
 ARCHIVO_C = 'colindancias.csv'
+
+def retorna_lista_rodales():
+    """retorna auna lista con las IDS de los rodales ya ingresados"""
+    global DICC_RODALES
+    rodales = list(DICC_RODALES.keys())
+    rodales.sort()
+    return rodales
 
 def validar_rodal():
     ...
