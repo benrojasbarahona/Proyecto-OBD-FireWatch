@@ -42,31 +42,30 @@ def consultar_() -> dict:
         if rodal not in rodal_key:
             rodal_key[rodal] = {'propietario': propieario, 'nativo': float(nativo), 'exotico': float(exotico)}
         else:
-            ... #el pepe
+            ...     #el pepe
         # <--------------------------------------------------------------------------------------->
     for prop in propietario_key:                            #limpio datos innecesarios
         propietario_key[prop].pop('array_nativo'), propietario_key[prop].pop('array_exotico')
 
     return(propietario_key, rodal_key)
 
-def por_propietario(propietario:str) -> str:
+def por_propietario(propietario:str) -> str: # consulta por propietario
     dict_propietario, _ = consultar_()
     rodales_prop, natividad, exotico = dict_propietario[propietario].values()
     return (rodales_prop, natividad, exotico)
 
-def por_rodal(rodal:str):
+def por_rodal(rodal:str): #consulta por rodales
     _, dict_rodal = consultar_()
     propietario, natividad, exotico = dict_rodal[rodal].values()
     return (propietario, natividad, exotico)
 
-
-def cant_propietarios() -> tuple: #tupla de los propietarios disponibles a consultar...
-    a,_ = consultar_()
-    return tuple(a.keys())
+def por_lista_hectarea() -> tuple:
+    ...
 
 def cant_rodales() -> tuple: #tupla de los rodales disponibles a consultar...
     _, b = consultar_()
     return tuple(b.keys())
 
-
-print(por_rodal('R10'))
+def cant_propietarios() -> tuple:
+    a, _ = consultar_()
+    return tuple(a.keys())
