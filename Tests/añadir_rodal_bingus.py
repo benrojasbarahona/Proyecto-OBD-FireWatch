@@ -16,6 +16,7 @@ PENDIENTE:
 2. Implementar función recursiva (Guía en onenote) <-- RESUELTO
 3. Todo el tema de archivos <-- PENDIENTE
 """
+import os
 
 class OpcionInvalidaError(Exception): pass
 class ValorInvalidoError(Exception): pass
@@ -146,7 +147,6 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
             asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion], origen)
         )
 
-
 def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
     """Recorrer la lista de rodales, en el caso en que otro rodal tenga al rodal
     colindante de referencia en la misma dirección que el que está siendo creado
@@ -230,6 +230,14 @@ def guardar_en_archivo(modo_escritura = 'a'):
                 if colindante != '':
                     archivo.write(f'{id_rodal}, {colindante}, {direccion}\n')
 
+def limpiar_datos():
+
+    with open('Tests/colindancias.csv', 'w', encoding = 'utf-8'):
+        pass
+
+    with open('Tests/rodales.csv', 'w', encoding = 'utf-8'):
+        pass
+
 # Programa
 def main():
 
@@ -237,7 +245,8 @@ def main():
  Opciones:
  1. Añadir rodal
  2. Guardar datos
- 3. Salir
+ 3. Eliminar datos
+ 4. Salir
  > """
     referencia_coordenadas = {
         "N" : "Sur",
@@ -267,7 +276,7 @@ def main():
         while True:
             try:
                 opcion = int(input(mensaje))
-                if opcion not in [1, 2, 3]:
+                if opcion not in [1, 2, 3, 4]:
                     raise OpcionInvalidaError
                 break
             except ValueError: print("< Ingrese un caracter válido >\n")
@@ -494,8 +503,24 @@ def main():
                 guardar_en_archivo()
                 print('\n< Datos guardados exitosamente >\n')
 
-            # 3. SALIR
+            # 3. LIMPIAR ARCHIVO
             case 3:
+                while True:
+                    try:
+                        seguro = input("\n¿Estás seguro que quieres eliminar los datos?(S/N)\n> ").lower()
+                        if seguro not in ["s", "n", "si", "no"]:
+                            raise OpcionInvalidaError
+                        break
+                    except OpcionInvalidaError: print("< Opción inválida, ingrese nuevamente >\n")
+
+                if seguro in ["s", "si"]:
+                    limpiar_datos()
+                    print()
+                if seguro in ["n", "no"]:
+                    print()
+
+            # 4. SALIR
+            case 4:
                 while True:
                     try:
                         seguro = input("\n¿Estás seguro que quieres salir?(S/N)\n> ").lower()
