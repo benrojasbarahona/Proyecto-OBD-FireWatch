@@ -175,8 +175,8 @@ def main():
     def ventana_consulta():
         # DIMENSIONES DE LA VENTANA
         ventana_cons = tk.Toplevel()
-        ventana_cons.geometry("650x250")
-        ventana_cons.minsize(650, 250)
+        ventana_cons.geometry("550x250")
+        ventana_cons.minsize(550, 250)
         ventana_cons.configure(bg="#675F2A")  # Cambia el color de fondo de la ventana
         ventana_cons.title('OBD Firewatch - Consultar')
 
