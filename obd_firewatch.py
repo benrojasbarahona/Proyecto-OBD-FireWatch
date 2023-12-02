@@ -9,8 +9,8 @@ import añadir_rodal_bingus as bingus
 
 #contadores a usar para texto temporal
 contador_id = 0
-contador_exo = 0
 contador_nat = 0
+contador_exo = 0
 contador_prop = 0
 
 
@@ -26,14 +26,40 @@ def main():
     label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
     img_nube = tk.PhotoImage(file = "assets/iconos/nube.png").subsample(25,25)
 
+    ventana_abierta = False
+
+    def abrir_ingreso():
+        nonlocal ventana_abierta
+        if ventana_abierta == False:
+            ventana_ingresar()
+            ventana_abierta = True
+
+    def abrir_incendio():
+        nonlocal ventana_abierta
+        if ventana_abierta == False:
+            ventana_incendio()
+            ventana_abierta = True
+
+    def abrir_consulta():
+        nonlocal ventana_abierta
+        if ventana_abierta == False:
+            ventana_consulta()
+            ventana_abierta = True
+
+
     def guardar_archivo():
             """Handler boton guardar archivo"""
             print("estoy guardando wiiiiiiiiiii")
 
     boton_guardar = ttk.Button(root, image=img_nube, command=guardar_archivo).grid(row=0,column=0)
-    boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:ventana_ingresar()).grid(row=1,column=1)
-    boton_incendio = ttk.Button(root, image=img_incendio, command=lambda:ventana_incendio()).grid(row=1,column=3)
-    boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:ventana_consulta()).grid(row=1,column=5)
+
+    boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:abrir_ingreso()).grid(row=1,column=1)
+
+    boton_incendio = ttk.Button(root, image=img_incendio, command=lambda:abrir_incendio()).grid(row=1,column=3)
+
+
+    boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:abrir_consulta()).grid(row=1,column=5)
+
 
     def ventana_error_ingreso(msg:str):
         ventana_erorr_ing = tk.Toplevel()
@@ -41,14 +67,6 @@ def main():
         ventana_erorr_ing.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         tk.Label(ventana_erorr_ing, text = msg).grid(row=1,column=2,sticky="w")
         boton_cerrar= ttk.Button(ventana_erorr_ing, text = "OK", command = ventana_erorr_ing.destroy)
-        boton_cerrar.grid(row=3,column=2)
-
-    def ventana_ingreso_correcto():
-        ventana_ing_correcto = tk.Toplevel()
-        ventana_ing_correcto.columnconfigure([0, 1, 2], minsize = 25, weight = 1)
-        ventana_ing_correcto.rowconfigure([0, 1, 2], minsize = 25, weight = 1)
-        tk.Label(ventana_ing_correcto, text = "Su rodal ha sido ingresado correctamente !").grid(row=1,column=1,sticky="w")
-        boton_cerrar= ttk.Button(ventana_ing_correcto, text = "OK", command = ventana_ingreso_correcto.destroy)
         boton_cerrar.grid(row=3,column=2)
 
     def ventana_ingresar():
@@ -67,9 +85,17 @@ def main():
         panel_derecho.columnconfigure([1, 2], minsize = 25, weight = 1)
         panel_derecho.rowconfigure([3,6,9,12,15,18], minsize = 10, weight = 1)
         panel_derecho.grid(row=1,column=6,rowspan=14)
+
+        def cierre_ventana():
+            nonlocal ventana_abierta
+            if msgbox.askyesno("Salir", "¿Desea cerrar esta ventana?"):
+                ventana_abierta = False
+                ventana_ingr.destroy()
+
+        boton_cerrar = ttk.Button(ventana_ingr, image=img_nube, 
+                                   command=cierre_ventana).grid(row=0,column=7,sticky="N")
+
         
-        boton_guardar = ttk.Button(ventana_ingr, image=img_nube, 
-                                   command=guardar_archivo).grid(row=0,column=0,sticky="N")
 
         def temp_rodal(e):
             """Handler que borra texto en la entrada al primer focusin"""
@@ -113,17 +139,17 @@ def main():
                 pass
 
             global contador_id
-            global contador_exo
             global contador_nat
+            global contador_exo
             global contador_prop
 
             datos_rodal = {}
 
             print("primero valido, despues retorno o tiro error")
             try: #Si casillas bosques nativo o exotico no tiene solo numeros, levanta excepción ValueError
-                datos_rodal[str(entrada_rodal.get())] = {"propietario":str(entrada_propietario.get()), 
-                                                        "b_nativo":int(entrada_nativo.get()),
+                datos_rodal[str(entrada_rodal.get())] = {"b_nativo":int(entrada_nativo.get()),
                                                         "b_exotico": int(entrada_exotico.get()),
+                                                        "propietario":str(entrada_propietario.get()), 
                                                         "colindancias" : {'N' : entrada_norte.get(),
                                                         'NW' : entrada_noroeste.get(),
                                                         'NE' : entrada_noreste.get(),
@@ -131,14 +157,16 @@ def main():
                                                         'SE' : entrada_sureste.get(),
                                                         'SW' : entrada_suroeste.get()}}
                 
+                #bool, msj = log.validar_rodal(datos_rodal)
                 #INGRESE AQUI PASE DICC A LOG PARA VALIDAR
 
                 #AQUI IRIA PASE A LEVANTAR OTRA EXCEPCION SI NO VALIDADO
-                #smthsmth Raise IngresoNoValido
+                if (bool == False):
+                    raise IngresoNoValido (msj)
 
                 contador_id = 0 #Vuelta contadores texto temporal a 0
-                contador_exo = 0
                 contador_nat = 0
+                contador_exo = 0
                 contador_prop = 0
 
                 entrada_rodal.delete(0,"end") #Borro lo que habia en las entradas

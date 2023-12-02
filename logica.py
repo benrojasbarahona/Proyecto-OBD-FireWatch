@@ -13,10 +13,11 @@ DICC_RODALES["R3"] = "ADIOS"
 ARCHIVO_R = 'rodales.csv'
 ARCHIVO_C = 'colindancias.csv'
 
-def retorna_lista_rodales():
+def retorna_lista_rodales() -> list:
     """retorna auna lista con las IDS de los rodales ya ingresados"""
     global DICC_RODALES
     rodales = list(DICC_RODALES.keys())
+    rodales.append("")
     rodales.sort()
     return rodales
 
