@@ -8,10 +8,6 @@ import tkinter.ttk as ttk
 import añadir_rodal_bingus as bingus
 
 #contadores a usar para texto temporal
-contador_id = 0
-contador_nat = 0
-contador_exo = 0
-contador_prop = 0
 
 
 def main():
@@ -95,11 +91,14 @@ def main():
         boton_cerrar = ttk.Button(ventana_ingr, image=img_nube, 
                                    command=cierre_ventana).grid(row=0,column=7,sticky="N")
 
-        
+        contador_id = 0
+        contador_nat = 0
+        contador_exo = 0
+        contador_prop = 0
 
         def temp_rodal(e):
             """Handler que borra texto en la entrada al primer focusin"""
-            global contador_id
+            nonlocal contador_id
             if contador_id == 0:
                 entrada_rodal.delete(0,"end")
                 contador_id +=1
@@ -108,7 +107,7 @@ def main():
 
         def temp_exotico(e):
             """Handler que borra texto en la entrada al primer focusin"""
-            global contador_exo
+            nonlocal contador_exo
             if contador_exo == 0:
                 entrada_exotico.delete(0,"end")
                 contador_exo +=1
@@ -117,7 +116,7 @@ def main():
 
         def temp_nativo(e):
             """Handler que borra texto en la entrada al primer focusin"""
-            global contador_nat
+            nonlocal contador_nat
             if contador_nat == 0:
                 entrada_nativo.delete(0,"end")
                 contador_nat +=1
@@ -126,7 +125,7 @@ def main():
 
         def temp_propietario(e):
             """Handler que borra texto en la entrada al primer focusin"""
-            global contador_prop
+            nonlocal contador_prop
             if contador_prop == 0:
                 entrada_propietario.delete(0,"end")
                 contador_prop +=1
@@ -138,10 +137,10 @@ def main():
             class IngresoNoValido (Exception):
                 pass
 
-            global contador_id
-            global contador_nat
-            global contador_exo
-            global contador_prop
+            nonlocal contador_id
+            nonlocal contador_nat
+            nonlocal contador_exo
+            nonlocal contador_prop
 
             datos_rodal = {}
 
