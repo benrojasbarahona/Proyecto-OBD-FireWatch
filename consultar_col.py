@@ -10,13 +10,14 @@
     libremente con los datos y poder extraer informacion mas rapidamente de manera mas fluida, para que de esta
     manera, poder mostrar la informacion en menos lineas y menos analizis de datos.
 
-"""#    @shyupss_    #
+"""
+
+#    @shyupss_    #
+def promedio(arreglo_de_numeros: list) -> float: #funcion de promedio
+    return (round((sum(arreglo_de_numeros))/len(arreglo_de_numeros), 2))
 
 def consultar_() -> dict:
 
-    def promedio(arreglo_de_numeros: list) -> float: #funcion de promedio
-        return (round((sum(arreglo_de_numeros))/len(arreglo_de_numeros), 2))
-    
     #lectura del archivo csv...
     with open('rodales.csv', 'r') as info:
         lineas_rodales_info = info.readlines()
@@ -25,7 +26,7 @@ def consultar_() -> dict:
     
     #filtro las lineas y las almaceno para ambos tipos de "data_pack"
     for linea in lineas_rodales_info:
-        rodal, propieario, nativo, exotico = linea.strip('\n').split(', ')
+        rodal, nativo, exotico, propieario = linea.strip('\n').split(', ')
         #  guardo los datos en los distintos "data_pack"
 
         #  <--------------------------------------------------------------------------------------->
@@ -41,8 +42,7 @@ def consultar_() -> dict:
         # <--------------------------------------------------------------------------------------->
         if rodal not in rodal_key:
             rodal_key[rodal] = {'propietario': propieario, 'nativo': float(nativo), 'exotico': float(exotico)}
-        else:
-            ...     #el pepe
+       
         # <--------------------------------------------------------------------------------------->
     for prop in propietario_key:                            #limpio datos innecesarios
         propietario_key[prop].pop('array_nativo'), propietario_key[prop].pop('array_exotico')
@@ -59,13 +59,38 @@ def por_rodal(rodal:str): #consulta por rodales
     propietario, natividad, exotico = dict_rodal[rodal].values()
     return (propietario, natividad, exotico)
 
-def por_lista_hectarea() -> tuple:
-    ...
+def por_lista_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
+    #   Defino variables a utilizar.
+    split_str_rodales = str_rodales.split(', '); rodales_total = []; _, dict_rodal = consultar_()
+    nativo_hectareas_total = 0; exotico_hectareas_total = 0;
+    # <===========================================================================================================>
+    for paso_rodal in split_str_rodales:
+        if '-' in paso_rodal:
+            temp = paso_rodal.replace('R', '').split('-')
+            for agregando in range(int(temp[0]), int(temp[-1])+1, 1):   # ingreso todos los radales que se estan
+                rodales_total.append(f'R{agregando}')                   # consultando a la lista rodales_total.
+        else:
+            rodales_total.append(paso_rodal)
 
-def cant_rodales() -> tuple: #tupla de los rodales disponibles a consultar...
+    for rodal in rodales_total:
+
+        try:
+            _, natividad, exotico = dict_rodal[rodal].values()          # cálculo de los porcentajes de hectareas
+            nativo_hectareas_total += (natividad/100)*10                # respecto a la natividad y lo exótico.
+            exotico_hectareas_total += (exotico/100)*10                 # uwu
+
+        except KeyError:
+            ...
+
+    return round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
+
+def cant_rodales() -> tuple: # tupla de los rodales disponibles a consultar...
     _, b = consultar_()
     return tuple(b.keys())
 
-def cant_propietarios() -> tuple:
+def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a consultar
     a, _ = consultar_()
     return tuple(a.keys())
+
+a, _ = por_lista_hectarea('R1, R3-R9, R10')
+print(a)
