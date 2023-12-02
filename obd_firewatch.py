@@ -4,17 +4,20 @@
 import logica as log # se imoorta la capa de negocio
 import tkinter as tk
 import tkinter.messagebox as msgbox
+from tkinter import filedialog
 import tkinter.ttk as ttk
 import añadir_rodal_bingus as bingus
-
-#contadores a usar para texto temporal
 
 
 def main():
     root = tk.Tk() # crea ventana principal
-    root.title('OBD Firewatch - Consultar') # título de la aplicación
+    root.title('OBD Firewatch') # título de la aplicación
     root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize = 50, weight = 1)
     root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
+
+    #logo = tk.PhotoImage(file = "assets/iconos/logo.png")
+    #root.iconphoto(True, logo)
+
     img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
     img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
     img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
@@ -24,35 +27,53 @@ def main():
 
     ventana_abierta = False
 
+    def cerrando_ventana():
+        nonlocal ventana_abierta
+        if msgbox.askokcancel("Quit", "¿Desea salir y guardar ?"):
+            root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
+    
     def abrir_ingreso():
         nonlocal ventana_abierta
         if ventana_abierta == False:
             ventana_ingresar()
             ventana_abierta = True
+        else:
+            msgbox.showinfo("Error","Ya posee una ventana abierta")
 
     def abrir_incendio():
         nonlocal ventana_abierta
         if ventana_abierta == False:
             ventana_incendio()
             ventana_abierta = True
+        else:
+            msgbox.showinfo("Error","Ya posee una ventana abierta")
 
     def abrir_consulta():
         nonlocal ventana_abierta
         if ventana_abierta == False:
             ventana_consulta()
             ventana_abierta = True
+        else:
+            msgbox.showinfo("Error","Ya posee una ventana abierta")
 
+    def dialogo_abrir_archivo():
+        direccion_archivo = filedialog.askopenfilename(title="Abrir Archivo", 
+                                                       filetypes=[("Archivos CSV", "*.csv")])
+        if direccion_archivo:
+            archivo_seleccionado.config(text=f"Archivo Seleccionado: {direccion_archivo}")
+            #process_file(file_path)
 
-    def guardar_archivo():
-            """Handler boton guardar archivo"""
-            print("estoy guardando wiiiiiiiiiii")
-
-    boton_guardar = ttk.Button(root, image=img_nube, command=guardar_archivo).grid(row=0,column=0)
+    boton_abrir = tk.Button(root, text = "Abrir Archivo", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
+                             command=dialogo_abrir_archivo).grid(row=0,column=0,columnspan=2,padx = 10,sticky = "w")
+    archivo_seleccionado = tk.Label(root, text = "Archivo seleccionado: ",fg ="#EFD1D1", 
+                                    bg = "#675F2A", font=("Clear Sans", 10, "bold"))
+    archivo_seleccionado.grid(row=0, column= 2, columnspan=6,sticky="w")
 
     boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:abrir_ingreso()).grid(row=1,column=1)
 
     boton_incendio = ttk.Button(root, image=img_incendio, command=lambda:abrir_incendio()).grid(row=1,column=3)
-
 
     boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:abrir_consulta()).grid(row=1,column=5)
 
@@ -67,6 +88,7 @@ def main():
 
     def ventana_ingresar():
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
+        ventana_ingr.title('OBD Firewatch - Ingresar') # título de la aplicación
         ventana_ingr.columnconfigure([0, 4, 5, 6, 7], minsize = 25, weight = 1)
         ventana_ingr.rowconfigure([0, 15], minsize = 25, weight = 1)
         label_bg = tk.Label(ventana_ingr, image=img_background)
@@ -81,15 +103,14 @@ def main():
         panel_derecho.columnconfigure([1, 2], minsize = 25, weight = 1)
         panel_derecho.rowconfigure([3,6,9,12,15,18], minsize = 10, weight = 1)
         panel_derecho.grid(row=1,column=6,rowspan=14)
-
-        def cierre_ventana():
+        
+        def cerrando_ventana():
             nonlocal ventana_abierta
-            if msgbox.askyesno("Salir", "¿Desea cerrar esta ventana?"):
+            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?"):
                 ventana_abierta = False
                 ventana_ingr.destroy()
 
-        boton_cerrar = ttk.Button(ventana_ingr, image=img_nube, 
-                                   command=cierre_ventana).grid(row=0,column=7,sticky="N")
+        ventana_ingr.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
         contador_id = 0
         contador_nat = 0
