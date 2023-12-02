@@ -81,9 +81,9 @@ def generar_rodal(
     }
 
     datos_rodal = {
-        'propietario' : propietario,
         'b_nativo' : nativo,
         'b_exotico' : exotico,
+        'propietario' : propietario,
         'colindancias' : colindancias
     }
 
@@ -154,28 +154,41 @@ def leer_en_archivo():
     para cada ejecución del programa, al principio armar el diccionario "dicc_rodales" para que
     se guarde el progreso del usuario"""
 
-    # Inicializar archivos, en caso que no existan agregar headers
+    # Inicializar archivos
     try:
-        with open('Tests/rodales.csv', 'r'): existe_rodales = True
-    except FileNotFoundError: existe_rodales = False
+        with open('Tests/rodales.csv', 'x'): pass
+    except FileExistsError: pass
 
     try:
-        with open('Tests/colindancias.csv', 'r'): existe_colindancias = True
-    except FileNotFoundError: existe_colindancias = False
-
-    if not existe_rodales:
-        with open('Tests/rodales.csv', 'w'): pass
-    
-    if not existe_colindancias:
-        with open('Tests/colindancias.csv', 'w'): pass
+        with open('Tests/colindancias.csv', 'x'): pass
+    except FileExistsError: pass
 
     # Rearmar dicc_rodales desde lo almacenado en el archivo
 
 
-def guardar_en_archivo():
+def guardar_en_archivo(modo_escritura = 'a'):
     """Esta funcion debe guardar los datos en dicc_rodales para que se puedan utilizar
     en una siguiente ejecución del programa"""
-    ...
+
+    with open('Tests/rodales.csv', modo_escritura, encoding = "utf-8") as archivo:
+
+        for id_rodal, datos in dicc_rodales.items():
+            archivo.write(f'{id_rodal}, ')
+
+            for tipo, dato in datos.items():
+
+                if tipo != "colindancias" and tipo != "propietario":
+                    archivo.write(f'{dato}, ')
+                elif tipo == "propietario":
+                    archivo.write(f'{dato}\n')
+
+    with open('Tests/colindancias.csv', modo_escritura, encoding = 'utf-8') as archivo:
+
+        for id_rodal, datos in dicc_rodales.items():
+            for direccion, colindante in dicc_rodales[id_rodal]['colindancias'].items():
+
+                if colindante != '':
+                    archivo.write(f'{id_rodal}, {colindante}, {direccion}\n')
 
 # Programa
 def main():
@@ -185,8 +198,8 @@ def main():
     mensaje = """<<< OBD Firewatch >>>\n
  Opciones:
  1. Añadir rodal
- 2. Salir y guardar
- 3. Salir sin guardar
+ 2. Guardar datos
+ 3. Salir
  > """
     referencia_coordenadas = {
         "N" : "Sur",
@@ -428,21 +441,23 @@ def main():
                     print(f"{key}   : {value}")
                 print()
 
-            # 2. SALIR Y GUARDAR
+            # 2. GUARDAR DATOS
             case 2:
-                ...
-            # 3. SALIR SIN GUARDAR
+                guardar_en_archivo()
+                print('\n< Datos guardados exitosamente >\n')
+
+            # 3. SALIR
             case 3:
                 while True:
                     try:
-                        seguro = input("\n¿Estás seguro que quieres salir sin guardar?(S/N)\n> ").lower()
+                        seguro = input("\n¿Estás seguro que quieres salir?(S/N)\n> ").lower()
                         if seguro not in ["s", "n", "si", "no"]:
                             raise OpcionInvalidaError
                         break
                     except OpcionInvalidaError: print("< Opción inválida, ingrese nuevamente >\n")
 
                 if seguro in ["s", "si"]:
-                    print("\nGracias por ver suscribanse a shyupss en youtube")
+                    print("\no/")
                     loop = False
                 if seguro in ["n", "no"]:
                     print()
