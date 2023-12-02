@@ -77,15 +77,6 @@ def main():
 
     boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:abrir_consulta()).grid(row=1,column=5)
 
-
-    def ventana_error_ingreso(msg:str):
-        ventana_erorr_ing = tk.Toplevel()
-        ventana_erorr_ing.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        ventana_erorr_ing.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        tk.Label(ventana_erorr_ing, text = msg).grid(row=1,column=2,sticky="w")
-        boton_cerrar= ttk.Button(ventana_erorr_ing, text = "OK", command = ventana_erorr_ing.destroy)
-        boton_cerrar.grid(row=3,column=2)
-
     def ventana_ingresar():
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
         ventana_ingr.title('OBD Firewatch - Ingresar') # título de la aplicación
@@ -106,7 +97,7 @@ def main():
         
         def cerrando_ventana():
             nonlocal ventana_abierta
-            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?"):
+            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_ingr):
                 ventana_abierta = False
                 ventana_ingr.destroy()
 
@@ -176,12 +167,10 @@ def main():
                                                         'S' : entrada_sur.get(),
                                                         'SE' : entrada_sureste.get(),
                                                         'SW' : entrada_suroeste.get()}}
-                
-                #bool, msj = log.validar_rodal(datos_rodal)
                 #INGRESE AQUI PASE DICC A LOG PARA VALIDAR
-
+                valido, msj = log.validar_ingreso(datos_rodal)
                 #AQUI IRIA PASE A LEVANTAR OTRA EXCEPCION SI NO VALIDADO
-                if (bool == False):
+                if (valido == False):
                     raise IngresoNoValido (msj)
 
                 contador_id = 0 #Vuelta contadores texto temporal a 0
@@ -201,14 +190,20 @@ def main():
                 entrada_exotico.insert(0, "Ejemplo: 20")
                 entrada_propietario.insert(0, "Ejemplo: Inv. Rojas")
 
-                #ventana_ingreso_correcto()
-                msgbox.showinfo("Ingreso","Ingreso Correcto") #Aviso que todo se ingreso correctamente
+                entrada_norte.config(values = log.retorna_lista_rodales())
+                entrada_noreste.config(values = log.retorna_lista_rodales())
+                entrada_noroeste.config(values = log.retorna_lista_rodales())
+                entrada_sur.config(values = log.retorna_lista_rodales())
+                entrada_sureste.config(values = log.retorna_lista_rodales())
+                entrada_suroeste.config(values = log.retorna_lista_rodales())
+
+                msgbox.showinfo("CORRECTO","Rodal ingresado correctamente", parent = ventana_ingr) #Aviso que todo se ingreso correctamente
             
             except IngresoNoValido as msj:
-                ventana_error_ingreso(msj)
+                msgbox.showerror("ERROR", msj, parent = ventana_ingr)
 
             except ValueError:
-                ventana_error_ingreso("ERROR, Ingrese solo números en casillas bosque nativo y exótico")
+                msgbox.showerror("ERROR","Ingrese solo números en casillas bosque nativo y exótico", parent = ventana_ingr)
 
             #ventana_ingreso_correcto()                
 
@@ -280,8 +275,8 @@ def main():
         #Colindancia al NW
         tk.Label(panel_derecho, text = "Noroeste", fg = "#EFD1D1",
                   bg = "#675F2A", font = F_col).grid(row=7,column=1,sticky="w",padx=10)
-        entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly", 
-                                        values = log.retorna_lista_rodales())
+        entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly") 
+        entrada_noroeste.config(values = log.retorna_lista_rodales())
         entrada_noroeste.grid(row=8,column=1,columnspan=3)
 
         #Colindancia al S
@@ -313,6 +308,14 @@ def main():
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
 
+        def cerrando_ventana():
+            nonlocal ventana_abierta
+            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_inc):
+                ventana_abierta = False
+                ventana_inc.destroy()
+
+        ventana_inc.protocol("WM_DELETE_WINDOW", cerrando_ventana)
+
     def ventana_consulta():
         ventana_cons = tk.Toplevel() # crea ventana consulta
         ventana_cons.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
@@ -320,6 +323,14 @@ def main():
         ventana_cons.title('OBD Firewatch - Consultar') # título de la ventana
         img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
         label_bg = tk.Label(ventana_cons, image=img_background).place(x=-0,y=0)
+
+        def cerrando_ventana():
+            nonlocal ventana_abierta
+            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_cons):
+                ventana_abierta = False
+                ventana_cons.destroy()
+        
+        ventana_cons.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
         boton_guardar = ttk.Button(ventana_cons, image=img_nube).grid(row=0,column=0)
 

@@ -13,9 +13,10 @@ IMPORTANTES:
 
 PENDIENTE:
 1. Validar que el rodal referencia no tenga un rodal existente en la misma posición <-- RESUELTO
-2. Implementar función recursiva (Guía en onenote) <-- PROGRESO
+2. Implementar función recursiva (Guía en onenote) <-- RESUELTO
 3. Todo el tema de archivos <-- PENDIENTE
 """
+import os
 
 class OpcionInvalidaError(Exception): pass
 class ValorInvalidoError(Exception): pass
@@ -31,19 +32,6 @@ coordenada_opuesta = {
     "SE" : "NW",
     "SW" : "NE"
 }
-# El value de cada key es para saber la vuelta por la que está pasando
-referencias_subprocesos = { 
-    "N" : {"NE": 1, "NW": 2},
-    "NE" : {"SE": 1, "N": 2},
-    "NW" : {"N": 1, "SW": 2},
-    "S" : {"SE": 1, "SW": 2},
-    "SE" : {"S": 1, "NE": 2},
-    "SW" : {"NW": 1, "S": 2}
-}
-# Referencia dependiendo de vuelta horaria o antihoraria
-referencia_horario = {}
-
-referencia_antihorario = {}
 
 # Funciones que ojalá se puedan reciclar
 def generar_rodal(
@@ -51,38 +39,115 @@ def generar_rodal(
         propietario: str, 
         nativo: int, 
         exotico: int,
-        colin_N = "none", colin_NW = "none", colin_NE = "none", 
-        colin_S = "none", colin_SW = "none", colin_SE = "none"
+        colin_N = '', colin_NW = '', colin_NE = '', 
+        colin_S = '', colin_SW = '', colin_SE = '',
+        colindancias_dict = dict()
         ):
     global dicc_rodales
 
-    colindancias = {
-        'N' : colin_N,
-        'NW' : colin_NW,
-        'NE' : colin_NE,
-        'S' : colin_S,
-        'SE' : colin_SE,
-        'SW' : colin_SW
-    }
+    if not colindancias_dict:
+
+        colindancias_dict = {
+            'N' : colin_N,
+            'NW' : colin_NW,
+            'NE' : colin_NE,
+            'S' : colin_S,
+            'SE' : colin_SE,
+            'SW' : colin_SW
+        }
 
     datos_rodal = {
-        'propietario' : propietario,
         'b_nativo' : nativo,
         'b_exotico' : exotico,
-        'colindancias' : colindancias
+        'propietario' : propietario,
+        'colindancias' : colindancias_dict
     }
 
     dicc_rodales[id_rodal] = datos_rodal
 
 
-def asignar_colindancias(rodal_entregado: str, rodal_colindante: str, direccion: str, Subproceso_innecesario = "none"):
+def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str, origen: str):
+    """Actualiza todas las colindancias de los rodales en base a los rodales 
+    que se están agregando"""
 
-    if not rodal_colindante == "none":
-        # Asignar colindancia opuesta
-        dicc_rodales[rodal_colindante]["colindancias"][coordenada_opuesta[direccion]] = rodal_entregado
+    # El value de cada key es para saber la vuelta por la que está pasando
+    referencias_subprocesos = { 
+        "N" : ["NW","NE"],
+        "NE" : ["N","SE"],
+        "NW" : ["SW","N"],
+        "S" : ["SE","SW"],
+        "SE" : ["NE","S"],
+        "SW" : ["S","NW"]
+    }
 
+    # Referencia para buscar en sentido horario
+    vuelta_1_horario = {
+        "N": "NE",
+        "NE": "SE",
+        "NW": "N",
+        "S": "SW",
+        "SE": "S",
+        "SW": "NW"
+    }
 
-def validar_rodal(rodal_colindante: str, direccion: str) -> bool:
+    # Referencia para buscar en sentido antihorario
+    vuelta_2_antihorario = {
+        "N": "NW",
+        "NE": "N",
+        "NW": "SW",
+        "S": "SE",
+        "SE": "NE",
+        "SW": "S"
+    }
+
+    vuelta = 1; r_col_v1 = str(); r_col_v2 = str()
+
+    print(f' --- Rodal referencia: {rodal_referencia} ---')
+
+    # En el caso que el rodal que se entregue esté vacío, se detiene la recursividad
+    if rodal_referencia == '': 
+        print(' -- Rodal_referencia vacío --')
+        return
+
+    # Si se llega a un rodal que tiene colindancias, se detiene la recursividad
+    if dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] != '': 
+        print(' -- Rodal_referencia vacío --')
+        return
+    
+    # Comenzar el proceso de asignación de colindancias
+    if dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] == '':
+
+        # Asignar colindancias opuestas
+        dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] = nuevo_rodal
+        dicc_rodales[nuevo_rodal]["colindancias"][direccion] = rodal_referencia
+        print(f' A {rodal_referencia} le asigno {nuevo_rodal} en {coordenada_opuesta[direccion]}')
+        print(f' A {nuevo_rodal} se le referenció a {rodal_referencia} en {direccion}\n')
+
+        # Inicia proceso de búsqueda
+        for coord_a_buscar in referencias_subprocesos[coordenada_opuesta[direccion]]:
+            print(f' Busco al {coord_a_buscar} de {rodal_referencia} [vuelta {vuelta}]')
+
+            # Guardar los rodales a buscar en variables
+            match vuelta:
+                case 1:
+                    if dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar] != '':
+                        r_col_v1 = dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar]
+                case 2:
+                    if dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar] != '':
+                        r_col_v2 = dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar]
+            
+            vuelta += 1
+        
+        print(f' Rodal al {referencias_subprocesos[coordenada_opuesta[direccion]][0]}: {r_col_v1}')
+        print(f' Rodal al {referencias_subprocesos[coordenada_opuesta[direccion]][1]}: {r_col_v2}')
+
+        # Retorna la misma función retornando lo que se encontró en los laterales del rodal referencia
+        return (
+            asignar_colindancias(nuevo_rodal, r_col_v1, vuelta_1_horario[direccion], origen),
+            asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion], origen)
+        )
+
+def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
     """Recorrer la lista de rodales, en el caso en que otro rodal tenga al rodal
     colindante de referencia en la misma dirección que el que está siendo creado
     se retorna True para continuar preguntando al usuario que ingrese un rodal válido"""
@@ -100,41 +165,89 @@ def leer_en_archivo():
     para cada ejecución del programa, al principio armar el diccionario "dicc_rodales" para que
     se guarde el progreso del usuario"""
 
-    # Inicializar archivos, en caso que no existan agregar headers
+    # Inicializar archivos
     try:
-        with open('Tests/info_rodales.csv', 'r'): existe_rodales = True
-    except FileNotFoundError: existe_rodales = False
+        with open('Tests/rodales.csv', 'x'): existe_rodales = False
+    except FileExistsError: existe_rodales = True
 
     try:
-        with open('Tests/info_colindancias.csv', 'r'): existe_colindancias = True
-    except FileNotFoundError: existe_colindancias = False
-
-    if not existe_rodales:
-        with open('Tests/info_rodales.csv', 'w') as headers:
-            headers.write("ID, Nombre_Propietario, %_Bosque_nativo, %_Bosque_exotico")
-    
-    if not existe_colindancias:
-        with open('Tests/info_colindancias.csv', 'w') as headers:
-            headers.write("ID, rodal colindante, direccion colindancia")
+        with open('Tests/colindancias.csv', 'x'): existe_colindancias = False
+    except FileExistsError: existe_colindancias = True
 
     # Rearmar dicc_rodales desde lo almacenado en el archivo
+    temp_colindancias = dict()
+
+    # Armar el diccionario temporal de colindancias
+    if existe_colindancias:
+        with open('Tests/colindancias.csv', 'r', encoding = 'utf-8') as archivo:
+            datos = archivo.read().splitlines()
+        
+        for colindancia in datos:
+            id_rodal, colindante, direccion = colindancia.split(",")
+            id_rodal.strip(); colindante.strip(); direccion.strip()
+
+            if id_rodal not in temp_colindancias:
+                temp_colindancias[id_rodal] = {'N':'','NW':'','NE':'','S':'','SE':'','SW':''}
+
+            temp_colindancias[id_rodal][direccion] = colindante.strip('"').strip('"')
+
+    # Extraer los datos de los rodales
+    if existe_rodales:
+        with open('Tests/rodales.csv', 'r', encoding = 'utf-8') as archivo:
+            datos = archivo.read().splitlines()
+
+        for rodal in datos:
+            id_rodal, b_nativo, b_exotico, propietario = rodal.split(",")
+            id_rodal.strip(); b_nativo.strip(); b_exotico.strip(); propietario.strip()
+
+            # Generar todo utilizando la función generar_rodal
+            generar_rodal(id_rodal, propietario, int(b_nativo), int(b_exotico), colindancias_dict = temp_colindancias[id_rodal])
 
 
-def guardar_en_archivo():
+def guardar_en_archivo(modo_escritura = 'a'):
     """Esta funcion debe guardar los datos en dicc_rodales para que se puedan utilizar
     en una siguiente ejecución del programa"""
-    ...
+
+    # Escribir en el archivo de rodales
+    with open('Tests/rodales.csv', modo_escritura, encoding = "utf-8") as archivo:
+
+        for id_rodal, datos in dicc_rodales.items():
+            archivo.write(f'{id_rodal}, ')
+
+            for tipo, dato in datos.items():
+
+                if tipo != "colindancias" and tipo != "propietario":
+                    archivo.write(f'{dato}, ')
+                elif tipo == "propietario":
+                    archivo.write(f'{dato}\n')
+
+    # Escribir las colindancias en el archivo
+    with open('Tests/colindancias.csv', modo_escritura, encoding = 'utf-8') as archivo:
+
+        for id_rodal, datos in dicc_rodales.items():
+            for direccion, colindante in dicc_rodales[id_rodal]['colindancias'].items():
+
+                if colindante != '':
+                    archivo.write(f'{id_rodal}, {colindante}, {direccion}\n')
+
+def limpiar_datos():
+
+    with open('Tests/colindancias.csv', 'w', encoding = 'utf-8'):
+        pass
+
+    with open('Tests/rodales.csv', 'w', encoding = 'utf-8'):
+        pass
+
 
 # Programa
 def main():
-    # Guardar todos los datos en variables
-    leer_en_archivo()
 
     mensaje = """<<< OBD Firewatch >>>\n
  Opciones:
  1. Añadir rodal
- 2. Salir y guardar
- 3. Salir sin guardar
+ 2. Guardar datos
+ 3. Eliminar datos
+ 4. Salir
  > """
     referencia_coordenadas = {
         "N" : "Sur",
@@ -147,24 +260,30 @@ def main():
     
     global dicc_rodales
     dicc_rodales = dict()
-    
-    # Variables colindancias
-    colin_norte,colin_noroeste,colin_noreste,colin_sur,colin_sureste,colin_suroeste = [0, 0, 0, 0, 0, 0]
-    rodal_colindante = "none"
+
+    # Reconstruir dicc_rodales
+    leer_en_archivo()
+
+    # # ----- debug :3 -----
+    # for key,value in dicc_rodales.items():
+    #     print(f"{key}   : {value}")
+    # print()
 
     # Main loop
     loop = True
     while loop:
 
+        # Preguntar por la opción del menú
         while True:
             try:
                 opcion = int(input(mensaje))
-                if opcion not in [1, 2, 3]:
+                if opcion not in [1, 2, 3, 4]:
                     raise OpcionInvalidaError
                 break
             except ValueError: print("< Ingrese un caracter válido >\n")
             except OpcionInvalidaError: print("< Opción inválida, ingrese nuevamente >\n")
 
+        # Según lo que haya escogido el usuario
         match opcion:
             # 1. AÑADIR RODAL
             case 1:
@@ -219,6 +338,10 @@ def main():
 
                 print(f'Bosque Nativo: %{pb_nativo}\nBosque Exótico: %{pb_exotico}\n')
 
+                # IMPORTANTE RESETEAR LAS VARIABLES CADA VEZ QUE SE VAYA A AGREGAR UN NUEVO RODAL
+                colin_norte,colin_noroeste,colin_noreste,colin_sur,colin_sureste,colin_suroeste = ['', '', '', '', '', '']
+                rodal_colindante = "none"
+
                 # Colindancias
                 if not dicc_rodales: invalido = False
                 else: invalido = True
@@ -244,8 +367,8 @@ def main():
                                         if rodal_colindante not in dicc_rodales:
                                             raise OpcionInvalidaError
                                         info_colin = "N"
-                                        if validar_rodal(rodal_colindante, info_colin):
-                                            colin_norte = 0 # Si no se resetea el valor, hace conflicto al ingresar el rodal
+                                        if colindancia_valida(rodal_colindante, info_colin):
+                                            colin_norte = '' # Si no se resetea el valor, hace conflicto al ingresar el rodal
                                             raise EspacioNoValidoError
                                         invalido = False
                                         colin_norte = rodal_colindante
@@ -264,8 +387,8 @@ def main():
                                         if rodal_colindante not in dicc_rodales:
                                             raise OpcionInvalidaError
                                         info_colin = "NE"
-                                        if validar_rodal(rodal_colindante, info_colin):
-                                            colin_noreste = 0   # Si no se resetea el valor, hace conflicto al ingresar el rodal
+                                        if colindancia_valida(rodal_colindante, info_colin):
+                                            colin_noreste = ''   # Si no se resetea el valor, hace conflicto al ingresar el rodal
                                             raise EspacioNoValidoError
                                         invalido = False
                                         colin_noreste = rodal_colindante
@@ -284,8 +407,8 @@ def main():
                                         if rodal_colindante not in dicc_rodales:
                                             raise OpcionInvalidaError
                                         info_colin = "NW"
-                                        if validar_rodal(rodal_colindante, info_colin):
-                                            colin_noroeste = 0  # Si no se resetea el valor, hace conflicto al ingresar el rodal
+                                        if colindancia_valida(rodal_colindante, info_colin):
+                                            colin_noroeste = ''  # Si no se resetea el valor, hace conflicto al ingresar el rodal
                                             raise EspacioNoValidoError
                                         invalido = False
                                         colin_noroeste = rodal_colindante
@@ -304,8 +427,8 @@ def main():
                                         if rodal_colindante not in dicc_rodales:
                                             raise OpcionInvalidaError
                                         info_colin = "SW"
-                                        if validar_rodal(rodal_colindante, info_colin):
-                                            colin_suroeste = 0  # Si no se resetea el valor, hace conflicto al ingresar el rodal
+                                        if colindancia_valida(rodal_colindante, info_colin):
+                                            colin_suroeste = ''  # Si no se resetea el valor, hace conflicto al ingresar el rodal
                                             raise EspacioNoValidoError
                                         invalido = False
                                         colin_suroeste = rodal_colindante
@@ -324,8 +447,8 @@ def main():
                                         if rodal_colindante not in dicc_rodales:
                                             raise OpcionInvalidaError
                                         info_colin = "SE"
-                                        if validar_rodal(rodal_colindante, info_colin):
-                                            colin_sureste = 0   # Si no se resetea el valor, hace conflicto al ingresar el rodal
+                                        if colindancia_valida(rodal_colindante, info_colin):
+                                            colin_sureste = ''   # Si no se resetea el valor, hace conflicto al ingresar el rodal
                                             raise EspacioNoValidoError
                                         invalido = False
                                         colin_sureste = rodal_colindante
@@ -344,8 +467,8 @@ def main():
                                         if rodal_colindante not in dicc_rodales:
                                             raise OpcionInvalidaError
                                         info_colin = "S"
-                                        if validar_rodal(rodal_colindante, info_colin):
-                                            colin_sur = 0   # Si no se resetea el valor, hace conflicto al ingresar el rodal
+                                        if colindancia_valida(rodal_colindante, info_colin):
+                                            colin_sur = ''   # Si no se resetea el valor, hace conflicto al ingresar el rodal
                                             raise EspacioNoValidoError
                                         invalido = False
                                         colin_sur = rodal_colindante
@@ -368,28 +491,47 @@ def main():
                 try: 
                     # Dentro de una excepcion en caso de que info_colin no exista
                     print(f"Se encuentra al {referencia_coordenadas[info_colin]} de {rodal_colindante}\n")
-                    asignar_colindancias(id_rodal, rodal_colindante, info_colin)
+                    asignar_colindancias(id_rodal, rodal_colindante, info_colin, rodal_colindante)
                 except UnboundLocalError: pass
 
                 # -------------- debug --------------
                 for key,value in dicc_rodales.items():
                     print(f"{key}   : {value}")
+                print()
 
-            # 2. SALIR Y GUARDAR
+            # 2. GUARDAR DATOS
             case 2:
-                ...
-            # 3. SALIR SIN GUARDAR
+                guardar_en_archivo()
+                print('\n< Datos guardados exitosamente >\n')
+
+            # 3. LIMPIAR ARCHIVO
             case 3:
                 while True:
                     try:
-                        seguro = input("\n¿Estás seguro que quieres salir sin guardar?(S/N)\n> ").lower()
+                        seguro = input("\n¿Estás seguro que quieres eliminar los datos?(S/N)\n> ").lower()
                         if seguro not in ["s", "n", "si", "no"]:
                             raise OpcionInvalidaError
                         break
                     except OpcionInvalidaError: print("< Opción inválida, ingrese nuevamente >\n")
 
                 if seguro in ["s", "si"]:
-                    print("\nGracias por ver suscribanse a shyupss en youtube")
+                    limpiar_datos()
+                    print()
+                if seguro in ["n", "no"]:
+                    print()
+
+            # 4. SALIR
+            case 4:
+                while True:
+                    try:
+                        seguro = input("\n¿Estás seguro que quieres salir?(S/N)\n> ").lower()
+                        if seguro not in ["s", "n", "si", "no"]:
+                            raise OpcionInvalidaError
+                        break
+                    except OpcionInvalidaError: print("< Opción inválida, ingrese nuevamente >\n")
+
+                if seguro in ["s", "si"]:
+                    print("\no/")
                     loop = False
                 if seguro in ["n", "no"]:
                     print()
