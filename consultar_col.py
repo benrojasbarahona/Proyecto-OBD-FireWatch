@@ -92,5 +92,4 @@ def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a cons
     a, _ = consultar_()
     return tuple(a.keys())
 
-a, _ = por_lista_hectarea('R1, R3-R9, R10')
-print(a)
+print(por_lista_hectarea('R1, R3-R9, R10'))
