@@ -201,7 +201,10 @@ def leer_en_archivo():
             id_rodal.strip(); b_nativo.strip(); b_exotico.strip(); propietario.strip()
 
             # Generar todo utilizando la función generar_rodal
-            generar_rodal(id_rodal, propietario, int(b_nativo), int(b_exotico), colindancias_dict = temp_colindancias[id_rodal])
+            if id_rodal in temp_colindancias:
+                generar_rodal(id_rodal, propietario, int(b_nativo), int(b_exotico), colindancias_dict = temp_colindancias[id_rodal])
+            else:
+                generar_rodal(id_rodal, propietario, int(b_nativo), int(b_exotico))
 
 
 def guardar_en_archivo(modo_escritura = 'a'):
@@ -263,10 +266,10 @@ def main():
     # Reconstruir dicc_rodales
     leer_en_archivo()
 
-    # # ----- debug :3 -----
-    # for key,value in dicc_rodales.items():
-    #     print(f"{key}   : {value}")
-    # print()
+    # ----- debug :3 -----
+    for key,value in dicc_rodales.items():
+        print(f"{key}   : {value}")
+    print()
 
     # Main loop
     loop = True
@@ -492,6 +495,9 @@ def main():
                     print(f"Se encuentra al {referencia_coordenadas[info_colin]} de {rodal_colindante}\n")
                     asignar_colindancias(id_rodal, rodal_colindante, info_colin, rodal_colindante)
                 except UnboundLocalError: pass
+
+                guardar_en_archivo()
+                print('\n< Datos guardados exitosamente >\n')
 
                 # -------------- debug --------------
                 for key,value in dicc_rodales.items():
