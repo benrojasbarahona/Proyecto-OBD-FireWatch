@@ -53,21 +53,21 @@ def por_propietario(propietario:str) -> str: # consulta por propietario
     # colocar validacion (función a parte)
     dict_propietario, _ = consultar_()
     rodales_prop, natividad, exotico = dict_propietario[propietario].values()
-    return (rodales_prop, natividad, exotico)
+    return [rodales_prop, natividad, exotico]
     #   Retorno de la cantidad de los rodales los cuales es propietario,
     #   natividad, exotico al preguntar por algún rodal en particular.
-    #   ejemplo de salida ... -> ('Rodales Pepe', '87', '13')
+    #   ejemplo de salida ... -> ['Rodales Pepe', '87', '13']
     #   tipo: tupla de strings
 
 def por_rodal(rodal:str): #consulta por rodales
     _, dict_rodal = consultar_()
     propietario, natividad, exotico = dict_rodal[rodal].values()
-    return (propietario, natividad, exotico)
+    return [propietario, natividad, exotico]
     #   Retorno de propietario, natividad, exotico al preguntar por algún rodal en particular
-    #   ejemplo de salida ... -> ('Rodales Pepe', '87', '13')
-    #   tipo: tupla de strings
+    #   ejemplo de salida ... -> ['Rodales Pepe', '87', '13']
+    #   tipo: lista de strings
 
-def por_lista_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
+def por_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
     #   Defino variables a utilizar.
     split_str_rodales = str_rodales.split(', '); rodales_total = []; _, dict_rodal = consultar_()
     nativo_hectareas_total = 0; exotico_hectareas_total = 0;
@@ -90,26 +90,22 @@ def por_lista_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, 
         except KeyError:
             ...
 
-    return round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
+    return list(round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2))
     #   Retorno de las hectarias totales de nativos y exoticos
     #   ejemplo de salida...-> esto retorna dos valores, por ende... -> (24, 27.5)
-    #   tipo: dos valores, flotantes (se puede conciderar una tupla de flotantes)
+    #   tipo: lista de dos valores flotantes (se puede conciderar una tupla de flotantes)
 
 def cant_rodales() -> tuple: # tupla de los rodales disponibles a consultar... (ayuda al combobox)
     _, b = consultar_()
     lista_ = list(b.keys())
     return sorted(lista_, key=lambda x: int(x[1:]))
-                            # ejemplo de salida ... -> ('R1', 'R3', 'R6', 'R7', 'R8', 'R9', 'R10')0
-                            # tipo: tupla de string's
+                            # ejemplo de salida ... -> ['R1', 'R3', 'R6', 'R7', 'R8', 'R9', 'R10']
+                            # tipo: lista de string's
 
 def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a consultar ... (ayuda al combobox)
     a, _ = consultar_()
-    return tuple(a.keys())  # ejemplo de salida ... -> ('Rodales Csazsar', 'Bingus Radianes',
-                            #                               'Simu Asociados', 'Toledo.s Rodales')
-                            # tipo: tupla de string's
+    return list(a.keys())   # ejemplo de salida ... -> ['Rodales Csazsar', 'Bingus Radianes',
+                            #                               'Simu Asociados', 'Toledo.s Rodales']
+                            # tipo: lista de string's
 
-print(cant_rodales())
-
-# comentarrrrrr
-
-# incendio backend (ben)
+print(por_rodal('R10'))
