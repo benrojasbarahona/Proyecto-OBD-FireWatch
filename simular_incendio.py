@@ -1,57 +1,20 @@
-#Cada rodal es una figura hexagonal con las direcciones de los lados como se muestra en la figura.
-#sus lados tienen colindancias hacia el norte (N), noreste (NE), sureste (SE), sur (S), suroeste (SW) y noroeste (NW).
+dicc_rodales = {
+        'R1'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R4', 'NW': 'R6', 'NE': 'R3', 'S': '', 'SE': 'R2', 'SW': ''}},
+        'R2'   : {'b_nativo': 12, 'b_exotico': 88, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R3', 'NW': 'R1', 'NE': '', 'S': '', 'SE': '', 'SW': ''}},
+        'R3'   : {'b_nativo': 98, 'b_exotico': 2, 'propietario': 'R. Maturana', 'colindancias': {'N': 'R5', 'NW': 'R4', 'NE': '', 'S': 'R2', 'SE': '', 'SW': 'R1'}},
+        'R4'   : {'b_nativo': 87, 'b_exotico': 13, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': 'R7', 'NE': 'R5', 'S': 'R1', 'SE': 'R3', 'SW': 'R6'}},
+        'R5'   : {'b_nativo': 90, 'b_exotico': 10, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R3', 'SE': '', 'SW': 'R4'}},
+        'R6'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'Inv. Lazo', 'colindancias': {'N': 'R7', 'NW': '', 'NE': 'R4', 'S': '', 'SE': 'R1', 'SW': ''}},
+        'R7'   : {'b_nativo': 50, 'b_exotico': 50, 'propietario': 'lucas reyes', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R6', 'SE': 'R4', 'SW': ''}}
+}
 
-def main(): 
-
-    # Diccionario de colindancias desde el archivo
-    # RN : {propietario: 'nombre', b_nativo: 0, b_exotico: 0, colindancias: {N: 'R1', NW: 'R2', NE: 0, S: 0, SE: 0, SW: 0}
-    diccionario_rodales = {
-        'R1'   : {'propietario': 'Ben', 'b_nativo': 40, 'b_exotico': 60, 'colindancias': {'N': 'R4', 'NW': 'R6', 'NE': 'R3', 'S': 0, 'SE': 'R2', 'SW': 0}},
-        'R2'   : {'propietario': 'Joe', 'b_nativo': 12, 'b_exotico': 88, 'colindancias': {'N': 'R3', 'NW': 'R1', 'NE': 0, 'S': 0, 'SE': 0, 'SW': 0}},
-        'R3'   : {'propietario': 'Karl', 'b_nativo': 98, 'b_exotico': 2, 'colindancias': {'N': 'R5', 'NW': 'R4', 'NE': 0, 'S': 'R2', 'SE': 0, 'SW': 'R1'}},
-        'R4'   : {'propietario': 'JH', 'b_nativo': 87, 'b_exotico': 13, 'colindancias': {'N': 0, 'NW': 'R7', 'NE': 'R5', 'S': 'R1', 'SE': 'R3', 'SW': 'R6'}},
-        'R5'   : {'propietario': 'Trump', 'b_nativo': 90, 'b_exotico': 10, 'colindancias': {'N': 0, 'NW': 0, 'NE': 0, 'S': 'R3', 'SE': 0, 'SW': '0'}} , 
-        'R6'   : {'propietario': 'Van', 'b_nativo': 40, 'b_exotico': 60, 'colindancias': {'N': 'R7', 'NW': 0, 'NE': 'R4', 'S': 0, 'SE': 'R1', 'SW': 0}},
-        'R7'  : {'propietario': 'Leo', 'b_nativo': 50, 'b_exotico': 50, 'colindancias': {'N': 0, 'NW': 0, 'NE': 0, 'S': 'R6', 'SE': 'R4', 'SW': 0}}} 
-
-    # Simular incendio en un rodal y mostrar los rodales afectados
-    rodal_comprometido = input('Ingrese rodal comprometido inicial, para simular incendio: ')
-    direccion = input('Ingrese dirección del viento (dirección del incendio): ')
-    rodales_afectados = simular_incendio(rodal_comprometido, direccion, diccionario_rodales)
-
-    print('Los rodales afectados son: ', rodales_afectados)
-#  Creo una funcion la cual recibe como parametro el diccionario de colindancias,
-#  el rodal comprometido y la direccion del viento, para simular el incendio y hacia donde se propaga.
-#  Las direcciones del viento pueden ser: N, NE, SE, S, SW, NW, E, W. 
-#  Cabe señalar que E afecta a NE y SE, y W afecta a NW y SW, debido a la forma hexagonal de los rodales.
-#  1. La funcion retorna una lista con los rodales afectados y flotantes de las hectareas afectadas.
-#  2. La funcion debe ser recursiva.
-
-def simular_incendio(rodal_comprometido, direccion, dicc_rodales):
-
+def simular_afectados(direccion_viento: str, rodal_inicial: str, afectados:set = set()) -> list: 
     #_________________________________INFORMACION_______________________________________
-    #1. Debe desplegar la funcion de "consultar rodal" para el rodal comprometido + direccion
-    #2. Debe desplegar la funcion de "consultar rodal" para los rodales afectados
-    #3. Debe retornar la set de rodales afectados
-    #4. Debe retornar la set de propietarios afectados
-    #5. Debe retornar las hectareas totales afectadas por el incendio (cada rodal tiene 10 hectareas)
-    #6. Debe retornar las hectareas de bosque nativo afectado con una conversión de (porcentaje*0.1)
-    #7. Debe retornar las hectareas de bosque exotico afectado con una conversión de (porcentaje*0.1)
+    # Busca recursivamente en el diccionario de rodales según la dirección del viento y añade a 
+    #                       un set los rodales afectados encontrados
+    # *** RETORNA: una lista de rodales afectados ordenados de menor a mayor ***
     #___________________________________________________________________________________
-
-    # Listas
-    rodales_riesgo_incendio = set()
-    propietarios_afectados = set()
-
-    # Contadores
-    bosque_nativo_afectado = dicc_rodales[rodal_comprometido]['b_nativo'] * 0.1
-    bosque_exotico_afectado = dicc_rodales[rodal_comprometido]['b_exotico'] * 0.1
-    hectareas_totales_afectadas = 0.
-
-    # Agregar el rodal comprometido a las lista de propietarios
-    propietarios_afectados.add(dicc_rodales[rodal_comprometido]['propietario'])
-
-    # Definir las direcciones afectadas según la dirección del viento
+    vuelta = 1
     direcciones_afectadas = {
         'N': ['N'],
         'NE': ['NE'],
@@ -63,25 +26,80 @@ def simular_incendio(rodal_comprometido, direccion, dicc_rodales):
         'E': ['NE', 'SE']
     }
 
-    # Iterar sobre las direcciones afectadas y agregar los rodales afectados
-    for dir_afectada in direcciones_afectadas[direccion]:
-        rodal_afectado = dicc_rodales[rodal_comprometido]['colindancias'][dir_afectada]
-        if rodal_afectado != 0:
-            rodales_riesgo_incendio.add(rodal_afectado)
-            propietarios_afectados.add(dicc_rodales[rodal_afectado]['propietario'])
-            
-            
-    bosque_nativo_afectado += dicc_rodales[rodal_afectado]['b_nativo'] * 0.1
-    bosque_exotico_afectado += dicc_rodales[rodal_afectado]['b_exotico'] * 0.1
+    # Caso base: No se encontraron rodales
+    if rodal_inicial == '':
+        return
+
+    # En el caso de que se hayan encontrado
+    if rodal_inicial != '':
+        # Añadir al set
+        afectados.add(rodal_inicial)
+        # Buscar más rodales 
+        for direccion in direcciones_afectadas[direccion_viento]:
+            match vuelta:
+                case 1:
+                    siguiente_rodal_1 = dicc_rodales[rodal_inicial]['colindancias'][direccion]
+                
+                case 2:
+                    siguiente_rodal_2 = dicc_rodales[rodal_inicial]['colindancias'][direccion]
+
+            vuelta += 1
+
+    # Devolver lo encontrado (según que dirección se haya entregado)
+    # E y W, son casos especiales, ya que se deben buscar en dos direcciones        
+    if direccion_viento in ['E', 'W']:
+        simular_afectados(direccion_viento, siguiente_rodal_1, afectados)
+        simular_afectados(direccion_viento, siguiente_rodal_2, afectados)
+        afectados = sorted(afectados, key=lambda x: int(x[1:]))
+        return afectados
+    else:
+        simular_afectados(direccion_viento, siguiente_rodal_1, afectados)
+        afectados = sorted(afectados, key=lambda x: int(x[1:])) #Ordenar los rodales
+        return afectados
+
+def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
+    #_________________________________INFORMACION_______________________________________
+    #1. Debe retornar las hectareas totales afectadas por el incendio (cada rodal tiene 10 hectareas)
+    #2. Debe retornar las hectareas de bosque nativo afectado con una conversión de (porcentaje*0.1)
+    #3. Debe retornar las hectareas de bosque exotico afectado con una conversión de (porcentaje*0.1)
+    #4. Debe retornar la set de propietarios afectados
+    # *** RETORNA tupla_suma = (hectareas_totales_afectadas, bosque_nativo_afectado, bosque_exotico_afectado) ***
+    #___________________________________________________________________________________
+    propietarios_afectados = [dicc_rodales[rodal_inicial]['propietario']]
+    bosque_nativo_afectado = dicc_rodales[rodal_inicial]['b_nativo'] * 0.1
+    bosque_exotico_afectado = dicc_rodales[rodal_inicial]['b_exotico'] * 0.1
+ 
+
+    for rodal in list_afectados:
+        # Excluir el rodal de inicio de la suma (no duplicarlo)
+        if rodal != rodal_inicial:
+            bosque_nativo_afectado += dicc_rodales[rodal]['b_nativo'] * 0.1
+            bosque_exotico_afectado += dicc_rodales[rodal]['b_exotico'] * 0.1
+            propietarios_afectados.append(dicc_rodales[rodal]['propietario'])
+
     hectareas_totales_afectadas = bosque_nativo_afectado + bosque_exotico_afectado
-    
-    return rodales_riesgo_incendio, propietarios_afectados, bosque_nativo_afectado, bosque_exotico_afectado, hectareas_totales_afectadas
+    tupla_suma = (hectareas_totales_afectadas, bosque_nativo_afectado, bosque_exotico_afectado)
+    tupla_propietarios = tuple(propietarios_afectados)
+    return tupla_suma, tupla_propietarios
 
-    #Realizo recursividad para los rodales afectados, recorro el set de rodales afectados y llamo a la funcion,
-    #solo si el rodal afectado no ha sido afectado anteriormente.
-    #Hago un break si no existen colindancias en la direccion del viento.
-    #Retorno finalmente
 
+
+def simular_incendio(direccion_viento: str, rodal_inicial: str) -> list:
+    #_________________________________INFORMACION_______________________________________
+    #1. Debe desplegar la funcion de "consultar rodal" para el rodal comprometido + direccion
+    #2. Debe desplegar la funcion de "consultar rodal" para los rodales afectados
+    #3. Debe retornar la lista de incendio
+    # *** RETORNA lista_incendio = [(rodales), (propietarios),(nativo, exotico, total)] ***
+    #__________________________________________________________________________________
+
+
+    rodales_afectados = simular_afectados(direccion_viento, rodal_inicial) #ordeno la lista de afectados
+    recursos_comprometidos = suma_afectados(rodal_inicial,rodales_afectados)
+    lista_incendio = [rodales_afectados, recursos_comprometidos[1], recursos_comprometidos[0]]
+    return lista_incendio
+
+def main():
+    rodales_afectados = simular_incendio('E', 'R6')
+    print(rodales_afectados)
 if __name__ == '__main__':
     main()
-
