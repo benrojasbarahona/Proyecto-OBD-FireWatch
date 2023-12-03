@@ -230,31 +230,42 @@ def reconstruir_diccionario(colindancias: str = 'colindancias.csv', rodales: str
         dicc_rodales[datos[0].strip("'")]['colindancias'] = temp_colindancias[datos[0].strip("'")]
 
 
-def guardar_en_archivo(modo_escritura = 'a'):
+def guardar_en_archivo(modo_escritura: str = 'a', directorio_archivos: str = 'Tests/'):
     """Esta funcion debe guardar los datos en dicc_rodales para que se puedan utilizar
     en una siguiente ejecución del programa"""
+    rodales_existentes = set()
+
+    # Primero leer el archivo para comprobar qué id de rodal ya está guardada (para evitar copias)
+    with open(f'{directorio_archivos}rodales.csv', 'r', encoding = 'utf-8') as archivo:
+        linea = archivo.readlines()
+
+    for rodal in linea[1:]:
+        datos = rodal.split(",")
+        rodales_existentes.add(datos[0].strip("'"))
 
     # Escribir en el archivo de rodales
-    with open('Tests/rodales.csv', modo_escritura, encoding = "utf-8") as archivo:
+    with open(f'{directorio_archivos}rodales.csv', modo_escritura, encoding = "utf-8") as archivo:
 
         for id_rodal, datos in dicc_rodales.items():
-            archivo.write(f"'{id_rodal}',")
+            if id_rodal not in rodales_existentes:
+                
+                archivo.write(f"'{id_rodal}',")
+                for tipo, dato in datos.items():
 
-            for tipo, dato in datos.items():
-
-                if tipo != "colindancias" and tipo != "propietario":
-                    archivo.write(f"{dato},")
-                elif tipo == "propietario":
-                    archivo.write(f"'{dato}'\n")
+                    if tipo != "colindancias" and tipo != "propietario":
+                        archivo.write(f"{dato},")
+                    elif tipo == "propietario":
+                        archivo.write(f"'{dato}'\n")
 
     # Escribir las colindancias en el archivo
-    with open('Tests/colindancias.csv', modo_escritura, encoding = 'utf-8') as archivo:
+    with open(f'{directorio_archivos}colindancias.csv', modo_escritura, encoding = 'utf-8') as archivo:
 
         for id_rodal, datos in dicc_rodales.items():
-            for direccion, colindante in dicc_rodales[id_rodal]['colindancias'].items():
+            if id_rodal not in rodales_existentes:
+                for direccion, colindante in dicc_rodales[id_rodal]['colindancias'].items():
 
-                if colindante != '':
-                    archivo.write(f"'{id_rodal}','{colindante}','{direccion}'\n")
+                    if colindante != '':
+                        archivo.write(f"'{id_rodal}','{colindante}','{direccion}'\n")
 
 
 def limpiar_datos():
