@@ -14,6 +14,7 @@ def main():
     root.title('OBD Firewatch') # título de la aplicación
     root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize = 50, weight = 1)
     root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
+    root.resizable(False, False)
 
     #logo = tk.PhotoImage(file = "assets/iconos/logo.png")
     #root.iconphoto(True, logo)
@@ -48,6 +49,7 @@ def main():
         nonlocal ventana_abierta
         if ventana_abierta == False:
             ventana_incendio()
+            reporte_incendio("R1","S")
             ventana_abierta = True
         else:
             msgbox.showerror("Error","Ya posee una ventana abierta")
@@ -85,10 +87,9 @@ def main():
         ventana_ingr.title('OBD Firewatch - Ingresar') # título de la aplicación
         ventana_ingr.columnconfigure([0, 4, 5, 6, 7], minsize = 25, weight = 1)
         ventana_ingr.rowconfigure([0, 15], minsize = 25, weight = 1)
-        ventana_ingr.minsize(650, 450)
+        ventana_ingr.resizable(False, False)
         label_bg = tk.Label(ventana_ingr, image=img_background)
         label_bg.place(x=-0,y=0)
-
         F_entrada = ("Clear Sans", 14, "bold") #tuplas de fuente para usar mas abajo
         F_entry = ("Clear Sans", 12, "bold")
         F_ejemplo = ("Clear Sans", 9, "bold")
@@ -320,6 +321,13 @@ def main():
         ventana_reporte.title('Proyección de incendio')
         ventana_reporte.columnconfigure([0,2,4], minsize=15, weight=1)
         ventana_reporte.rowconfigure([0,2,4], minsize=15, weight=1)
+        ventana_reporte.resizable(False, False)
+
+        img_fondo = tk.PhotoImage(file="assets\iconos\simular_incendio.png")
+
+        background_label = tk.Label(ventana_reporte, image=img_fondo)
+        background_label.image = img_fondo  # Establece la imagen
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)  # Coloca la imagen en toda la ventana
 
         def cerrando_ventana():
             """Handler cerrar ventana"""
@@ -329,21 +337,54 @@ def main():
         
         ventana_reporte.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
-        frame_rodal = tk.Frame(ventana_reporte, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        #Setup frames para ventana reporte incendio
+        frame_rodal = tk.Frame(ventana_reporte, bd=7, bg = "#AB431D", relief=tk.RAISED)
         frame_rodal.rowconfigure([0,7], minsize=5, weight=1)
         frame_rodal.columnconfigure([0,2,4], minsize=5, weight=1)
         frame_rodal.grid(row=1, column=1)
 
-        frame_riesgo_incendio = tk.Frame(ventana_reporte, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        frame_riesgo_incendio = tk.Frame(ventana_reporte, bd=7, bg = "#AB431D", relief=tk.RAISED)
         frame_riesgo_incendio.rowconfigure([0,7], minsize=5, weight=1) #hasta largo lista propietarios
         frame_riesgo_incendio.columnconfigure([0,5], minsize=5, weight=1)
         frame_riesgo_incendio.grid(row=2, column=1)
 
-        frame_comprometidos = tk.Frame(ventana_reporte, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        frame_comprometidos = tk.Frame(ventana_reporte, bd=7, bg = "#AB431D", relief=tk.RAISED)
         frame_comprometidos.rowconfigure([0,7], minsize=5, weight=1)
         frame_comprometidos.columnconfigure([0,2], minsize=5, weight=1)
-        frame_comprometidos.grid(row=1, columnspan=3)
+        frame_comprometidos.grid(row=1, column=3, columnspan=2)
 
+        #Relleno frame_rodal con informacion
+        tk.Label(frame_rodal, text = "RODAL INICIO INCENDIO", bg="#AB431D", 
+                 font=("Clear Sans", 14, "bold")).grid(row=1, column=1, columnspan=2, sticky="nw")
+        
+        textos_frame_rodal = ["ID:","% Nativo", "% Exótico", "Propietario", "Dirección Viento"]
+
+        for i in range(len(textos_frame_rodal)):
+            tk.Label(frame_rodal, text = textos_frame_rodal[i], bg="#AB431D", 
+                     font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw")
+            
+        #Relleno frame_riesgo_incendio con información
+        tk.Label(frame_riesgo_incendio, text = "RODALES EN RIESGO DE INCENDIO", bg="#AB431D",
+                 font=("Clear Sans", 14, "bold")).grid(row=1, column=1, columnspan=4, sticky="nw")
+
+        textos_frame_riesgo = ["Rodal","% Nativo", "% Exótico", "Propietario"]
+
+        for i in range(len(textos_frame_riesgo)):
+            tk.Label(frame_riesgo_incendio, text = textos_frame_riesgo[i], bg="#AB431D", 
+                     font=("Clear Sans", 12, "bold")).grid(row=2, column=1+i, sticky="nw")
+        
+        #Relleno frame_comprometidos
+        tk.Label(frame_comprometidos, text = "ROCURSOS COMPROMETIDOS", bg="#AB431D",
+                 font=("Clear Sans", 14, "bold")).grid(row=1, column=1, sticky="nw")
+        
+        textos_recursos = ["Superficie Total:","Superficie Nativos:", "Superficie exótico:"]
+        
+        for i in range(len(textos_recursos)):
+            tk.Label(frame_comprometidos, text = textos_recursos[i], bg="#AB431D",
+                     font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw")
+
+        tk.Label(frame_comprometidos, text="PROPIETARIOS COMPROMETIDOS", bg="#AB431D",
+                 font=("Clear Sans", 14, "bold")).grid(row=5, column=1, sticky="nw")
 
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
@@ -391,7 +432,7 @@ def main():
             rodal_seleccionado = rodal_combobox.get()
             direccion_viento = direccion_combobox.get()
             consulta_abierta = True
-            msgbox.showinfo("Simulación Exitosa", "Aquí debe desplegarse toda la información")
+            reporte_incendio(rodal_seleccionado, direccion_viento)
 
         boton_simular = tk.Button(ventana_inc, text="Simular Incendio", command=simular_incendio, bg='#820400', fg='white')
         boton_simular.place(x=190, y=350)
@@ -402,13 +443,13 @@ def main():
         label_imagen.place(x=160, y=165)
 
 
-    def ventana_resultados_rodal(propietario: str, nativo: int, 
-                                 exotico: int, colindancias: list, rodal: str):
+    def ventana_resultados_rodal(datos_rodal: list, rodal: str):
+                                #[propietario, natividad, exotico]
         
         ventana_res = tk.Toplevel()
         ventana_res.columnconfigure([0, 1, 2], minsize=15, weight=1)
         ventana_res.rowconfigure([0, 10], minsize=10, weight=1)
-        ventana_res.minsize(355,480)
+        ventana_res.resizable(False, False)
 
         label_bg = tk.Label(ventana_res, image=img_background)
         label_bg.place(x=0,y=0)
@@ -419,6 +460,8 @@ def main():
             consulta_abierta = False
             ventana_res.destroy()
         
+        colindancias = ["muchas","pocas"]
+
         ventana_res.protocol("WM_DELETE_WINDOW", cerrando_consulta)
         
         tk.Label (ventana_res, text = "Rodal Consultado:", fg = "#EFD1D1", bg = "#675F2A", 
@@ -428,17 +471,17 @@ def main():
         
         tk.Label (ventana_res, text = "Propietario: ", fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13, "bold")).grid(row=2, column=1, sticky="w")
-        tk.Label (ventana_res, text = propietario, fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = datos_rodal[0], fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13)).grid(row=2, column=1, sticky="w", padx = (95,0))
         
         tk.Label (ventana_res, text = "Porcentaje Bosque Nativo: ", fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13, "bold")).grid(row=3, column=1, sticky="w")
-        tk.Label (ventana_res, text = f"{nativo} %", fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = f"{datos_rodal[1]} %", fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13)).grid(row=3, column=1, sticky="w", padx=(215,0))
         
         tk.Label (ventana_res, text = "Porcentaje Bosque Exótico: ", fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13, "bold")).grid(row=4, column=1, sticky="w")
-        tk.Label (ventana_res, text = f"{exotico} %", fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = f"{datos_rodal[2]} %", fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13)).grid(row=4, column=1, sticky="w", padx=(227,0))
         
         tk.Label (ventana_res, text = "Rodales colindantes: ", fg = "#EFD1D1", bg = "#675F2A", 
@@ -451,8 +494,9 @@ def main():
         canvas.grid(row=7, column=1, sticky="nw")
         st = 0
         coord = 15, 15, 250, 250
-        pieValor = [nativo, exotico]
+        pieValor = [datos_rodal[1], datos_rodal[2]]
         pieColor = ["Green", "#0B320E"]
+
         #Genera grafico de torta en base a porcentajes bosque nativo y exotico
         for val,col in zip(pieValor, pieColor):    
             canvas.create_arc(coord,start=st,extent = val*3.6,fill=col,outline=col)
@@ -468,11 +512,11 @@ def main():
         
     def ventana_resultados_propietario(rodales: dict, hect_nat_total: float, 
                                        hect_exo_total: float, prop_a_consultar: str):
-        
+                                    #[rodales_prop, natividad, exotico]
         ventana_res = tk.Toplevel()
         ventana_res.columnconfigure([0, 1, 2], minsize=15, weight=1)
         ventana_res.rowconfigure([0, 8], minsize=10, weight=1)
-        ventana_res.minsize(355,480)
+        ventana_res.resizable(False, False)
 
         label_bg = tk.Label(ventana_res, image=img_background)
         label_bg.place(x=0,y=0)
@@ -483,28 +527,31 @@ def main():
             consulta_abierta = False
             ventana_res.destroy()
         
+        F_bold = ("Clear Sans", 12, "bold")
+        F_min = ("Clear Sans", 12)
+
         ventana_res.protocol("WM_DELETE_WINDOW", cerrando_consulta)
 
         tk.Label (ventana_res, text = prop_a_consultar, fg = "#EFD1D1", bg = "#675F2A", 
                       font = ("Clear Sans", 15, "bold underline")).grid(row=1, column=1, sticky="w", pady=15)
         
         tk.Label (ventana_res, text = "Cantidad de rodales:", fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 12, "bold")).grid(row=2, column=1, sticky="nw")
+                      font = F_bold).grid(row=2, column=1, sticky="nw")
         tk.Label (ventana_res, text = len(rodales), fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 12)).grid(row=2, column=1, sticky="w",padx= (165,0))
+                      font = F_min).grid(row=2, column=1, sticky="w",padx= (165,0))
         
         tk.Label (ventana_res, text = rodales, fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 13)).grid(row=3, column=1, sticky="w")
+                      font = F_min).grid(row=3, column=1, sticky="w")
         
         tk.Label (ventana_res, text = "Hectareas bosque nativo:", fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 13, "bold")).grid(row=4, column=1, sticky="nw")
+                      font = F_bold).grid(row=4, column=1, sticky="nw")
         tk.Label (ventana_res, text = f"{hect_nat_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 13)).grid(row=4, column=1, sticky="sw",padx= (210,0))
+                      font = F_min).grid(row=4, column=1, sticky="sw",padx= (210,0))
         
         tk.Label (ventana_res, text = "Hectareas bosque exótico:", fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 13, "bold")).grid(row=5, column=1, sticky="nw")
+                      font = F_bold).grid(row=5, column=1, sticky="nw")
         tk.Label (ventana_res, text = f"{hect_exo_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
-                      font = ("Clear Sans", 13)).grid(row=5, column=1, sticky="sw",padx= (220,0), pady=(0,15))
+                      font = F_min).grid(row=5, column=1, sticky="sw",padx= (220,0), pady=(0,15))
 
         #Setup Canvas para gráfico de torta
         canvas = tk.Canvas(ventana_res, width=270, height=270, bg = "#675F2A")
@@ -531,13 +578,14 @@ def main():
         tk.Label (ventana_res,bg = "#0B320E", width=2, height=1).grid(row=9, column=1, sticky="w")
 
 
-    def ventana_resultado_rango(hect_nat_total: float, hect_exo_total: float, 
+    def ventana_resultado_rango(hectareas_totales: list, 
                                 rango_a_consultar: str):
+        #list(round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
         
         ventana_res = tk.Toplevel()
         ventana_res.columnconfigure([0, 1, 2], minsize=25, weight=1)
         ventana_res.rowconfigure([0, 6, 7, 8, 9], minsize=25, weight=1)
-        ventana_res.minsize(355,480)
+        ventana_res.resizable(False, False)
         label_bg = tk.Label(ventana_res, image=img_background)
         label_bg.place(x=0,y=0)
 
@@ -556,12 +604,12 @@ def main():
         
         tk.Label (ventana_res, text = "Hectareas bosque nativo:", fg = "#EFD1D1", bg = "#675F2A", 
                       font = ("Clear Sans", 13, "bold")).grid(row=3, column=1, sticky="nw")
-        tk.Label (ventana_res, text = f"{hect_nat_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = f"{hectareas_totales[0]} ha", fg = "#EFD1D1", bg = "#675F2A", 
                       font = ("Clear Sans", 12)).grid(row=3, column=1, sticky="w", padx=(210,0))
         
         tk.Label (ventana_res, text = "Hectareas bosque exotico:", fg = "#EFD1D1", bg = "#675F2A", 
                       font = ("Clear Sans", 13, "bold")).grid(row=4, column=1, sticky="nw")
-        tk.Label (ventana_res, text = f"{hect_exo_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = f"{hectareas_totales[1]} ha", fg = "#EFD1D1", bg = "#675F2A", 
                       font = ("Clear Sans", 12)).grid(row=4, column=1, sticky="w", padx=(220,0),pady=(0,15))
         
         #Setup Canvas para gráfico de torta
@@ -569,8 +617,8 @@ def main():
         canvas.grid(row=5, column=1, sticky="nw")
         st = 0
         coord = 15, 15, 250, 250
-        porcentaje_hect_nat = hect_nat_total/(hect_nat_total + hect_exo_total)*100
-        porcentaje_hect_exo = hect_exo_total/(hect_nat_total + hect_exo_total)*100
+        porcentaje_hect_nat = hectareas_totales[0]/(hectareas_totales[0] + hectareas_totales[1])*100
+        porcentaje_hect_exo = hectareas_totales[1]/(hectareas_totales[0] + hectareas_totales[1])*100
         pieValor = [porcentaje_hect_nat, porcentaje_hect_exo]
         pieColor = ["Green", "#0B320E"]
 
@@ -592,7 +640,7 @@ def main():
     def ventana_consulta(): # ----------------------- Ventana Consulta -------------------------------------------------
         ventana_cons = tk.Toplevel()
         ventana_cons.title('OBD Firewatch - Consultar')
-        ventana_cons.minsize(650, 450)
+        ventana_cons.resizable(False, False)
         ventana_cons.columnconfigure([0, 1, 2, 3], minsize = 25, weight = 1)
         ventana_cons.rowconfigure([0, 1, 5,6,7,8], minsize = 25, weight = 1)
 
@@ -681,9 +729,9 @@ def main():
 
                 if consulta.get() == "Bosque":
                     rango_a_consultar = consulta_temp.get()
-                    #hect_nat_total, hect_exo_total = log.por_lista_hectarea(rango_a_consultar)
-
-                    #ventana_resultado_rango(hect_nat_total, hect_exo_total, rango_a_consultar)
+                    lista_hect = log.por_lista_hectarea(rango_a_consultar)
+                    ventana_resultado_rango(lista_hect, rango_a_consultar)
+                    #list(round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
                     ventana_resultado_rango(33.4, 70.2, "R3,R4-R9,R10")
                     consulta_abierta = True
             else:

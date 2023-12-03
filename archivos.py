@@ -88,6 +88,7 @@ def guardar_en_archivo(dicc_rodales: dict, modo_escritura: str = 'a', directorio
     """Esta funcion debe guardar los datos en dicc_rodales para que se puedan utilizar
     en una siguiente ejecución del programa"""
     rodales_existentes = set()
+    generar_archivos()
 
     # Primero leer el archivo para comprobar qué id de rodal ya está guardada (para evitar copias)
     with open(f'{directorio_archivos}/rodales.csv', 'r', encoding = 'utf-8') as archivo:
@@ -120,6 +121,8 @@ def guardar_en_archivo(dicc_rodales: dict, modo_escritura: str = 'a', directorio
 
                     if colindante != '':
                         archivo.write(f"'{id_rodal}','{colindante}','{direccion}'\n")
+
+    print(dicc_rodales)
 
 
 def limpiar_datos():
