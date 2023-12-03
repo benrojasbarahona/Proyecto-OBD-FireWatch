@@ -358,19 +358,31 @@ def main():
         #Relleno frame_rodal con informacion
         
         datos_rodal_inicial = log.por_rodal(rodal_inicial)
-
+        #[propietario, natividad, exotico]
         tk.Label(frame_rodal, text = "RODAL INICIO INCENDIO", bg="#AB431D", 
                  font=("Clear Sans", 14, "bold")).grid(row=1, column=1, columnspan=2, sticky="nw")
         
-        textos_frame_rodal = ["ID:","% Nativo", "% Exótico", "Propietario", "Dirección Viento"]
+        textos_frame_rodal = ["ID:","% Nativo:", "% Exótico:", "Propietario:", "Dirección Viento:"]
 
         for i in range(len(textos_frame_rodal)):
             tk.Label(frame_rodal, text = textos_frame_rodal[i], bg="#AB431D", 
                      font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw")
         
-        for i in range(len(datos_rodal_inicial)):
-            tk.Label(frame_rodal, text=datos_rodal_inicial[i], bg="#AB431D",
-                     font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw", padx= (100,0))
+        tk.Label(frame_rodal, text=rodal_inicial, bg="#AB431D",
+                    font=("Clear Sans", 12)).grid(row=2, column=1, sticky="nw", padx= (140,0))
+        
+        tk.Label(frame_rodal, text=datos_rodal_inicial[1], bg="#AB431D",
+                    font=("Clear Sans", 12)).grid(row=3, column=1, sticky="nw", padx= (140,0))
+        
+        tk.Label(frame_rodal, text=datos_rodal_inicial[2], bg="#AB431D",
+                    font=("Clear Sans", 12)).grid(row=4, column=1, sticky="nw", padx= (140,0))
+        
+        tk.Label(frame_rodal, text=datos_rodal_inicial[0], bg="#AB431D",
+                    font=("Clear Sans", 12)).grid(row=5, column=1, sticky="nw", padx= (140,0))
+        
+        tk.Label(frame_rodal, text=viento, bg="#AB431D",
+                    font=("Clear Sans", 12)).grid(row=6, column=1, sticky="nw", padx= (140,0))
+        
                     
 
         #Relleno frame_riesgo_incendio con información

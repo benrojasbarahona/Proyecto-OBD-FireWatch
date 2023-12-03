@@ -382,6 +382,7 @@ def simular_afectados(direccion_viento: str, rodal_inicial: str, afectados:set =
         simular_afectados(direccion_viento, siguiente_rodal_1, afectados)
         afectados = sorted(afectados, key=lambda x: int(x[1:])) #Ordenar los rodales
         return afectados
+    
 
 def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
     #_________________________________INFORMACION_______________________________________
