@@ -409,49 +409,9 @@ def test():
     
     print (validado, msj)
 
-
-def simular_incendio(direccion_viento: str, rodal_inicial: str, afectados: set):
-
-    vuelta = 1
-    direcciones_afectadas = {
-        'N': ['N'],
-        'NE': ['NE'],
-        'SE': ['NE'],
-        'S': ['S'],
-        'SW': ['SW'],
-        'NW': ['NW'],
-        'W': ['NW', 'SW'],
-        'E': ['NE', 'SE']
-    }
-
-    if rodal_inicial == '':
-        return
-
-    if rodal_inicial != '':
-
-        afectados.add(rodal_inicial)
-        for i in direcciones_afectadas[direccion_viento]:
-            match vuelta:
-                case 1:
-                    siguiente_rodal_1 = dicc_rodales[rodal_inicial]['colindancias'][i]
-                
-                case 2:
-                    siguiente_rodal_2 = dicc_rodales[rodal_inicial]['colindancias'][i]
-
-            vuelta += 1
-
-    if direccion_viento in ['E', 'W']:
-        simular_incendio(direccion_viento, siguiente_rodal_1, afectados)
-        simular_incendio(direccion_viento, siguiente_rodal_2, afectados)
-        return (afectados)
-    
-    else:
-        simular_incendio(direccion_viento, siguiente_rodal_1, afectados)
-        return (afectados)
-
-
     for key,value in dicc_rodales.items():
         print(f"{key}   : {value}")
         print()
+
 if __name__ == "__main__":
     test()

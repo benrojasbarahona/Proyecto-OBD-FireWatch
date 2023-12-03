@@ -380,18 +380,21 @@ def main():
         ventana_res.minsize(650,450)
         label_bg = tk.Label(ventana_res, image=img_background)
         label_bg.place(x=-0,y=0)
-        lista_datos = [f"Propietario{propietario}",natividad,exotico,colindancias]
-        for i in range (5):
-            tk.Label (text = "Suroeste", fg = "#EFD1D1", bg = "#675F2A").grid(row=16,column=1,sticky="w",padx=10)
+        lista_datos = [f"Propietario{propietario}",f"Porcentaje Bosque Nativo: {natividad}",
+                       f"Porcentaje Bosque Exotico {exotico}",colindancias]
+        for i in range (4):
+            tk.Label (text = lista_datos[i], fg = "#EFD1D1", bg = "#675F2A").grid(row=16,column=1,sticky="w",padx=10)
+        
 
     def ventana_consulta(): # ----------------------- Ventana Consulta -------------------------------------------------
         ventana_cons = tk.Toplevel()
+        ventana_cons.title('OBD Firewatch - Consultar')
         ventana_cons.minsize(650, 450)
         ventana_cons.columnconfigure([0, 1, 2, 3], minsize = 25, weight = 1)
         ventana_cons.rowconfigure([0, 1, 5,6,7,8], minsize = 25, weight = 1)
         label_bg = tk.Label(ventana_cons, image=img_background)
         label_bg.place(x=-0,y=0)
-        ventana_cons.title('OBD Firewatch - Consultar')
+        
 
         F_radiob = ("Clear Sans", 13, "bold") #tuplas de fuente para usar mas abajo
         F_rango = ("Clear Sans", 12, "bold")
@@ -399,6 +402,7 @@ def main():
         F_col = ("Clear Sans", 13, "bold")
 
         def cerrando_ventana():
+            """Handler cerrar ventana"""
             nonlocal ventana_abierta
             if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_cons):
                 ventana_abierta = False
