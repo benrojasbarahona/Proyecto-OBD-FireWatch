@@ -16,7 +16,6 @@ PENDIENTE:
 2. Implementar función recursiva (Guía en onenote) <-- RESUELTO
 3. Todo el tema de archivos <-- PENDIENTE
 """
-import os
 
 class OpcionInvalidaError(Exception): pass
 class ValorInvalidoError(Exception): pass
@@ -43,6 +42,7 @@ def generar_rodal(
         colin_S = '', colin_SW = '', colin_SE = '',
         colindancias_dict = dict()
         ):
+    
     global dicc_rodales
 
     if not colindancias_dict:
@@ -111,7 +111,7 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
 
     # Si se llega a un rodal que tiene colindancias, se detiene la recursividad
     if dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] != '': 
-        print(' -- Rodal_referencia vacío --')
+        print(' -- Vuelta completa --')
         return
     
     # Comenzar el proceso de asignación de colindancias
@@ -160,51 +160,74 @@ def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
     return False
 
 
-def leer_en_archivo():
-    """El trabajo de esta función es crear archivos en el caso de que no existan antes y
-    para cada ejecución del programa, al principio armar el diccionario "dicc_rodales" para que
-    se guarde el progreso del usuario"""
+def generar_archivos():
+    '''Esta función crea los archivos en caso de que no existan'''
 
-    # Inicializar archivos
+    # Crea (en caso de que no exista) el archivo rodales.csv
     try:
-        with open('Tests/rodales.csv', 'x'): existe_rodales = False
-    except FileExistsError: existe_rodales = True
+        with open('Tests/rodales.csv', 'x', encoding = 'utf-8'):
+            print('< El archivo rodales.csv ha sido generado >')
+            rodales_generado = True
+    except FileExistsError: rodales_generado = False
 
+    # Crea (en caso de que no exista) el archivo colindancias.csv
     try:
-        with open('Tests/colindancias.csv', 'x'): existe_colindancias = False
-    except FileExistsError: existe_colindancias = True
+        with open('Tests/colindancias.csv', 'x', encoding = 'utf-8'):
+            colindancias_generado = True
+            print('< El archivo colindancias.csv ha sido generado >\n')
+    except FileExistsError: colindancias_generado = False
+    
+    # Si el archivo rodales.csv fue recien generado, escribir headers
+    if rodales_generado:
+        with open('Tests/rodales.csv', 'w', encoding = 'utf-8') as archivo:
+            archivo.write("# rodal %nativo %exotico propietario\n")
 
-    # Rearmar dicc_rodales desde lo almacenado en el archivo
+    # Si el archivo colindancias.csv fue recien generado, escribir headers
+    if colindancias_generado:
+        with open('Tests/colindancias.csv', 'w', encoding = 'utf-8') as archivo:
+            archivo.write("# rodal_nuevo rodal_existente orientacion\n")
+
+
+def reconstruir_diccionario(colindancias: str = 'colindancias.csv', rodales: str = 'rodales.csv'):
+    """El trabajo de esta función es para cada inicio del programa, leer el archivo para
+    reconstruir el diccionario que contiene la información de todos los rodales registrados
+    por el usuario"""
+
     temp_colindancias = dict()
+    global dicc_rodales
 
     # Armar el diccionario temporal de colindancias
-    if existe_colindancias:
-        with open('Tests/colindancias.csv', 'r', encoding = 'utf-8') as archivo:
-            datos = archivo.read().splitlines()
-        
-        for colindancia in datos:
-            id_rodal, colindante, direccion = colindancia.split(",")
-            id_rodal.strip(); colindante.strip(); direccion.strip()
+    with open(f'Tests/{colindancias}', 'r', encoding = 'utf-8') as archivo:
+        linea = archivo.readlines()
+    
+    for colindancia in linea[1:]:
+        datos = colindancia.split(",")
 
-            if id_rodal not in temp_colindancias:
-                temp_colindancias[id_rodal] = {'N':'','NW':'','NE':'','S':'','SE':'','SW':''}
+        if datos[0].strip("'") not in temp_colindancias:
+            temp_colindancias[datos[0].strip("'")] = {'N': '', 'NW': '', 'NE': '', 'S': '', 'SW': '', 'SE': ''}
 
-            temp_colindancias[id_rodal][direccion] = colindante
+        temp_colindancias[datos[0].strip("'")][datos[2].strip().strip("'")] = datos[1].strip("'")
 
     # Extraer los datos de los rodales
-    if existe_rodales:
-        with open('Tests/rodales.csv', 'r', encoding = 'utf-8') as archivo:
-            datos = archivo.read().splitlines()
+    with open(f'Tests/{rodales}', 'r', encoding = 'utf-8') as archivo:
+        linea = archivo.read().splitlines()
 
-        for rodal in datos:
-            id_rodal, b_nativo, b_exotico, propietario = rodal.split(",")
-            id_rodal.strip(); b_nativo.strip(); b_exotico.strip(); propietario.strip()
+    # Reconstruir dicc_rodales manualmente
+    for rodal in linea[1:]:
+        datos = rodal.split(",")
 
-            # Generar todo utilizando la función generar_rodal
-            if id_rodal in temp_colindancias:
-                generar_rodal(id_rodal, propietario, int(b_nativo), int(b_exotico), colindancias_dict = temp_colindancias[id_rodal])
-            else:
-                generar_rodal(id_rodal, propietario, int(b_nativo), int(b_exotico))
+        if datos[0].strip("'") not in dicc_rodales:
+            dicc_rodales[datos[0].strip("'")] = {
+                'b_nativo' : int(),
+                'b_exotico' : int(),
+                'propietario' : str(),
+                'colindancias' : dict()
+            }
+        
+        dicc_rodales[datos[0].strip("'")]['b_nativo'] = datos[1].strip()
+        dicc_rodales[datos[0].strip("'")]['b_exotico'] = datos[2].strip()
+        dicc_rodales[datos[0].strip("'")]['propietario'] = datos[3].strip("'").strip()
+        dicc_rodales[datos[0].strip("'")]['colindancias'] = temp_colindancias[datos[0].strip("'")]
 
 
 def guardar_en_archivo(modo_escritura = 'a'):
@@ -215,14 +238,14 @@ def guardar_en_archivo(modo_escritura = 'a'):
     with open('Tests/rodales.csv', modo_escritura, encoding = "utf-8") as archivo:
 
         for id_rodal, datos in dicc_rodales.items():
-            archivo.write(f'{id_rodal}, ')
+            archivo.write(f"'{id_rodal}',")
 
             for tipo, dato in datos.items():
 
                 if tipo != "colindancias" and tipo != "propietario":
-                    archivo.write(f'{dato}, ')
+                    archivo.write(f"{dato},")
                 elif tipo == "propietario":
-                    archivo.write(f'{dato}\n')
+                    archivo.write(f"'{dato}'\n")
 
     # Escribir las colindancias en el archivo
     with open('Tests/colindancias.csv', modo_escritura, encoding = 'utf-8') as archivo:
@@ -231,15 +254,18 @@ def guardar_en_archivo(modo_escritura = 'a'):
             for direccion, colindante in dicc_rodales[id_rodal]['colindancias'].items():
 
                 if colindante != '':
-                    archivo.write(f'{id_rodal}, {colindante}, {direccion}\n')
+                    archivo.write(f"'{id_rodal}','{colindante}','{direccion}'\n")
+
 
 def limpiar_datos():
+    '''Esta función está encargada de limpiar los datos de los rodales en
+    los archivos'''
 
-    with open('Tests/colindancias.csv', 'w', encoding = 'utf-8'):
-        pass
+    with open('Tests/colindancias.csv', 'w', encoding = 'utf-8') as archivo:
+        archivo.write("# rodal_nuevo rodal_existente orientacion\n")
 
-    with open('Tests/rodales.csv', 'w', encoding = 'utf-8'):
-        pass
+    with open('Tests/rodales.csv', 'w', encoding = 'utf-8') as archivo:
+        archivo.write("# rodal %nativo %exotico propietario\n")
 
 # Programa
 def main():
@@ -263,8 +289,9 @@ def main():
     global dicc_rodales
     dicc_rodales = dict()
 
-    # Reconstruir dicc_rodales
-    leer_en_archivo()
+    # Generar el archivo en el caso de que no exista
+    generar_archivos()
+    reconstruir_diccionario()
 
     # ----- debug :3 -----
     for key,value in dicc_rodales.items():
@@ -496,7 +523,6 @@ def main():
                     asignar_colindancias(id_rodal, rodal_colindante, info_colin, rodal_colindante)
                 except UnboundLocalError: pass
 
-                guardar_en_archivo()
                 print('\n< Datos guardados exitosamente >\n')
 
                 # -------------- debug --------------
