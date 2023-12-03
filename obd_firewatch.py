@@ -1,11 +1,11 @@
 # Esta es la capa de , es decir, acá está main() y
 # todo lo relacionado a tkinter, es lo que el USUARIO ve.
 
-import logica as log # se imoorta la capa de negocio
+import logica as log # se importa la capa de negocio
 import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter import filedialog
-import tkinter.ttk as ttk
 import añadir_rodal_bingus as bingus
 
 
@@ -27,9 +27,10 @@ def main():
 
     ventana_abierta = False
 
-    def cerrando_ventana():
+    def cerrando_ventana(): #---------------------------------------------------------------------------------------------------
         nonlocal ventana_abierta
         if msgbox.askokcancel("Quit", "¿Desea salir y guardar ?"):
+#---------------------------------------------------------
             root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
@@ -37,6 +38,7 @@ def main():
     def abrir_ingreso():
         nonlocal ventana_abierta
         if ventana_abierta == False:
+            #arr.generar_archivos()
             ventana_ingresar()
             ventana_abierta = True
         else:
@@ -59,17 +61,18 @@ def main():
             msgbox.showinfo("Error","Ya posee una ventana abierta")
 
     def dialogo_abrir_archivo():
-        direccion_archivo = filedialog.askopenfilename(title="Abrir Archivo", 
-                                                       filetypes=[("Archivos CSV", "*.csv")])
+        direccion_archivo = filedialog.askdirectory(title="Abrir Carpeta")
         if direccion_archivo:
-            archivo_seleccionado.config(text=f"Archivo Seleccionado: {direccion_archivo}")
-            #process_file(file_path)
+            carpeta_seleccionada.config(text=f"Carpeta Seleccionada: {direccion_archivo}")
+            #arr.generar_archivos(direccion_archivo)
 
-    boton_abrir = tk.Button(root, text = "Abrir Archivo", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
+    boton_abrir = tk.Button(root, text = "Abrir Carpeta", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
                              command=dialogo_abrir_archivo).grid(row=0,column=0,columnspan=2,padx = 10,sticky = "w")
-    archivo_seleccionado = tk.Label(root, text = "Archivo seleccionado: ",fg ="#EFD1D1", 
+    
+    carpeta_seleccionada = tk.Label(root, text = "Carpeta Seleccionada: ",fg ="#EFD1D1", 
                                     bg = "#675F2A", font=("Clear Sans", 10, "bold"))
-    archivo_seleccionado.grid(row=0, column= 2, columnspan=6,sticky="w")
+    
+    carpeta_seleccionada.grid(row=0, column= 2, columnspan=6,sticky="w")
 
     boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:abrir_ingreso()).grid(row=1,column=1)
 
@@ -77,11 +80,12 @@ def main():
 
     boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:abrir_consulta()).grid(row=1,column=5)
 
-    def ventana_ingresar():
+    def ventana_ingresar(): #-------------------------------- Ventana Ingresar --------------------------------------------------
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
         ventana_ingr.title('OBD Firewatch - Ingresar') # título de la aplicación
         ventana_ingr.columnconfigure([0, 4, 5, 6, 7], minsize = 25, weight = 1)
         ventana_ingr.rowconfigure([0, 15], minsize = 25, weight = 1)
+        ventana_ingr.minsize(650, 450)
         label_bg = tk.Label(ventana_ingr, image=img_background)
         label_bg.place(x=-0,y=0)
 
@@ -99,6 +103,7 @@ def main():
             nonlocal ventana_abierta
             if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_ingr):
                 ventana_abierta = False
+                #arr.guardar_en_archivo() # TENTATIVO A CAMBIO --------------------------------------------------------
                 ventana_ingr.destroy()
 
         ventana_ingr.protocol("WM_DELETE_WINDOW", cerrando_ventana)
@@ -261,6 +266,7 @@ def main():
         #Colindancia al norte
         tk.Label(panel_derecho, text = "Norte", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=1,column=1,sticky="w",padx=10)
+        
         entrada_norte = ttk.Combobox(panel_derecho, state = "readonly",
                                       values = log.retorna_lista_rodales())
         entrada_norte.grid(row=2,column=1,columnspan=3,padx=10)
@@ -268,6 +274,7 @@ def main():
         #Colindancia al NE
         tk.Label(panel_derecho, text = "Noreste", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=4,column=1,sticky="w",padx=10)
+        
         entrada_noreste = ttk.Combobox(panel_derecho, state = "readonly",
                                        values = log.retorna_lista_rodales())
         entrada_noreste.grid(row=5,column=1,columnspan=3)
@@ -275,13 +282,15 @@ def main():
         #Colindancia al NW
         tk.Label(panel_derecho, text = "Noroeste", fg = "#EFD1D1",
                   bg = "#675F2A", font = F_col).grid(row=7,column=1,sticky="w",padx=10)
-        entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly") 
-        entrada_noroeste.config(values = log.retorna_lista_rodales())
+        
+        entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly", 
+                                        values = log.retorna_lista_rodales())
         entrada_noroeste.grid(row=8,column=1,columnspan=3)
 
         #Colindancia al S
         tk.Label(panel_derecho, text = "Sur",  fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=10,column=1,sticky="w",padx=10)
+        
         entrada_sur = ttk.Combobox(panel_derecho,state = "readonly", 
                                    values = log.retorna_lista_rodales())
         entrada_sur.grid(row=11,column=1,columnspan=3)
@@ -289,6 +298,7 @@ def main():
         #Colindancia al SE
         tk.Label(panel_derecho, text = "Sureste", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=13,column=1,sticky="w",padx=10)
+        
         entrada_sureste = ttk.Combobox(panel_derecho,state = "readonly",
                                         values = log.retorna_lista_rodales())
         entrada_sureste.grid(row=14,column=1,columnspan=3)
@@ -296,6 +306,7 @@ def main():
         #Colindancia al SW
         tk.Label(panel_derecho, text = "Suroeste", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=16,column=1,sticky="w",padx=10)
+        
         entrada_suroeste = ttk.Combobox(panel_derecho,state = "readonly",
                                         values = log.retorna_lista_rodales())
         entrada_suroeste.grid(row=17,column=1,columnspan=3)
@@ -307,6 +318,9 @@ def main():
 
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
+        ventana_inc.geometry("500x400")
+        ventana_inc.title('OBD Firewatch - Incendio')  # título de la ventana
+        ventana_inc.resizable(False, False)  # no se puede cambiar el tamaño de la ventana
 
         def cerrando_ventana():
             nonlocal ventana_abierta
@@ -316,13 +330,73 @@ def main():
 
         ventana_inc.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
-    def ventana_consulta():
-        ventana_cons = tk.Toplevel() # crea ventana consulta
-        ventana_cons.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        ventana_cons.rowconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
-        ventana_cons.title('OBD Firewatch - Consultar') # título de la ventana
-        img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
-        label_bg = tk.Label(ventana_cons, image=img_background).place(x=-0,y=0)
+        style= ttk.Style()
+        style.theme_use('clam')
+        style.configure("TCombobox", fieldbackground= "#FFEA9E", background= "#EBD792")
+
+        img_fondo = tk.PhotoImage(file="assets\iconos\simular_incendio.png")
+
+        background_label = tk.Label(ventana_inc, image=img_fondo)
+        background_label.image = img_fondo  # Establece la imagen
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)  # Coloca la imagen en toda la ventana
+
+        F_entrada = ("Clear Sans", 14, "bold")
+
+        label_id_rodal = tk.Label(ventana_inc, text="ID del rodal", fg="white", bg= "#820400", font=F_entrada)
+        label_id_rodal.place(x=20, y=20)
+
+        rodal_options = log.retorna_lista_rodales()
+        rodal_combobox = ttk.Combobox(ventana_inc, values=rodal_options, state="readonly", width=51, style="clam.TCombobox")
+        rodal_combobox.place(x=22, y=50)  # Establece la posición del combobox
+
+        label_dir_viento = tk.Label(ventana_inc, text="Dir. del viento (N, NE, NO, S, SE, SO)", fg="white", bg="#820400", font=F_entrada)
+        label_dir_viento.place(x=20, y=100)
+
+        opciones_viento = ["N", "NE", "NO", "S", "SE", "SO"]
+        direccion_combobox = ttk.Combobox(ventana_inc, values=opciones_viento, state="readonly", width=51, style="clam.TCombobox")
+        direccion_combobox.place(x=22, y=130)
+
+
+        def simular_incendio():
+            rodal_seleccionado = rodal_combobox.get()
+            direccion_viento = direccion_combobox.get()
+            msgbox.showinfo("Simulación Exitosa", "Aquí debe desplegarse toda la información")
+
+        boton_simular = tk.Button(ventana_inc, text="Simular Incendio", command=simular_incendio, bg='#820400', fg='white')
+        boton_simular.place(x=190, y=350)
+
+        img_sobre_boton = tk.PhotoImage(file="assets\iconos\direcciones_viento.png")  # Cambia "ruta_de_la_imagen.png" por la ruta de tu imagen
+        label_imagen = tk.Label(ventana_inc, image=img_sobre_boton)
+        label_imagen.image = img_sobre_boton  # Establece la imagen
+        label_imagen.place(x=160, y=165)
+
+
+    def ventana_resultados_rodal(propietario: str, natividad: int, 
+                           exotico: int, colindancias: list):
+        
+        ventana_res = tk.Toplevel()
+        ventana_res.columnconfigure([0, 1, 2], minsize=25, weight=1)
+        ventana_res.rowconfigure([0, 6, 7, 8, 9], minsize=25, weight=1)
+        ventana_res.minsize(650,450)
+        label_bg = tk.Label(ventana_res, image=img_background)
+        label_bg.place(x=-0,y=0)
+        lista_datos = [f"Propietario{propietario}",natividad,exotico,colindancias]
+        for i in range (5):
+            tk.Label (text = "Suroeste", fg = "#EFD1D1", bg = "#675F2A").grid(row=16,column=1,sticky="w",padx=10)
+
+    def ventana_consulta(): # ----------------------- Ventana Consulta -------------------------------------------------
+        ventana_cons = tk.Toplevel()
+        ventana_cons.minsize(650, 450)
+        ventana_cons.columnconfigure([0, 1, 2, 3], minsize = 25, weight = 1)
+        ventana_cons.rowconfigure([0, 1, 5,6,7,8], minsize = 25, weight = 1)
+        label_bg = tk.Label(ventana_cons, image=img_background)
+        label_bg.place(x=-0,y=0)
+        ventana_cons.title('OBD Firewatch - Consultar')
+
+        F_radiob = ("Clear Sans", 13, "bold") #tuplas de fuente para usar mas abajo
+        F_rango = ("Clear Sans", 12, "bold")
+        F_texto = ("Clear Sans", 9, "bold")
+        F_col = ("Clear Sans", 13, "bold")
 
         def cerrando_ventana():
             nonlocal ventana_abierta
@@ -332,47 +406,100 @@ def main():
         
         ventana_cons.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
-        boton_guardar = ttk.Button(ventana_cons, image=img_nube).grid(row=0,column=0)
+        # Configuro Radiobuttons de consulta
+        mensaje = tk.Label(ventana_cons, text="Consultar por", bg="#675F2A", fg="#EFD1D1", font= F_radiob)
+        mensaje.grid(row=0, column=1, sticky="w")
 
-        #Configuro entry con texto temporal
-        def temp_text(e):
-            entrada_busqueda.delete(0,"end")
+        style= ttk.Style()
+        style.theme_use('clam')
+        style.configure("TCombobox", fieldbackground= "#FFEA9E", background= "#EBD792")
 
-        entrada_busqueda = tk.Entry(ventana_cons, width = 30, borderwidth = 2)
-        #Considerar mover el .bind a otro lado, actualmente borra texto si cambio el foco a otro lado, quizas otro evento, no focusin
-        entrada_busqueda.bind("<FocusIn>", temp_text)
-        entrada_busqueda.grid(row=1,column=1,sticky="w")
-        entrada_busqueda.insert(0,"Ejemplo: R1")
-
-        #Configuro Radiobuttons de consulta
+        consulta_temp= ttk.Combobox(ventana_cons,state = "readonly",width = 29, font= F_rango,
+                                        values = log.retorna_lista_rodales())
+        consulta_temp.grid(row=1, column = 1, columnspan = 2)
         consulta = tk.StringVar()
         consulta.set("Rodal")
-
-        def sel(): #Handler, cambia el texto temporal, fuerza foco a la ventana para que vuelva a funcionar el texto temporal
-            entrada_busqueda.delete(0,"end")
-            if consulta.get() == "Propietario":
-                texto2 = "Seleccione el Propietario"
-                texto_temporal = "Seleccione el Propietario"
-            if consulta.get() == "Bosque":
-                texto2 = "Ingrese el rango de rodales"
-                texto_temporal = "Ejemplo: R1, R9-R14, R4"
+        
+        def sel():
+            nonlocal consulta_temp
             if consulta.get() == "Rodal":
-                texto2= "Ingrese el rodal"
-                texto_temporal = "Ejemplo: R1"
-            texto = texto2 + " que desea consultar"
-            mensaje.config(text = texto)
-            entrada_busqueda.insert(0,texto_temporal)
+                consulta_temp.destroy()
+                consulta_temp = ttk.Combobox(ventana_cons,state = "readonly",width = 29, font= F_rango,
+                                        values = log.retorna_lista_rodales())
+                consulta_temp.grid(row=1, column = 1, columnspan = 2, sticky="w")
+
+            elif consulta.get() == "Propietario":
+                consulta_temp.destroy()
+                consulta_temp = ttk.Combobox(ventana_cons,state = "readonly",width = 29, font= F_rango,
+                                        values = log.retorna_lista_propietarios())
+                consulta_temp.grid(row=1, column = 1, columnspan = 2, sticky="w")
+
+            elif consulta.get() == "Bosque":
+
+                consulta_temp.destroy()
+
+                def temp_text(e):
+                    nonlocal consulta_temp
+                    consulta_temp.delete(0, "end")
+
+                texto_temporal = "Ejemplo: R1, R9-R14, R4"
+                consulta_temp = tk.Entry(ventana_cons, width=30, borderwidth=2, bg="white", 
+                                            fg="black", font= F_rango)
+                consulta_temp.bind("<FocusIn>", temp_text)
+                consulta_temp.grid(row=1, column=1, columnspan= 2, sticky="w")
+                consulta_temp.insert(0, texto_temporal)
+
             ventana_cons.focus_set()
 
-        tk.Radiobutton(ventana_cons, text = "Rodal", variable = consulta,
-                       value = "Rodal", command=sel).grid(row=2,column=1,sticky="w")
-        tk.Radiobutton(ventana_cons, text = "Hectáreas y tipo de bosque", variable = consulta,
-                       value = "Bosque", command=sel).grid(row=3,column=1,sticky="w")
-        tk.Radiobutton(ventana_cons, text = "Propietario", variable = consulta,
-                       value = "Propietario", command=sel).grid(row=4,column=1,sticky="w")
+        def consultar():
+            """Handler boton consulta"""
+            if consulta.get() == "Rodal":
+                rodal_a_consultar = consulta_temp.get()
+                propietario, natividad, exotico, colindancias = log.por_rodal(rodal_a_consultar)
+                ventana_resultados_rodal(propietario, natividad, exotico, colindancias)
+                
+                #LLamo a funcion consulta para luego levantar ventana
+            if consulta.get() == "Propietario":
+                prop_a_consultar = consulta_temp.get()
+                #LLamo a funcion consulta propietario para luego levantar ventana
+            
+            if consulta.get() == "Bosque":
+                rango_a_consultar = consulta_temp.get()
+        
+        #Radiobotones para especificar consulta
+        tk.Radiobutton(ventana_cons, text="Rodal", variable=consulta, value="Rodal", font=F_radiob, 
+                       command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=2, column=1, sticky="w")
 
-        mensaje = tk.Label(ventana_cons, text = "Ingrese el rodal que desea")
-        mensaje.grid(row=0,column=1,sticky="w",columnspan=3)
+        tk.Radiobutton(ventana_cons, text="Hectáreas y tipo de bosque", variable=consulta, value="Bosque", font=F_radiob,
+                       command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=3, column=1, sticky="w")
+
+        tk.Radiobutton(ventana_cons, text="Propietario", variable=consulta,value="Propietario", font=F_radiob,
+                       command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=4, column=1, sticky="w")
+        
+        boton_consulta = tk.Button(ventana_cons, text = "Consultar", fg = "#343434", 
+                                bg = "#C4A11E", font = F_col, command=consultar) #Boton consulta
+        boton_consulta.grid(row=6,column=1,pady=20)
+
+        # Columna al lado de consultar, con texto que explique cómo consultar
+        info_frame = tk.Frame(ventana_cons, borderwidth=2, relief="groove", bg="#675F2A")
+        info_frame.grid(row=1, column=3, rowspan=7, sticky="nsew")
+
+        info_explicativo = tk.Label(info_frame, text="¿Cómo consultar?", bg="#675F2A", fg="white", font=F_texto)
+        info_explicativo.grid(row=0, column=0, sticky="w", padx=(10, 10), pady=(10, 10))
+
+        # Nuevo texto explicativo
+        texto_explicativo = ("Rodal: Para consultar las características o estado de un rodal, debe escribir una R y "
+                            "posterior a la letra, el número respectivo del rodal. Por ejemplo, si usted escribe "
+                            "\"R14\", le saldrá en pantalla toda la información sobre el Rodal 14. Hectáreas: Para "
+                            "consultar sobre una cantidad determinada de hectáreas, debe usar una coma entre cada rodal "
+                            "y un guion, si es que desea además, preguntar sobre un determinado rango de rodales. Por ejemplo, "
+                            "si usted escribe \"R1, R3-R6, R9\" en pantalla obtendrá la información de los rodales R1, R3, R4, R5, R6 y R9.")
+
+        info_explicativo = tk.Label(info_frame, text=texto_explicativo, wraplength=300, justify="left", 
+                                    bg="#675F2A", fg="white", font=F_texto)
+        info_explicativo.grid(row=1, column=0, sticky="w", padx=(10, 10), pady=(10, 10))
+
+
 
     root.mainloop()
 

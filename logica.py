@@ -1,13 +1,16 @@
 # Esta es la capa de lógica, donde están las FUNCIONES y VALIDACIONES
 
 import os
+import archivos as file
 
 class OpcionInvalidaError(Exception): pass
 class ValorInvalidoError(Exception): pass
 class RodalYaExistenteError(Exception): pass
 class EspacioNoValidoError(Exception): pass
 
+global dicc_rodales
 dicc_rodales = {}
+#dicc_rodales = file.construir_diccionario()
 
 # Metes una coordenada y te devuelve la opuesta
 coordenada_opuesta = {
@@ -97,7 +100,7 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
 
     # Si se llega a un rodal que tiene colindancias, se detiene la recursividad
     if dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] != '': 
-        print(' -- Rodal_referencia vacío --')
+        print(' -- Vuelta completa --')
         return
     
     # Comenzar el proceso de asignación de colindancias
@@ -186,6 +189,7 @@ def validar_ingreso(D:dict):
 
     except IngresoInvalido as msj:
             return validado, msj
+    
     validado = True
 
     datos_rodal = {
@@ -202,47 +206,152 @@ def validar_ingreso(D:dict):
 
 
 def retorna_lista_rodales() -> list:
-    """retorna auna lista con las IDS de los rodales ya ingresados"""
+    """Retorna una lista con las IDS de los rodales ya ingresados"""
     global dicc_rodales
     rodales = list(dicc_rodales.keys())
     rodales.append("")
     rodales.sort()
     return rodales
 
-def validar_porcentaje():
-    ...
-def consulta_un_rodal():
-    ...
-def consulta_rango_rodales():
-    ...
-def consultar_colindantes():
-    ...
-def obtener_bosque():
-    ...
-def obtener_propietario():
-    ...
-def obtener_colindantes():
-    ...
-def traducir_rango():
-    ...
-def colindantes_en_riesgo():
-    ...
-def calcular_hectarea():
-    ...
-def filtrar_por_propietario():
-    ...
-def agregar_rodal():
-    ...
-def simular_incendio():
-    ...
-def consultar_rodal():
-    ...
-def consultar_hectarea():
-    ...
-def consultar_hect_propietario():
-    ...
-def consulta_rango_rodales():
-    ...
+def retorna_lista_propietarios() -> list:
+    """Retorna una lista con los propietarios de los rodales ya ingresados"""
+    global dicc_rodales
+    propietarios = set()
+    for rodal in dicc_rodales.keys():
+        propietarios.add = dicc_rodales[rodal]["propietario"]
+    propietarios = list(propietarios)
+    return propietarios
+
+def promedio(arreglo_de_numeros: list) -> float: #funcion de promedio
+    return (round((sum(arreglo_de_numeros))/len(arreglo_de_numeros), 2))
+
+def consultar_() -> dict:
+
+    #lectura del archivo csv...
+    with open('rodales.csv', 'r') as info:
+        lineas_rodales_info = info.readlines()
+
+    propietario_key = {}; rodal_key = {} # <--- "data_pack"
+    
+    #filtro las lineas y las almaceno para ambos tipos de "data_pack"
+    for linea in lineas_rodales_info:
+        rodal, nativo, exotico, propieario = linea.strip('\n').split(', ')
+        #  guardo los datos en los distintos "data_pack"
+
+        #  <--------------------------------------------------------------------------------------->
+        if propieario not in propietario_key:
+            propietario_key[propieario] = {'rodales': rodal, 'nativo': float(nativo), 'exotico': float(exotico),
+                                           'array_nativo': [float(nativo)], 'array_exotico': [float(exotico)]}
+        else:
+            propietario_key[propieario]['array_nativo'].append(float(nativo))
+            propietario_key[propieario]['array_exotico'].append(float(exotico))
+            propietario_key[propieario]['rodales'] += f', {rodal}'
+            propietario_key[propieario]['nativo'] = promedio(propietario_key[propieario]['array_nativo'])
+            propietario_key[propieario]['exotico'] = promedio(propietario_key[propieario]['array_exotico'])
+        # <--------------------------------------------------------------------------------------->
+        if rodal not in rodal_key:
+            rodal_key[rodal] = {'propietario': propieario, 'nativo': float(nativo), 'exotico': float(exotico)}
+       
+        # <--------------------------------------------------------------------------------------->
+    for prop in propietario_key:                            #limpio datos innecesarios
+        propietario_key[prop].pop('array_nativo'), propietario_key[prop].pop('array_exotico')
+
+    return(propietario_key, rodal_key)
+
+def promedio(arreglo_de_numeros: list) -> float: #funcion de promedio
+    return (round((sum(arreglo_de_numeros))/len(arreglo_de_numeros), 2))
+
+def consultar_() -> dict:
+
+    #lectura del archivo csv...
+    with open('rodales.csv', 'r') as info:
+        lineas_rodales_info = info.readlines()
+
+    propietario_key = {}; rodal_key = {} # <--- "data_pack"
+    
+    #filtro las lineas y las almaceno para ambos tipos de "data_pack"
+    for linea in lineas_rodales_info:
+        rodal, nativo, exotico, propieario = linea.strip('\n').split(', ')
+        #  guardo los datos en los distintos "data_pack"
+        #  <=====================================================================================================>
+        if propieario not in propietario_key:
+            propietario_key[propieario] = {'rodales': rodal, 'nativo': float(nativo), 'exotico': float(exotico),
+                                           'array_nativo': [float(nativo)], 'array_exotico': [float(exotico)]}
+        else:
+            propietario_key[propieario]['array_nativo'].append(float(nativo))
+            propietario_key[propieario]['array_exotico'].append(float(exotico))
+            propietario_key[propieario]['rodales'] += f', {rodal}'
+            propietario_key[propieario]['nativo'] = promedio(propietario_key[propieario]['array_nativo'])
+            propietario_key[propieario]['exotico'] = promedio(propietario_key[propieario]['array_exotico'])
+
+        # <=====================================================================================================>
+        if rodal not in rodal_key:
+            rodal_key[rodal] = {'propietario': propieario, 'nativo': float(nativo), 'exotico': float(exotico)}
+       
+        # <=====================================================================================================>
+    for prop in propietario_key:                            #limpio datos innecesarios
+        propietario_key[prop].pop('array_nativo'), propietario_key[prop].pop('array_exotico')
+
+    return(propietario_key, rodal_key)
+
+def por_propietario(propietario:str) -> int: # consulta por propietario
+    # colocar validacion (función a parte)
+    dict_propietario, _ = consultar_()
+    rodales_prop, natividad, exotico = dict_propietario[propietario].values()
+    return (rodales_prop, natividad, exotico)
+    #   Retorno de la cantidad de los rodales los cuales es propietario,
+    #   natividad, exotico al preguntar por algún rodal en particular.
+    #   ejemplo de salida ... -> ('Rodales Pepe', '87', '13')
+    #   tipo: tupla de strings
+
+def por_rodal(rodal:str) ->int: #consulta por rodales
+    _, dict_rodal = consultar_()
+    propietario, natividad, exotico, colindancias = dict_rodal[rodal].values()
+    return (propietario, natividad, exotico, colindancias)
+    #   Retorno de propietario, natividad, exotico al preguntar por algún rodal en particular
+    #   ejemplo de salida ... -> ('Rodales Pepe', '87', '13')
+    #   tipo: tupla de strings
+
+def por_lista_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
+    #   Defino variables a utilizar.
+    split_str_rodales = str_rodales.split(', '); rodales_total = []; _, dict_rodal = consultar_()
+    nativo_hectareas_total = 0; exotico_hectareas_total = 0;
+    # <===========================================================================================================>
+    for paso_rodal in split_str_rodales:
+        if '-' in paso_rodal:
+            temp = paso_rodal.replace('R', '').split('-')
+            for agregando in range(int(temp[0]), int(temp[-1])+1, 1):   # ingreso todos los radales que se estan
+                rodales_total.append(f'R{agregando}')                   # consultando a la lista rodales_total.
+        else:
+            rodales_total.append(paso_rodal)
+
+    for rodal in rodales_total:
+
+        try:
+            _, natividad, exotico = dict_rodal[rodal].values()          # cálculo de los porcentajes de hectareas
+            nativo_hectareas_total += (natividad/100)*10                # respecto a la natividad y lo exótico.
+            exotico_hectareas_total += (exotico/100)*10                 # uwu
+
+        except KeyError:
+            ...
+
+    return round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
+    #   Retorno de las hectarias totales de nativos y exoticos
+    #   ejemplo de salida...-> esto retorna dos valores, por ende... -> (24, 27.5)
+    #   tipo: dos valores, flotantes (se puede conciderar una tupla de flotantes)
+
+def cant_rodales() -> tuple: # tupla de los rodales disponibles a consultar... (ayuda al combobox)
+    _, b = consultar_()
+
+    return tuple(b.keys())  # ejemplo de salida ... -> ('R7', 'R3', 'R1', 'R6', 'R9', 'R10', 'R8')
+                            # tipo: tupla de string's
+
+def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a consultar ... (ayuda al combobox)
+    a, _ = consultar_()
+    return tuple(a.keys())  # ejemplo de salida ... -> ('Rodales Csazsar', 'Bingus Radianes',
+                            #                               'Simu Asociados', 'Toledo.s Rodales')
+                            # tipo: tupla de string's
+
 
 def test():
     global dicc_rodales
@@ -299,6 +408,47 @@ def test():
                                                         )
     
     print (validado, msj)
+
+
+def simular_incendio(direccion_viento: str, rodal_inicial: str, afectados: set):
+
+    vuelta = 1
+    direcciones_afectadas = {
+        'N': ['N'],
+        'NE': ['NE'],
+        'SE': ['NE'],
+        'S': ['S'],
+        'SW': ['SW'],
+        'NW': ['NW'],
+        'W': ['NW', 'SW'],
+        'E': ['NE', 'SE']
+    }
+
+    if rodal_inicial == '':
+        return
+
+    if rodal_inicial != '':
+
+        afectados.add(rodal_inicial)
+        for i in direcciones_afectadas[direccion_viento]:
+            match vuelta:
+                case 1:
+                    siguiente_rodal_1 = dicc_rodales[rodal_inicial]['colindancias'][i]
+                
+                case 2:
+                    siguiente_rodal_2 = dicc_rodales[rodal_inicial]['colindancias'][i]
+
+            vuelta += 1
+
+    if direccion_viento in ['E', 'W']:
+        simular_incendio(direccion_viento, siguiente_rodal_1, afectados)
+        simular_incendio(direccion_viento, siguiente_rodal_2, afectados)
+        return (afectados)
+    
+    else:
+        simular_incendio(direccion_viento, siguiente_rodal_1, afectados)
+        return (afectados)
+
 
     for key,value in dicc_rodales.items():
         print(f"{key}   : {value}")
