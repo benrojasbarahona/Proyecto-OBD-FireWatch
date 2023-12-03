@@ -5,7 +5,7 @@ import logica as log # se imoorta la capa de negocio
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
-import añadir_rodal_bingus as bingus
+
 
 #contadores a usar para texto temporal
 
@@ -18,7 +18,7 @@ def main():
     img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
     img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
     img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
-    img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
+    img_background = tk.PhotoImage(file = "assets/iconos/Fondo_Ventana1.png")
     label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
     img_nube = tk.PhotoImage(file = "assets/iconos/nube.png").subsample(25,25)
 
