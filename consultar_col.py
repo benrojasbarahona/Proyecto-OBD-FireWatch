@@ -11,43 +11,62 @@
     manera, poder mostrar la informacion en menos lineas y menos analizis de datos.
 
 """
-
 #    @shyupss_    #
 def promedio(arreglo_de_numeros: list) -> float: #funcion de promedio
     return (round((sum(arreglo_de_numeros))/len(arreglo_de_numeros), 2))
-
+#   <================================================================================================================================================================>
+dicc_rodales = {
+       'R1'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R4', 'NW': 'R6', 'NE': 'R3', 'S': '', 'SE': 'R2', 'SW': ''}},
+       'R2'   : {'b_nativo': 12, 'b_exotico': 88, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R3', 'NW': 'R1', 'NE': '', 'S': '', 'SE': '', 'SW': ''}},
+       'R3'   : {'b_nativo': 98, 'b_exotico': 2, 'propietario': 'R. Maturana', 'colindancias': {'N': 'R5', 'NW': 'R4', 'NE': '', 'S': 'R2', 'SE': '', 'SW': 'R1'}},
+       'R4'   : {'b_nativo': 87, 'b_exotico': 13, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': 'R7', 'NE': 'R5', 'S': 'R1', 'SE': 'R3', 'SW': 'R6'}},
+       'R5'   : {'b_nativo': 90, 'b_exotico': 10, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R3', 'SE': '', 'SW': 'R4'}},
+       'R6'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'Inv. Lazo', 'colindancias': {'N': 'R7', 'NW': '', 'NE': 'R4', 'S': '', 'SE': 'R1', 'SW': ''}},
+       'R7'   : {'b_nativo': 50, 'b_exotico': 50, 'propietario': 'lucas reyes', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R6', 'SE': 'R4', 'SW': ''}}
+   }
+#   <================================================================================================================================================================>
 def consultar_() -> dict:
 
-    #lectura del archivo csv...
-    with open('rodales.csv', 'r') as info:
-        lineas_rodales_info = info.readlines()
+    #lectura del archivo diccionario global...
 
     propietario_key = {}; rodal_key = {} # <--- "data_pack"
+
+    global dicc_rodales
     
     #filtro las lineas y las almaceno para ambos tipos de "data_pack"
-    for linea in lineas_rodales_info:
-        rodal, nativo, exotico, propieario = linea.strip('\n').split(', ')
+    for rodal_lectura in dicc_rodales:
+        nativo, exotico, propieario, _ = dicc_rodales[rodal_lectura].values()
+
         #  guardo los datos en los distintos "data_pack"
         #  <=====================================================================================================>
         if propieario not in propietario_key:
-            propietario_key[propieario] = {'rodales': rodal, 'nativo': float(nativo), 'exotico': float(exotico),
+            propietario_key[propieario] = {'rodales': rodal_lectura, 'nativo': float(nativo), 'exotico': float(exotico),
                                            'array_nativo': [float(nativo)], 'array_exotico': [float(exotico)]}
         else:
             propietario_key[propieario]['array_nativo'].append(float(nativo))
             propietario_key[propieario]['array_exotico'].append(float(exotico))
-            propietario_key[propieario]['rodales'] += f', {rodal}'
+            propietario_key[propieario]['rodales'] += f', {rodal_lectura}'
             propietario_key[propieario]['nativo'] = promedio(propietario_key[propieario]['array_nativo'])
             propietario_key[propieario]['exotico'] = promedio(propietario_key[propieario]['array_exotico'])
 
         # <=====================================================================================================>
-        if rodal not in rodal_key:
-            rodal_key[rodal] = {'propietario': propieario, 'nativo': float(nativo), 'exotico': float(exotico)}
+        if rodal_lectura not in rodal_key:
+            rodal_key[rodal_lectura] = {'propietario': propieario, 'nativo': float(nativo), 'exotico': float(exotico)}
        
         # <=====================================================================================================>
     for prop in propietario_key:                            #limpio datos innecesarios
         propietario_key[prop].pop('array_nativo'), propietario_key[prop].pop('array_exotico')
 
     return(propietario_key, rodal_key)
+
+#HACE FALTA LEER EL DICCIONARIO GLOBAL.
+def por_rodal(rodal:str): #consulta por rodales
+    _, dict_rodal = consultar_()
+    propietario, natividad, exotico = dict_rodal[rodal].values()
+    return [propietario, natividad, exotico]
+    #   Retorno de propietario, natividad, exotico al preguntar por algún rodal en particular
+    #   ejemplo de salida ... -> ['Rodales Pepe', '87', '13']
+    #   tipo: lista de strings
 
 def por_propietario(propietario:str) -> str: # consulta por propietario
     # colocar validacion (función a parte)
@@ -58,14 +77,6 @@ def por_propietario(propietario:str) -> str: # consulta por propietario
     #   natividad, exotico al preguntar por algún rodal en particular.
     #   ejemplo de salida ... -> ['Rodales Pepe', '87', '13']
     #   tipo: tupla de strings
-
-def por_rodal(rodal:str): #consulta por rodales
-    _, dict_rodal = consultar_()
-    propietario, natividad, exotico = dict_rodal[rodal].values()
-    return [propietario, natividad, exotico]
-    #   Retorno de propietario, natividad, exotico al preguntar por algún rodal en particular
-    #   ejemplo de salida ... -> ['Rodales Pepe', '87', '13']
-    #   tipo: lista de strings
 
 def por_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
     #   Defino variables a utilizar.
@@ -90,7 +101,7 @@ def por_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
         except KeyError:
             ...
 
-    return list(round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2))
+    return [round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)]
     #   Retorno de las hectarias totales de nativos y exoticos
     #   ejemplo de salida...-> esto retorna dos valores, por ende... -> (24, 27.5)
     #   tipo: lista de dos valores flotantes (se puede conciderar una tupla de flotantes)
@@ -108,4 +119,4 @@ def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a cons
                             #                               'Simu Asociados', 'Toledo.s Rodales']
                             # tipo: lista de string's
 
-print(por_rodal('R10'))
+print(por_hectarea('R1, R3-R9, R10'))
