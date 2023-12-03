@@ -6,7 +6,6 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter import filedialog
-import añadir_rodal_bingus as bingus
 
 consulta_abierta = False
 
@@ -162,7 +161,6 @@ def main():
 
             datos_rodal = {}
 
-            print("primero valido, despues retorno o tiro error")
             try: #Si casillas bosques nativo o exotico no tiene solo numeros, levanta excepción ValueError
                 datos_rodal[str(entrada_rodal.get())] = {"b_nativo":int(entrada_nativo.get()),
                                                         "b_exotico": int(entrada_exotico.get()),
@@ -317,7 +315,7 @@ def main():
                                 bg = "#C4A11E", font = F_entrada, command=boton_entrada_rodal)
         boton_rodal.grid(row=12,column=2,pady=20)
 
-    def reporte_incendio():
+    def reporte_incendio(rodal_inicial: str, viento: str):
         ventana_reporte = tk.Toplevel()
         ventana_reporte.title('Proyección de incendio')
         ventana_reporte.columnconfigure([0,2,4], minsize=15, weight=1)
@@ -325,18 +323,26 @@ def main():
 
         def cerrando_ventana():
             """Handler cerrar ventana"""
-            nonlocal ventana_abierta
+            global consulta_abierta
             consulta_abierta = False
             ventana_reporte.destroy()
         
         ventana_reporte.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
-        frame_rodal = tk.Frame()
-        
+        frame_rodal = tk.Frame(ventana_reporte, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        frame_rodal.rowconfigure([0,7], minsize=5, weight=1)
+        frame_rodal.columnconfigure([0,2,4], minsize=5, weight=1)
+        frame_rodal.grid(row=1, column=1)
 
-        frame_riesgo_incendio = tk.Frame()
+        frame_riesgo_incendio = tk.Frame(ventana_reporte, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        frame_riesgo_incendio.rowconfigure([0,7], minsize=5, weight=1) #hasta largo lista propietarios
+        frame_riesgo_incendio.columnconfigure([0,5], minsize=5, weight=1)
+        frame_riesgo_incendio.grid(row=2, column=1)
 
-        frame_comprometidos = tk.Frame()
+        frame_comprometidos = tk.Frame(ventana_reporte, bd=7, bg = "#675F2A", relief=tk.RAISED)
+        frame_comprometidos.rowconfigure([0,7], minsize=5, weight=1)
+        frame_comprometidos.columnconfigure([0,2], minsize=5, weight=1)
+        frame_comprometidos.grid(row=1, columnspan=3)
 
 
     def ventana_incendio():
@@ -381,6 +387,7 @@ def main():
 
 
         def simular_incendio():
+            global consulta_abierta
             rodal_seleccionado = rodal_combobox.get()
             direccion_viento = direccion_combobox.get()
             consulta_abierta = True
