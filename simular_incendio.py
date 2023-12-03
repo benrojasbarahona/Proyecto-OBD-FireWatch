@@ -46,7 +46,6 @@ def simular_afectados(direccion_viento: str, rodal_inicial: str, afectados:set =
             vuelta += 1
 
     # Devolver lo encontrado (según que dirección se haya entregado)
-    # E y W, son casos especiales, ya que se deben buscar en dos direcciones        
     if direccion_viento in ['E', 'W']:
         simular_afectados(direccion_viento, siguiente_rodal_1, afectados)
         simular_afectados(direccion_viento, siguiente_rodal_2, afectados)
@@ -65,7 +64,7 @@ def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
     #4. Debe retornar la set de propietarios afectados
     # *** RETORNA tupla_suma = (hectareas_totales_afectadas, bosque_nativo_afectado, bosque_exotico_afectado) ***
     #___________________________________________________________________________________
-    propietarios_afectados = [dicc_rodales[rodal_inicial]['propietario']]
+    propietarios_afectados = {dicc_rodales[rodal_inicial]['propietario']}
     bosque_nativo_afectado = dicc_rodales[rodal_inicial]['b_nativo'] * 0.1
     bosque_exotico_afectado = dicc_rodales[rodal_inicial]['b_exotico'] * 0.1
  
@@ -75,7 +74,7 @@ def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
         if rodal != rodal_inicial:
             bosque_nativo_afectado += dicc_rodales[rodal]['b_nativo'] * 0.1
             bosque_exotico_afectado += dicc_rodales[rodal]['b_exotico'] * 0.1
-            propietarios_afectados.append(dicc_rodales[rodal]['propietario'])
+            propietarios_afectados.add(dicc_rodales[rodal]['propietario'])
 
     hectareas_totales_afectadas = bosque_nativo_afectado + bosque_exotico_afectado
     tupla_suma = (hectareas_totales_afectadas, bosque_nativo_afectado, bosque_exotico_afectado)
@@ -83,6 +82,9 @@ def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
     return tupla_suma, tupla_propietarios
 
 
+#Creo una funcion que me haga una lista de tuplas con los rodales afectados,
+# los propietarios afectados y las hectareas afectadas
+# lista = [(rodales), (propietarios),(nativo, exotico, total)]
 
 def simular_incendio(direccion_viento: str, rodal_inicial: str) -> list:
     #_________________________________INFORMACION_______________________________________
@@ -91,7 +93,9 @@ def simular_incendio(direccion_viento: str, rodal_inicial: str) -> list:
     #3. Debe retornar la lista de incendio
     # *** RETORNA lista_incendio = [(rodales), (propietarios),(nativo, exotico, total)] ***
     #__________________________________________________________________________________
-
+    #
+    # consultar_rodal(...) + direccion_viento
+    # for a los sets
 
     rodales_afectados = simular_afectados(direccion_viento, rodal_inicial) #ordeno la lista de afectados
     recursos_comprometidos = suma_afectados(rodal_inicial,rodales_afectados)
