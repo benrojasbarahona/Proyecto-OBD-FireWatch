@@ -16,6 +16,8 @@ def main():
     root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
     root.resizable(False, False)
 
+   # log.inicializar_diccionario()
+
     #logo = tk.PhotoImage(file = "assets/iconos/logo.png")
     #root.iconphoto(True, logo)
 
@@ -31,7 +33,7 @@ def main():
     def cerrando_ventana(): #---------------------------------------------------------------------------------------------------
         nonlocal ventana_abierta
         if msgbox.askokcancel("Quit", "¿Desea guardar y salir?"):
-            log.guardar_diccionario()
+            #log.guardar_diccionario()
             root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
@@ -354,6 +356,9 @@ def main():
         frame_comprometidos.grid(row=1, column=3, columnspan=2)
 
         #Relleno frame_rodal con informacion
+        
+        datos_rodal_inicial = log.por_rodal(rodal_inicial)
+
         tk.Label(frame_rodal, text = "RODAL INICIO INCENDIO", bg="#AB431D", 
                  font=("Clear Sans", 14, "bold")).grid(row=1, column=1, columnspan=2, sticky="nw")
         
@@ -362,7 +367,12 @@ def main():
         for i in range(len(textos_frame_rodal)):
             tk.Label(frame_rodal, text = textos_frame_rodal[i], bg="#AB431D", 
                      font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw")
-            
+        
+        for i in range(len(datos_rodal_inicial)):
+            tk.Label(frame_rodal, text=datos_rodal_inicial[i], bg="#AB431D",
+                     font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw", padx= (100,0))
+                    
+
         #Relleno frame_riesgo_incendio con información
         tk.Label(frame_riesgo_incendio, text = "RODALES EN RIESGO DE INCENDIO", bg="#AB431D",
                  font=("Clear Sans", 14, "bold")).grid(row=1, column=1, columnspan=4, sticky="nw")
@@ -510,9 +520,8 @@ def main():
                     font = ("Clear Sans", 13)).grid(row=9, column=1, sticky="nw",padx=(25,0))
         tk.Label (ventana_res,bg = "#0B320E", width=2, height=1).grid(row=9, column=1, sticky="w")
         
-    def ventana_resultados_propietario(rodales: dict, hect_nat_total: float, 
-                                       hect_exo_total: float, prop_a_consultar: str):
-                                    #[rodales_prop, natividad, exotico]
+    def ventana_resultados_propietario(datos_rodales_prop: list, prop_a_consultar: str):
+                                      #[rodales_prop, natividad, exotico]
         ventana_res = tk.Toplevel()
         ventana_res.columnconfigure([0, 1, 2], minsize=15, weight=1)
         ventana_res.rowconfigure([0, 8], minsize=10, weight=1)
@@ -537,20 +546,20 @@ def main():
         
         tk.Label (ventana_res, text = "Cantidad de rodales:", fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_bold).grid(row=2, column=1, sticky="nw")
-        tk.Label (ventana_res, text = len(rodales), fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = len(datos_rodales_prop[0]), fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_min).grid(row=2, column=1, sticky="w",padx= (165,0))
         
-        tk.Label (ventana_res, text = rodales, fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = datos_rodales_prop[0], fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_min).grid(row=3, column=1, sticky="w")
         
         tk.Label (ventana_res, text = "Hectareas bosque nativo:", fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_bold).grid(row=4, column=1, sticky="nw")
-        tk.Label (ventana_res, text = f"{hect_nat_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = f"{datos_rodales_prop[1]} ha", fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_min).grid(row=4, column=1, sticky="sw",padx= (210,0))
         
         tk.Label (ventana_res, text = "Hectareas bosque exótico:", fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_bold).grid(row=5, column=1, sticky="nw")
-        tk.Label (ventana_res, text = f"{hect_exo_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+        tk.Label (ventana_res, text = f"{datos_rodales_prop[2]} ha", fg = "#EFD1D1", bg = "#675F2A", 
                       font = F_min).grid(row=5, column=1, sticky="sw",padx= (220,0), pady=(0,15))
 
         #Setup Canvas para gráfico de torta
@@ -558,8 +567,8 @@ def main():
         canvas.grid(row=6, column=1, sticky="nw")
         st = 0
         coord = 15, 15, 250, 250
-        porcentaje_hect_nat = hect_nat_total/(hect_nat_total + hect_exo_total)*100
-        porcentaje_hect_exo = hect_exo_total/(hect_nat_total + hect_exo_total)*100
+        porcentaje_hect_nat = datos_rodales_prop[1]/(datos_rodales_prop[1] + datos_rodales_prop[2])*100
+        porcentaje_hect_exo = datos_rodales_prop[2]/(datos_rodales_prop[1] + datos_rodales_prop[2])*100
         pieValor = [porcentaje_hect_nat, porcentaje_hect_exo]
         pieColor = ["Green", "#0B320E"]
 
@@ -578,8 +587,7 @@ def main():
         tk.Label (ventana_res,bg = "#0B320E", width=2, height=1).grid(row=9, column=1, sticky="w")
 
 
-    def ventana_resultado_rango(hectareas_totales: list, 
-                                rango_a_consultar: str):
+    def ventana_resultado_rango(hectareas_totales: list, rango_a_consultar: str):
         #list(round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
         
         ventana_res = tk.Toplevel()
@@ -712,27 +720,23 @@ def main():
             if consulta_abierta == False:
                 if consulta.get() == "Rodal":
                     rodal_a_consultar = consulta_temp.get()
-                    #propietario, natividad, exotico, colindancias = log.por_rodal(rodal_a_consultar)
-
-                    #ventana_resultados_rodal(propietario, natividad, exotico, colindancias, rodal_a_consultar)
-
-                    ventana_resultados_rodal("Yo", 70, 30, "muchas", "R1")
+                    datos_rodal = log.por_rodal(rodal_a_consultar)
+                    #[propietario, natividad, exotico]
+                    ventana_resultados_rodal(datos_rodal , rodal_a_consultar)
                     consulta_abierta = True
 
                 if consulta.get() == "Propietario":
                     prop_a_consultar = consulta_temp.get()
-                    #rodales, hect_nat_total, hect_exo_total = log.por_propietario(prop_a_consultar)
-
-                    #ventana_resultados_propietario(rodales, hect_nat_total, hect_exo_total, prop_a_consultar)
-                    ventana_resultados_propietario(["R1","R3","R4"], 33.4, 60.5, "el pepe")
+                    datos_rodales_propietario = log.por_propietario(prop_a_consultar)
+                    #[rodales_prop, natividad, exotico]
+                    ventana_resultados_propietario(datos_rodales_propietario, prop_a_consultar)
                     consulta_abierta = True
 
                 if consulta.get() == "Bosque":
                     rango_a_consultar = consulta_temp.get()
-                    lista_hect = log.por_lista_hectarea(rango_a_consultar)
+                    lista_hect = log.por_hectarea(rango_a_consultar)
+                    #[round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)]
                     ventana_resultado_rango(lista_hect, rango_a_consultar)
-                    #list(round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)
-                    ventana_resultado_rango(33.4, 70.2, "R3,R4-R9,R10")
                     consulta_abierta = True
             else:
                 msgbox.showerror("ERROR", "Ya posee una ventana de consulta abierta", parent = ventana_cons)

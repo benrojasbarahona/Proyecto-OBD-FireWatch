@@ -48,6 +48,8 @@ def construir_diccionario(directorio_archivos: str = 'archivos') -> dict:
     temp_colindancias = dict()
     dicc_rodales = dict()
 
+    generar_archivos()
+
     # Armar el diccionario temporal de colindancias
     with open(f'{directorio_archivos}/colindancias.csv', 'r', encoding = 'utf-8') as archivo:
         linea = archivo.readlines()
