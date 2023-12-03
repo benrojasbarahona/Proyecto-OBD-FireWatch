@@ -97,8 +97,9 @@ def por_lista_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, 
 
 def cant_rodales() -> tuple: # tupla de los rodales disponibles a consultar... (ayuda al combobox)
     _, b = consultar_()
-
-    return tuple(b.keys())  # ejemplo de salida ... -> ('R7', 'R3', 'R1', 'R6', 'R9', 'R10', 'R8')
+    lista_ = list(b.keys())
+    return sorted(lista_, key=lambda x: int(x[1:]))
+                            # ejemplo de salida ... -> ('R1', 'R3', 'R6', 'R7', 'R8', 'R9', 'R10')0
                             # tipo: tupla de string's
 
 def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a consultar ... (ayuda al combobox)
@@ -107,7 +108,7 @@ def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a cons
                             #                               'Simu Asociados', 'Toledo.s Rodales')
                             # tipo: tupla de string's
 
-print(por_lista_hectarea('R4, R5-R8, R1'))
+print(cant_rodales())
 
 # comentarrrrrr
 
