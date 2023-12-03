@@ -14,7 +14,7 @@ IMPORTANTES:
 PENDIENTE:
 1. Validar que el rodal referencia no tenga un rodal existente en la misma posición <-- RESUELTO
 2. Implementar función recursiva (Guía en onenote) <-- RESUELTO
-3. Todo el tema de archivos <-- PENDIENTE
+3. Todo el tema de archivos <-- RESUELTO
 """
 
 class OpcionInvalidaError(Exception): pass
