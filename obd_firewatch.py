@@ -8,6 +8,7 @@ import tkinter.messagebox as msgbox
 from tkinter import filedialog
 import añadir_rodal_bingus as bingus
 
+consulta_abierta = False
 
 def main():
     root = tk.Tk() # crea ventana principal
@@ -29,8 +30,8 @@ def main():
 
     def cerrando_ventana(): #---------------------------------------------------------------------------------------------------
         nonlocal ventana_abierta
-        if msgbox.askokcancel("Quit", "¿Desea salir y guardar ?"):
-#---------------------------------------------------------
+        if msgbox.askokcancel("Quit", "¿Desea guardar y salir?"):
+            log.guardar_diccionario()
             root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
@@ -42,7 +43,7 @@ def main():
             ventana_ingresar()
             ventana_abierta = True
         else:
-            msgbox.showinfo("Error","Ya posee una ventana abierta")
+            msgbox.showerror("Error","Ya posee una ventana abierta")
 
     def abrir_incendio():
         nonlocal ventana_abierta
@@ -50,7 +51,7 @@ def main():
             ventana_incendio()
             ventana_abierta = True
         else:
-            msgbox.showinfo("Error","Ya posee una ventana abierta")
+            msgbox.showerror("Error","Ya posee una ventana abierta")
 
     def abrir_consulta():
         nonlocal ventana_abierta
@@ -58,7 +59,7 @@ def main():
             ventana_consulta()
             ventana_abierta = True
         else:
-            msgbox.showinfo("Error","Ya posee una ventana abierta")
+            msgbox.showerror("Error","Ya posee una ventana abierta")
 
     def dialogo_abrir_archivo():
         direccion_archivo = filedialog.askdirectory(title="Abrir Carpeta")
@@ -103,7 +104,7 @@ def main():
             nonlocal ventana_abierta
             if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_ingr):
                 ventana_abierta = False
-                #arr.guardar_en_archivo() # TENTATIVO A CAMBIO --------------------------------------------------------
+                log.guardar_diccionario() # TENTATIVO A CAMBIO --------------------------------------------------------
                 ventana_ingr.destroy()
 
         ventana_ingr.protocol("WM_DELETE_WINDOW", cerrando_ventana)
@@ -316,6 +317,28 @@ def main():
                                 bg = "#C4A11E", font = F_entrada, command=boton_entrada_rodal)
         boton_rodal.grid(row=12,column=2,pady=20)
 
+    def reporte_incendio():
+        ventana_reporte = tk.Toplevel()
+        ventana_reporte.title('Proyección de incendio')
+        ventana_reporte.columnconfigure([0,2,4], minsize=15, weight=1)
+        ventana_reporte.rowconfigure([0,2,4], minsize=15, weight=1)
+
+        def cerrando_ventana():
+            """Handler cerrar ventana"""
+            nonlocal ventana_abierta
+            consulta_abierta = False
+            ventana_reporte.destroy()
+        
+        ventana_reporte.protocol("WM_DELETE_WINDOW", cerrando_ventana)
+
+        frame_rodal = tk.Frame()
+        
+
+        frame_riesgo_incendio = tk.Frame()
+
+        frame_comprometidos = tk.Frame()
+
+
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
         ventana_inc.geometry("500x400")
@@ -323,11 +346,11 @@ def main():
         ventana_inc.resizable(False, False)  # no se puede cambiar el tamaño de la ventana
 
         def cerrando_ventana():
+            """Handler cerrar ventana"""
             nonlocal ventana_abierta
-            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_inc):
-                ventana_abierta = False
-                ventana_inc.destroy()
-
+            ventana_abierta = False
+            ventana_inc.destroy()
+        
         ventana_inc.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
         style= ttk.Style()
@@ -360,6 +383,7 @@ def main():
         def simular_incendio():
             rodal_seleccionado = rodal_combobox.get()
             direccion_viento = direccion_combobox.get()
+            consulta_abierta = True
             msgbox.showinfo("Simulación Exitosa", "Aquí debe desplegarse toda la información")
 
         boton_simular = tk.Button(ventana_inc, text="Simular Incendio", command=simular_incendio, bg='#820400', fg='white')
@@ -371,19 +395,191 @@ def main():
         label_imagen.place(x=160, y=165)
 
 
-    def ventana_resultados_rodal(propietario: str, natividad: int, 
-                           exotico: int, colindancias: list):
+    def ventana_resultados_rodal(propietario: str, nativo: int, 
+                                 exotico: int, colindancias: list, rodal: str):
+        
+        ventana_res = tk.Toplevel()
+        ventana_res.columnconfigure([0, 1, 2], minsize=15, weight=1)
+        ventana_res.rowconfigure([0, 10], minsize=10, weight=1)
+        ventana_res.minsize(355,480)
+
+        label_bg = tk.Label(ventana_res, image=img_background)
+        label_bg.place(x=0,y=0)
+
+        def cerrando_consulta():
+            """Handler cerrar consulta"""
+            global consulta_abierta
+            consulta_abierta = False
+            ventana_res.destroy()
+        
+        ventana_res.protocol("WM_DELETE_WINDOW", cerrando_consulta)
+        
+        tk.Label (ventana_res, text = "Rodal Consultado:", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13, "bold")).grid(row=1, column=1, sticky="w")
+        tk.Label (ventana_res, text = rodal, fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=1, column=1, sticky="w", padx= (150,0))
+        
+        tk.Label (ventana_res, text = "Propietario: ", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13, "bold")).grid(row=2, column=1, sticky="w")
+        tk.Label (ventana_res, text = propietario, fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=2, column=1, sticky="w", padx = (95,0))
+        
+        tk.Label (ventana_res, text = "Porcentaje Bosque Nativo: ", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13, "bold")).grid(row=3, column=1, sticky="w")
+        tk.Label (ventana_res, text = f"{nativo} %", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=3, column=1, sticky="w", padx=(215,0))
+        
+        tk.Label (ventana_res, text = "Porcentaje Bosque Exótico: ", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13, "bold")).grid(row=4, column=1, sticky="w")
+        tk.Label (ventana_res, text = f"{exotico} %", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=4, column=1, sticky="w", padx=(227,0))
+        
+        tk.Label (ventana_res, text = "Rodales colindantes: ", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13, "bold")).grid(row=5, column=1, sticky="w")
+        tk.Label (ventana_res, text = colindancias, fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=6, column=1, sticky="w", pady=(0,10))
+        
+
+        canvas = tk.Canvas(ventana_res, width=270, height=270, bg = "#675F2A")
+        canvas.grid(row=7, column=1, sticky="nw")
+        st = 0
+        coord = 15, 15, 250, 250
+        pieValor = [nativo, exotico]
+        pieColor = ["Green", "#0B320E"]
+        #Genera grafico de torta en base a porcentajes bosque nativo y exotico
+        for val,col in zip(pieValor, pieColor):    
+            canvas.create_arc(coord,start=st,extent = val*3.6,fill=col,outline=col)
+            st = st + val*3.6 
+
+        tk.Label (ventana_res, text = "Bosque Nativo", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=8, column=1, sticky="nw",padx=(25,0))
+        tk.Label (ventana_res,bg = "Green", width=2, height=1).grid(row=8, column=1, sticky="w")
+        
+        tk.Label (ventana_res, text = "Bosque Exotico", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=9, column=1, sticky="nw",padx=(25,0))
+        tk.Label (ventana_res,bg = "#0B320E", width=2, height=1).grid(row=9, column=1, sticky="w")
+        
+    def ventana_resultados_propietario(rodales: dict, hect_nat_total: float, 
+                                       hect_exo_total: float, prop_a_consultar: str):
+        
+        ventana_res = tk.Toplevel()
+        ventana_res.columnconfigure([0, 1, 2], minsize=15, weight=1)
+        ventana_res.rowconfigure([0, 8], minsize=10, weight=1)
+        ventana_res.minsize(355,480)
+
+        label_bg = tk.Label(ventana_res, image=img_background)
+        label_bg.place(x=0,y=0)
+
+        def cerrando_consulta():
+            """Handler cerrar consulta"""
+            global consulta_abierta
+            consulta_abierta = False
+            ventana_res.destroy()
+        
+        ventana_res.protocol("WM_DELETE_WINDOW", cerrando_consulta)
+
+        tk.Label (ventana_res, text = prop_a_consultar, fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 15, "bold underline")).grid(row=1, column=1, sticky="w", pady=15)
+        
+        tk.Label (ventana_res, text = "Cantidad de rodales:", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 12, "bold")).grid(row=2, column=1, sticky="nw")
+        tk.Label (ventana_res, text = len(rodales), fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 12)).grid(row=2, column=1, sticky="w",padx= (165,0))
+        
+        tk.Label (ventana_res, text = rodales, fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13)).grid(row=3, column=1, sticky="w")
+        
+        tk.Label (ventana_res, text = "Hectareas bosque nativo:", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13, "bold")).grid(row=4, column=1, sticky="nw")
+        tk.Label (ventana_res, text = f"{hect_nat_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13)).grid(row=4, column=1, sticky="sw",padx= (210,0))
+        
+        tk.Label (ventana_res, text = "Hectareas bosque exótico:", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13, "bold")).grid(row=5, column=1, sticky="nw")
+        tk.Label (ventana_res, text = f"{hect_exo_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13)).grid(row=5, column=1, sticky="sw",padx= (220,0), pady=(0,15))
+
+        #Setup Canvas para gráfico de torta
+        canvas = tk.Canvas(ventana_res, width=270, height=270, bg = "#675F2A")
+        canvas.grid(row=6, column=1, sticky="nw")
+        st = 0
+        coord = 15, 15, 250, 250
+        porcentaje_hect_nat = hect_nat_total/(hect_nat_total + hect_exo_total)*100
+        porcentaje_hect_exo = hect_exo_total/(hect_nat_total + hect_exo_total)*100
+        pieValor = [porcentaje_hect_nat, porcentaje_hect_exo]
+        pieColor = ["Green", "#0B320E"]
+
+        #Genera grafico de torta en base a porcentajes bosque nativo y exotico
+        for val,col in zip(pieValor, pieColor):    
+            canvas.create_arc(coord,start=st,extent = val*3.6,fill=col,outline=col)
+            st = st + val*3.6 
+
+        #Leyenda gráfico de torta
+        tk.Label (ventana_res, text = "Bosque Nativo", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=8, column=1, sticky="nw",padx=(25,0))
+        tk.Label (ventana_res,bg = "Green", width=2, height=1).grid(row=8, column=1, sticky="w")
+        
+        tk.Label (ventana_res, text = "Bosque Exotico", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=9, column=1, sticky="nw",padx=(25,0))
+        tk.Label (ventana_res,bg = "#0B320E", width=2, height=1).grid(row=9, column=1, sticky="w")
+
+
+    def ventana_resultado_rango(hect_nat_total: float, hect_exo_total: float, 
+                                rango_a_consultar: str):
         
         ventana_res = tk.Toplevel()
         ventana_res.columnconfigure([0, 1, 2], minsize=25, weight=1)
         ventana_res.rowconfigure([0, 6, 7, 8, 9], minsize=25, weight=1)
-        ventana_res.minsize(650,450)
+        ventana_res.minsize(355,480)
         label_bg = tk.Label(ventana_res, image=img_background)
-        label_bg.place(x=-0,y=0)
-        lista_datos = [f"Propietario{propietario}",f"Porcentaje Bosque Nativo: {natividad}",
-                       f"Porcentaje Bosque Exotico {exotico}",colindancias]
-        for i in range (4):
-            tk.Label (text = lista_datos[i], fg = "#EFD1D1", bg = "#675F2A").grid(row=16,column=1,sticky="w",padx=10)
+        label_bg.place(x=0,y=0)
+
+        def cerrando_consulta():
+            """Handler cerrar consulta"""
+            global consulta_abierta
+            consulta_abierta = False
+            ventana_res.destroy()
+        
+        ventana_res.protocol("WM_DELETE_WINDOW", cerrando_consulta)
+
+        tk.Label (ventana_res, text = "Rodales consultados:", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13, "bold")).grid(row=1, column=1, sticky="nw")
+        tk.Label (ventana_res, text = rango_a_consultar, fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 12)).grid(row=2, column=1, sticky="w")
+        
+        tk.Label (ventana_res, text = "Hectareas bosque nativo:", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13, "bold")).grid(row=3, column=1, sticky="nw")
+        tk.Label (ventana_res, text = f"{hect_nat_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 12)).grid(row=3, column=1, sticky="w", padx=(210,0))
+        
+        tk.Label (ventana_res, text = "Hectareas bosque exotico:", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 13, "bold")).grid(row=4, column=1, sticky="nw")
+        tk.Label (ventana_res, text = f"{hect_exo_total} ha", fg = "#EFD1D1", bg = "#675F2A", 
+                      font = ("Clear Sans", 12)).grid(row=4, column=1, sticky="w", padx=(220,0),pady=(0,15))
+        
+        #Setup Canvas para gráfico de torta
+        canvas = tk.Canvas(ventana_res, width=270, height=270, bg = "#675F2A")
+        canvas.grid(row=5, column=1, sticky="nw")
+        st = 0
+        coord = 15, 15, 250, 250
+        porcentaje_hect_nat = hect_nat_total/(hect_nat_total + hect_exo_total)*100
+        porcentaje_hect_exo = hect_exo_total/(hect_nat_total + hect_exo_total)*100
+        pieValor = [porcentaje_hect_nat, porcentaje_hect_exo]
+        pieColor = ["Green", "#0B320E"]
+
+        #Genera grafico de torta en base a porcentajes bosque nativo y exotico
+        for val,col in zip(pieValor, pieColor):    
+            canvas.create_arc(coord,start=st,extent = val*3.6,fill=col,outline=col)
+            st = st + val*3.6 
+
+        #Leyenda gráfico de torta
+        tk.Label (ventana_res, text = "Bosque Nativo", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=6, column=1, sticky="nw",padx=(25,0))
+        tk.Label (ventana_res,bg = "Green", width=2, height=1).grid(row=6, column=1, sticky="w")
+        
+        tk.Label (ventana_res, text = "Bosque Exotico", fg = "#EFD1D1", bg = "#675F2A", 
+                    font = ("Clear Sans", 13)).grid(row=7, column=1, sticky="nw",padx=(25,0))
+        tk.Label (ventana_res,bg = "#0B320E", width=2, height=1).grid(row=7, column=1, sticky="w")
         
 
     def ventana_consulta(): # ----------------------- Ventana Consulta -------------------------------------------------
@@ -392,9 +588,9 @@ def main():
         ventana_cons.minsize(650, 450)
         ventana_cons.columnconfigure([0, 1, 2, 3], minsize = 25, weight = 1)
         ventana_cons.rowconfigure([0, 1, 5,6,7,8], minsize = 25, weight = 1)
+
         label_bg = tk.Label(ventana_cons, image=img_background)
         label_bg.place(x=-0,y=0)
-        
 
         F_radiob = ("Clear Sans", 13, "bold") #tuplas de fuente para usar mas abajo
         F_rango = ("Clear Sans", 12, "bold")
@@ -404,15 +600,14 @@ def main():
         def cerrando_ventana():
             """Handler cerrar ventana"""
             nonlocal ventana_abierta
-            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_cons):
-                ventana_abierta = False
-                ventana_cons.destroy()
+            ventana_abierta = False
+            ventana_cons.destroy()
         
         ventana_cons.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
         # Configuro Radiobuttons de consulta
-        mensaje = tk.Label(ventana_cons, text="Consultar por", bg="#675F2A", fg="#EFD1D1", font= F_radiob)
-        mensaje.grid(row=0, column=1, sticky="w")
+        mensaje = tk.Label(ventana_cons, text="Consultar por:", bg="#675F2A", fg="#EFD1D1", font= F_radiob)
+        mensaje.grid(row=0, column=1, sticky="sw")
 
         style= ttk.Style()
         style.theme_use('clam')
@@ -457,18 +652,36 @@ def main():
 
         def consultar():
             """Handler boton consulta"""
-            if consulta.get() == "Rodal":
-                rodal_a_consultar = consulta_temp.get()
-                propietario, natividad, exotico, colindancias = log.por_rodal(rodal_a_consultar)
-                ventana_resultados_rodal(propietario, natividad, exotico, colindancias)
-                
-                #LLamo a funcion consulta para luego levantar ventana
-            if consulta.get() == "Propietario":
-                prop_a_consultar = consulta_temp.get()
-                #LLamo a funcion consulta propietario para luego levantar ventana
-            
-            if consulta.get() == "Bosque":
-                rango_a_consultar = consulta_temp.get()
+            global consulta_abierta
+
+            if consulta_abierta == False:
+                if consulta.get() == "Rodal":
+                    rodal_a_consultar = consulta_temp.get()
+                    #propietario, natividad, exotico, colindancias = log.por_rodal(rodal_a_consultar)
+
+                    #ventana_resultados_rodal(propietario, natividad, exotico, colindancias, rodal_a_consultar)
+
+                    ventana_resultados_rodal("Yo", 70, 30, "muchas", "R1")
+                    consulta_abierta = True
+
+                if consulta.get() == "Propietario":
+                    prop_a_consultar = consulta_temp.get()
+                    #rodales, hect_nat_total, hect_exo_total = log.por_propietario(prop_a_consultar)
+
+                    #ventana_resultados_propietario(rodales, hect_nat_total, hect_exo_total, prop_a_consultar)
+                    ventana_resultados_propietario(["R1","R3","R4"], 33.4, 60.5, "el pepe")
+                    consulta_abierta = True
+
+                if consulta.get() == "Bosque":
+                    rango_a_consultar = consulta_temp.get()
+                    #hect_nat_total, hect_exo_total = log.por_lista_hectarea(rango_a_consultar)
+
+                    #ventana_resultado_rango(hect_nat_total, hect_exo_total, rango_a_consultar)
+                    ventana_resultado_rango(33.4, 70.2, "R3,R4-R9,R10")
+                    consulta_abierta = True
+            else:
+                msgbox.showerror("ERROR", "Ya posee una ventana de consulta abierta", parent = ventana_cons)
+
         
         #Radiobotones para especificar consulta
         tk.Radiobutton(ventana_cons, text="Rodal", variable=consulta, value="Rodal", font=F_radiob, 
