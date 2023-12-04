@@ -66,7 +66,7 @@ def generar_rodal(
     dicc_rodales[id_rodal] = datos_rodal
 
 
-def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str, origen: str):
+def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str, origen: str, diccionario: dict()):
     """Actualiza todas las colindancias de los rodales en base a los rodales 
     que se están agregando"""
 
@@ -110,16 +110,16 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
         return
 
     # Si se llega a un rodal que tiene colindancias, se detiene la recursividad
-    if dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] != '': 
+    if diccionario[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] != '': 
         print(' -- Vuelta completa --')
         return
     
     # Comenzar el proceso de asignación de colindancias
-    if dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] == '':
+    if diccionario[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] == '':
 
         # Asignar colindancias opuestas
-        dicc_rodales[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] = nuevo_rodal
-        dicc_rodales[nuevo_rodal]["colindancias"][direccion] = rodal_referencia
+        diccionario[rodal_referencia]["colindancias"][coordenada_opuesta[direccion]] = nuevo_rodal
+        diccionario[nuevo_rodal]["colindancias"][direccion] = rodal_referencia
         print(f' A {rodal_referencia} le asigno {nuevo_rodal} en {coordenada_opuesta[direccion]}')
         print(f' A {nuevo_rodal} se le referenció a {rodal_referencia} en {direccion}\n')
 
@@ -130,11 +130,11 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
             # Guardar los rodales a buscar en variables
             match vuelta:
                 case 1:
-                    if dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar] != '':
-                        r_col_v1 = dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar]
+                    if diccionario[rodal_referencia]["colindancias"][coord_a_buscar] != '':
+                        r_col_v1 = diccionario[rodal_referencia]["colindancias"][coord_a_buscar]
                 case 2:
-                    if dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar] != '':
-                        r_col_v2 = dicc_rodales[rodal_referencia]["colindancias"][coord_a_buscar]
+                    if diccionario[rodal_referencia]["colindancias"][coord_a_buscar] != '':
+                        r_col_v2 = diccionario[rodal_referencia]["colindancias"][coord_a_buscar]
             
             vuelta += 1
         
@@ -142,10 +142,9 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
         print(f' Rodal al {referencias_subprocesos[coordenada_opuesta[direccion]][1]}: {r_col_v2}')
 
         # Retorna la misma función retornando lo que se encontró en los laterales del rodal referencia
-        return (
-            asignar_colindancias(nuevo_rodal, r_col_v1, vuelta_1_horario[direccion], origen),
-            asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion], origen)
-        )
+        asignar_colindancias(nuevo_rodal, r_col_v1, vuelta_1_horario[direccion], origen, diccionario),
+        asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion], origen, diccionario)
+        return (diccionario)
 
 def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
     """Recorrer la lista de rodales, en el caso en que otro rodal tenga al rodal
@@ -531,7 +530,7 @@ def main():
                 try: 
                     # Dentro de una excepcion en caso de que info_colin no exista
                     print(f"Se encuentra al {referencia_coordenadas[info_colin]} de {rodal_colindante}\n")
-                    asignar_colindancias(id_rodal, rodal_colindante, info_colin, rodal_colindante)
+                    dicc_rodales = asignar_colindancias(id_rodal, rodal_colindante, info_colin, rodal_colindante, dicc_rodales)
                 except UnboundLocalError: pass
 
                 print('\n< Datos guardados exitosamente >\n')
