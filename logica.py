@@ -540,6 +540,7 @@ def simular_incendio(direccion_viento: str, rodal_inicial: str) -> list:
 
 def limpiar_datos_log():
     file.limpiar_datos()
+    dicc_rodales.clear()
 
 def test():
     global dicc_rodales
