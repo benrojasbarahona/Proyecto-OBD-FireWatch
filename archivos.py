@@ -1,19 +1,9 @@
 # Esta es la capa de archivos, es la más cercana al csv
 # y se dedica a leer y escribir en el archivo
 
-def lee_rodales(archivo_rodales:str) -> dict:
-    # Lee rodales.csv y retorna un diccionario en donde la 
-    # clave es el nombre del cliente y el contenido es una lista con la 
-    # dirección, el teléfono y el monto adeudado, si no está, lo crea
-    ...
-
-def escribe_rodales(file_clientes:str, DICC_RODALES: dict) -> bool:
-    # Lee rodales.csv en el formato indicado y retorna True si salió
-    # correctamente, este booleano se usa en la nube
-    ...
-
 def generar_archivos(directorio_archivos: str = 'archivos'):
-    '''Esta función crea los archivos en caso de que no existan'''
+    '''Esta función crea los archivos en caso de que no existan
+    (se ejecuta en construir diccionario)'''
 
     # Crea (en caso de que no exista) el archivo rodales.csv
     try:
@@ -43,7 +33,8 @@ def generar_archivos(directorio_archivos: str = 'archivos'):
 def construir_diccionario(directorio_archivos: str = 'archivos') -> dict:
     """El trabajo de esta función es para cada inicio del programa, leer el archivo para
     reconstruir el diccionario que contiene la información de todos los rodales registrados
-    por el usuario"""
+    por el usuario
+    (SE DEBE EJECUTAR AL INICIO DEL PROGRAMA)"""
 
     temp_colindancias = dict()
     dicc_rodales = dict()
@@ -88,7 +79,9 @@ def construir_diccionario(directorio_archivos: str = 'archivos') -> dict:
 
 def guardar_en_archivo(dicc_rodales: dict, modo_escritura: str = 'a', directorio_archivos: str = 'archivos'):
     """Esta funcion debe guardar los datos en dicc_rodales para que se puedan utilizar
-    en una siguiente ejecución del programa"""
+    en una siguiente ejecución del programa
+    (SE EJECUTA CADA VEZ QUE SE GUARDE UN RODAL)"""
+    
     rodales_existentes = set()
     generar_archivos()
 
@@ -127,20 +120,21 @@ def guardar_en_archivo(dicc_rodales: dict, modo_escritura: str = 'a', directorio
     print(dicc_rodales)
 
 
-def limpiar_datos():
+def limpiar_datos(directorio: str = 'archivos'):
     '''Esta función está encargada de limpiar los datos de los rodales en
-    los archivos'''
+    los archivos
+    (AÑADIR UN BOTON PARA ESTO)'''
 
-    with open('Tests/colindancias.csv', 'w', encoding = 'utf-8') as archivo:
+    with open(f'{directorio}/colindancias.csv', 'w', encoding = 'utf-8') as archivo:
         archivo.write("# rodal_nuevo rodal_existente orientacion\n")
 
-    with open('Tests/rodales.csv', 'w', encoding = 'utf-8') as archivo:
+    with open(f'{directorio}/rodales.csv', 'w', encoding = 'utf-8') as archivo:
         archivo.write("# rodal %nativo %exotico propietario\n")
 
     
 def test():
     # Esta función prueba las funciones de este módulo
-    ...
+    print('bingus')
 
 if __name__ == "__main__":
     test()

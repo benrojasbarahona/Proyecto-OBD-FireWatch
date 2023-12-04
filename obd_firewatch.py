@@ -8,7 +8,7 @@ import tkinter.messagebox as msgbox
 from tkinter import filedialog
 
 consulta_abierta = False
-
+#limpiar_datos boton limpiar en main
 def main():
     root = tk.Tk() # crea ventana principal
     root.title('OBD Firewatch') # título de la aplicación
@@ -38,6 +38,14 @@ def main():
 
     root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
     
+    def handler_limpiar_datos():
+        if msgbox.askyesno("Limpiar datos", "¿Desea limpiar los datos de prueba?"):
+            log.limpiar_datos_log()
+            msgbox.showinfo('Datos limpiados','Los datos de prueba fueron limpiados')
+
+    boton_limpiar = tk.Button(root, text = "Limpiar Datos", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
+                              command=handler_limpiar_datos).grid(row=0,column=5,columnspan=2,padx = 10,sticky = "e")
+    
     def abrir_ingreso():
         nonlocal ventana_abierta
         if ventana_abierta == False:
@@ -51,7 +59,7 @@ def main():
         nonlocal ventana_abierta
         if ventana_abierta == False:
             ventana_incendio()
-            reporte_incendio("R1","S")
+            
             ventana_abierta = True
         else:
             msgbox.showerror("Error","Ya posee una ventana abierta")
@@ -104,10 +112,9 @@ def main():
         
         def cerrando_ventana():
             nonlocal ventana_abierta
-            if msgbox.askokcancel("Quit", "¿Desea cerrar esta ventana?", parent = ventana_ingr):
-                ventana_abierta = False
-                log.guardar_diccionario() # TENTATIVO A CAMBIO --------------------------------------------------------
-                ventana_ingr.destroy()
+            ventana_abierta = False
+            log.guardar_diccionario() # TENTATIVO A CAMBIO --------------------------------------------------------
+            ventana_ingr.destroy()
 
         ventana_ingr.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
@@ -333,8 +340,8 @@ def main():
 
         def cerrando_ventana():
             """Handler cerrar ventana"""
-            global consulta_abierta
-            consulta_abierta = False
+            global reporte_abierto
+            reporte_abierto = False
             ventana_reporte.destroy()
         
         ventana_reporte.protocol("WM_DELETE_WINDOW", cerrando_ventana)
@@ -353,7 +360,7 @@ def main():
         frame_comprometidos = tk.Frame(ventana_reporte, bd=7, bg = "#AB431D", relief=tk.RAISED)
         frame_comprometidos.rowconfigure([0,7], minsize=5, weight=1)
         frame_comprometidos.columnconfigure([0,2], minsize=5, weight=1)
-        frame_comprometidos.grid(row=1, column=3, columnspan=2)
+        frame_comprometidos.grid(row=1, column=3, rowspan=2)
 
         #Relleno frame_rodal con informacion
         
@@ -383,9 +390,10 @@ def main():
         tk.Label(frame_rodal, text=viento, bg="#AB431D",
                     font=("Clear Sans", 12)).grid(row=6, column=1, sticky="nw", padx= (140,0))
         
-                    
-
         #Relleno frame_riesgo_incendio con información
+        rodales_afectados,_,_ = log.simular_incendio(viento, rodal_inicial)
+        #[rodales_afectados, recursos_comprometidos[1], recursos_comprometidos[0]]
+
         tk.Label(frame_riesgo_incendio, text = "RODALES EN RIESGO DE INCENDIO", bg="#AB431D",
                  font=("Clear Sans", 14, "bold")).grid(row=1, column=1, columnspan=4, sticky="nw")
 
@@ -394,8 +402,28 @@ def main():
         for i in range(len(textos_frame_riesgo)):
             tk.Label(frame_riesgo_incendio, text = textos_frame_riesgo[i], bg="#AB431D", 
                      font=("Clear Sans", 12, "bold")).grid(row=2, column=1+i, sticky="nw")
+
+        for i in range(len(rodales_afectados)):
+            if rodales_afectados[i] != rodal_inicial:
+                datos_rodal = log.por_rodal(rodales_afectados[i])
+                #[propietario, natividad, exotico]
+                tk.Label(frame_riesgo_incendio, text = rodales_afectados[i], bg="#AB431D", 
+                         font=("Clear Sans", 12)).grid(row=3+i, column=1, sticky="nw")
+
+                tk.Label(frame_riesgo_incendio, text = datos_rodal[1], bg="#AB431D", 
+                         font=("Clear Sans", 12)).grid(row=3+i, column=2, sticky="nw")
+
+                tk.Label(frame_riesgo_incendio, text = datos_rodal[2], bg="#AB431D", 
+                         font=("Clear Sans", 12)).grid(row=3+i, column=3, sticky="nw")
+
+                tk.Label(frame_riesgo_incendio, text = datos_rodal[0], bg="#AB431D", 
+                         font=("Clear Sans", 12)).grid(row=3+i, column=4, sticky="nw")
         
         #Relleno frame_comprometidos
+
+        tupla_suma, tupla_propietarios = log.suma_afectados(rodal_inicial, list(rodales_afectados))
+        #(hectareas_totales_afectadas, bosque_nativo_afectado, bosque_exotico_afectado)
+
         tk.Label(frame_comprometidos, text = "ROCURSOS COMPROMETIDOS", bg="#AB431D",
                  font=("Clear Sans", 14, "bold")).grid(row=1, column=1, sticky="nw")
         
@@ -404,10 +432,17 @@ def main():
         for i in range(len(textos_recursos)):
             tk.Label(frame_comprometidos, text = textos_recursos[i], bg="#AB431D",
                      font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw")
+            tk.Label(frame_comprometidos, text = tupla_suma[i], bg="#AB431D",
+                     font=("Clear Sans", 12)).grid(row=2+i, column=1, sticky="nw", padx = (140,0))
+        
 
         tk.Label(frame_comprometidos, text="PROPIETARIOS COMPROMETIDOS", bg="#AB431D",
                  font=("Clear Sans", 14, "bold")).grid(row=5, column=1, sticky="nw")
-
+        
+        for i in range(len(tupla_propietarios)):
+            tk.Label(frame_comprometidos, text = tupla_propietarios[i], bg="#AB431D",
+                     font=("Clear Sans", 12)).grid(row=6+i, column=1, sticky="nw")
+        
     def ventana_incendio():
         ventana_inc = tk.Toplevel() # crea ventana simulación incendio
         ventana_inc.geometry("500x400")
@@ -444,17 +479,19 @@ def main():
         label_dir_viento = tk.Label(ventana_inc, text="Dir. del viento (N, NE, NO, S, SE, SO)", fg="white", bg="#820400", font=F_entrada)
         label_dir_viento.place(x=20, y=100)
 
-        opciones_viento = ["N", "NE", "NO", "S", "SE", "SO"]
+        opciones_viento = ["N", "NE", "E", "SE", "S", "SW", "W" ,"NW"]
         direccion_combobox = ttk.Combobox(ventana_inc, values=opciones_viento, state="readonly", width=51, style="clam.TCombobox")
         direccion_combobox.place(x=22, y=130)
 
-
         def simular_incendio():
-            global consulta_abierta
             rodal_seleccionado = rodal_combobox.get()
             direccion_viento = direccion_combobox.get()
-            consulta_abierta = True
-            reporte_incendio(rodal_seleccionado, direccion_viento)
+            if rodal_seleccionado and direccion_viento:  # Verifica que ambos combobox no estén en su estado predeterminado ("")
+                consulta_abierta = True
+                reporte_incendio(rodal_seleccionado, direccion_viento)
+
+            else:
+                msgbox.showerror("Error", "Por favor selecciona valores  válidos para ID del rodal y dirección del viento")
 
         boton_simular = tk.Button(ventana_inc, text="Simular Incendio", command=simular_incendio, bg='#820400', fg='white')
         boton_simular.place(x=190, y=350)

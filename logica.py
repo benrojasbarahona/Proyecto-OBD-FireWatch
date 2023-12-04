@@ -9,7 +9,16 @@ class RodalYaExistenteError(Exception): pass
 class EspacioNoValidoError(Exception): pass
 
 global dicc_rodales
-dicc_rodales = {}
+#dicc_rodales = {}
+dicc_rodales = {
+    'R1'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R4', 'NW': 'R6', 'NE': 'R3', 'S': '', 'SE': 'R2', 'SW': ''}},
+    'R2'   : {'b_nativo': 12, 'b_exotico': 88, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R3', 'NW': 'R1', 'NE': '', 'S': '', 'SE': '', 'SW': ''}},
+    'R3'   : {'b_nativo': 98, 'b_exotico': 2, 'propietario': 'R. Maturana', 'colindancias': {'N': 'R5', 'NW': 'R4', 'NE': '', 'S': 'R2', 'SE': '', 'SW': 'R1'}},
+    'R4'   : {'b_nativo': 87, 'b_exotico': 13, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': 'R7', 'NE': 'R5', 'S': 'R1', 'SE': 'R3', 'SW': 'R6'}},
+    'R5'   : {'b_nativo': 90, 'b_exotico': 10, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R3', 'SE': '', 'SW': 'R4'}},
+    'R6'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'Inv. Lazo', 'colindancias': {'N': 'R7', 'NW': '', 'NE': 'R4', 'S': '', 'SE': 'R1', 'SW': ''}},
+    'R7'   : {'b_nativo': 50, 'b_exotico': 50, 'propietario': 'lucas reyes', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R6', 'SE': 'R4','SW':''}}
+}
 #dicc_rodales = file.construir_diccionario()
 
 def inicializar_diccionario(path: str = 'archivo'):
@@ -62,7 +71,7 @@ def generar_rodal(
     dicc_rodales[id_rodal] = datos_rodal
 
 
-def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str, origen: str) -> None:
+def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str) -> None:
     """Actualiza todas las colindancias de los rodales en base a los rodales 
     que se están agregando"""
 
@@ -139,8 +148,8 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
 
         # Retorna la misma función retornando lo que se encontró en los laterales del rodal referencia
         return (
-            asignar_colindancias(nuevo_rodal, r_col_v1, vuelta_1_horario[direccion], origen),
-            asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion], origen)
+            asignar_colindancias(nuevo_rodal, r_col_v1, vuelta_1_horario[direccion]),
+            asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion])
         )
 
 def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
@@ -150,9 +159,8 @@ def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
     global dicc_rodales
     if rodal_colindante != "":
         for rodal, informacion in dicc_rodales.items():
-            if rodal != rodal_colindante:
-                if informacion["colindancias"][direccion] == rodal_colindante:
-                    return True
+            if informacion["colindancias"][direccion] == rodal_colindante:
+                return True
     return False
 
 
@@ -163,6 +171,23 @@ def guardar_diccionario() -> None:
 
     file.guardar_en_archivo(dicc_rodales)
 
+def ayudaporfavorquierosalirdeaqui(lista_colindancias: list, colindancia: str, direccion: str):
+    referencias_direccion = { 
+        "N" : ["NW","NE"],
+        "NE" : ["N","SE"],
+        "NW" : ["SW","N"],
+        "S" : ["SE","SW"],
+        "SE" : ["NE","S"],
+        "SW" : ["S","NW"]
+    }
+    global dicc_rodales
+
+    col_valida = lista_colindancias[0]
+    col_sospechosa = lista_colindancias[1]
+
+    for rodal in dicc_rodales.keys():
+        colidancias = dicc_rodales[rodal]["colindancias"]
+    
 
 def validar_ingreso(D:dict) -> None:
     global dicc_rodales
@@ -198,9 +223,15 @@ def validar_ingreso(D:dict) -> None:
             raise IngresoInvalido ("Casilla Propietario vacia")
         
         #Validaciones Colindancias
+        colindantes = []
         for direccion, rodal_col in colindancias.items():
             if colindancia_valida(rodal_col, direccion):
                 raise IngresoInvalido ("Colindancias no validas")
+            if rodal_col != "":
+                colindantes.append(rodal_col)
+                if len(colindancias) > 1:
+                   if ayudaporfavorquierosalirdeaqui(rodal_col, colindancias, direccion):
+                       raise IngresoInvalido ("para la wea")
 
     except IngresoInvalido as msj:
             return validado, msj
@@ -215,10 +246,19 @@ def validar_ingreso(D:dict) -> None:
     }
 
     dicc_rodales[id_rodal] = datos_rodal
+
+    for direct, rod in dicc_rodales[id_rodal]['colindancias'].items():
+        if rod != '':
+            direccion_referencia = direct
+            rodal_referencia = rod
+            break
     
+    try:
+        asignar_colindancias(id_rodal, rodal_referencia, direccion_referencia)
+    except UnboundLocalError: pass
+
     return validado, "Ingreso correcto"
     
-
 
 def retorna_lista_rodales() -> list:
     """Retorna una lista con las IDS de los rodales ya ingresados"""
@@ -227,6 +267,20 @@ def retorna_lista_rodales() -> list:
     rodales.append("")
     rodales.sort()
     return rodales
+
+
+# def retorna_lista_rodales(direccion: str) -> list:
+#     """Retorna una lista con las IDS de los rodales ya ingresados"""
+#     global dicc_rodales
+#     rodales = list(dicc_rodales.keys())
+
+#     for rodal in rodales:
+#         if dicc_rodales[rodal]['colindancias'][coordenada_opuesta[direccion]] != '':
+#             rodales.pop(rodal)
+            
+#     rodales.append("")
+#     return rodales
+
 
 def retorna_lista_propietarios() -> list:
     """Retorna una lista con los propietarios de los rodales ya ingresados"""
@@ -382,7 +436,6 @@ def simular_afectados(direccion_viento: str, rodal_inicial: str, afectados:set =
         simular_afectados(direccion_viento, siguiente_rodal_1, afectados)
         afectados = sorted(afectados, key=lambda x: int(x[1:])) #Ordenar los rodales
         return afectados
-    
 
 def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
     #_________________________________INFORMACION_______________________________________
@@ -430,6 +483,8 @@ def simular_incendio(direccion_viento: str, rodal_inicial: str) -> list:
     lista_incendio = [rodales_afectados, recursos_comprometidos[1], recursos_comprometidos[0]]
     return lista_incendio
 
+def limpiar_datos_log():
+    file.limpiar_datos()
 
 def test():
     global dicc_rodales
