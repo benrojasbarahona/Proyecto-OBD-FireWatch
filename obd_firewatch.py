@@ -1,3 +1,12 @@
+# ------------------- OBD Firewatch ---------------------
+# INTEGRANTES:
+# - Benjamín Rojas
+# - Diego Soto
+# - Matías Soto
+# - Matías Toledo
+# - Sebastián Mancilla
+# -------------------------------------------------------
+
 # Esta es la capa de , es decir, acá está main() y
 # todo lo relacionado a tkinter, es lo que el USUARIO ve.
 
@@ -5,7 +14,6 @@ import logica as log # se importa la capa de negocio
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
-from tkinter import filedialog
 import re
 
 consulta_abierta = False
@@ -32,14 +40,9 @@ def main():
 
     def cerrando_ventana(): #---------------------------------------------------------------------------------------------------
         nonlocal ventana_abierta
-        global direccion_archivo
         if msgbox.askokcancel("Quit", "¿Desea guardar y salir?"):
-            if direccion_archivo != "":
-                log.recordar_directorio(direccion_archivo)
-                root.destroy()
-            else:
-                log.guardar_diccionario()
-                root.destroy()
+            log.guardar_diccionario()
+            root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
     
@@ -76,16 +79,6 @@ def main():
             ventana_abierta = True
         else:
             msgbox.showerror("Error","Ya posee una ventana abierta")
-
-    def dialogo_abrir_archivo():
-        global direccion_archivo
-        direccion_archivo = filedialog.askdirectory(title="Abrir Carpeta")
-        if direccion_archivo != "":
-            log.inicializar_diccionario(direccion_archivo)
-
-    #Boton abrir carpeta archivo
-    tk.Button(root, text = "Abrir Carpeta", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
-                             command=dialogo_abrir_archivo).grid(row=0,column=0,columnspan=2,padx = 10,sticky = "w")
     
     #Botones ventanas
     ttk.Button(root, image=img_ingresar, command=lambda:abrir_ingreso()).grid(row=1,column=1)
@@ -116,12 +109,8 @@ def main():
             global direccion_archivo
             nonlocal ventana_abierta
             ventana_abierta = False
-            if direccion_archivo != "":
-                log.recordar_directorio(direccion_archivo)
-                ventana_ingr.destroy()
-            else:
-                log.guardar_diccionario
-                ventana_ingr.destroy()
+            log.guardar_diccionario
+            ventana_ingr.destroy()
 
         ventana_ingr.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 

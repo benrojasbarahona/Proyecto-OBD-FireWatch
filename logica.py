@@ -23,14 +23,9 @@ dicc_rodales = {}
 
 def inicializar_diccionario(path: str = 'archivos'):
     global dicc_rodales
-    path = file.buscar_directorio()
 
     file.generar_archivos(path)
     dicc_rodales = file.construir_diccionario(path)
-
-
-def recordar_directorio(directorio: str):
-    file.guardar_directorio(directorio)
 
 
 # Metes una coordenada y te devuelve la opuesta
