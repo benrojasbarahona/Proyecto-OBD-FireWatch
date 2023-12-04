@@ -86,8 +86,12 @@ def por_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
     for paso_rodal in split_str_rodales:
         if '-' in paso_rodal:
             temp = paso_rodal.replace('R', '').split('-')
-            for agregando in range(int(temp[0]), int(temp[-1])+1, 1):   # ingreso todos los radales que se estan
-                rodales_total.append(f'R{agregando}')                   # consultando a la lista rodales_total.
+            if int(temp[0]) > int(temp[-1]):
+                for agregando in range(int(temp[0]), int(temp[-1])-1, -1):  
+                    rodales_total.append(f'R{agregando}')
+            else:
+                for agregando in range(int(temp[0]), int(temp[-1])+1, 1):   # ingreso todos los radales que se estan
+                    rodales_total.append(f'R{agregando}')                   # consultando a la lista rodales_total.
         else:
             rodales_total.append(paso_rodal)
 
@@ -119,4 +123,4 @@ def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a cons
                             #                               'Simu Asociados', 'Toledo.s Rodales']
                             # tipo: lista de string's
 
-print(por_hectarea('R1, R3-R9, R10'))
+print(por_hectarea('R1, R9-R3, R10'))
