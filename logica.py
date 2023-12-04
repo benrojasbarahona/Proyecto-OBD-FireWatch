@@ -600,6 +600,64 @@ def test():
     for key,value in dicc_rodales.items():
         print(f"{key}   : {value}")
         print()
+    global dicc_rodales
+    validado, msj = validar_ingreso(D={"R2":{"b_nativo": 20, "b_exotico":80, "propietario": "inv rojas",
+                                        "colindancias":{'N' : "",
+                                                        'NW' : "",
+                                                        'NE' : "",
+                                                        'S' : "",
+                                                        'SE' : "",
+                                                        'SW' : ""}}}
+                                                        )
+    print (validado, msj)
+
+    validado, msj = validar_ingreso(D={"R1":{"b_nativo": 70, "b_exotico":10, "propietario": "inv rojas",
+                                        "colindancias":{'N' : "",
+                                                        'NW' : "R2",
+                                                        'NE' : "",
+                                                        'S' : "",
+                                                        'SE' : "",
+                                                        'SW' : ""}}}
+                                                        )
+    
+    print (validado, msj)
+
+    validado, msj = validar_ingreso(D={"  r1":{"b_nativo": 70, "b_exotico":30, "propietario": "inv rojas",
+                                        "colindancias":{'N' : "",
+                                                        'NW' : "R2",
+                                                        'NE' : "",
+                                                        'S' : "",
+                                                        'SE' : "",
+                                                        'SW' : ""}}}
+                                                        )
+    
+    print (validado, msj)
+
+    validado, msj = validar_ingreso(D={"r-3":{"b_nativo": 50, "b_exotico":50, "propietario": "inv rojas",
+                                        "colindancias":{'N' : "",
+                                                        'NW' : "R2",
+                                                        'NE' : "",
+                                                        'S' : "",
+                                                        'SE' : "",
+                                                        'SW' : ""}}}
+                                                        )
+    
+    print (validado, msj)
+
+    validado, msj = validar_ingreso(D={"R3":{"b_nativo": 50, "b_exotico":50, "propietario": "inv rojas",
+                                        "colindancias":{'N' : "",
+                                                        'NW' : "R1",
+                                                        'NE' : "",
+                                                        'S' : "",
+                                                        'SE' : "",
+                                                        'SW' : ""}}}
+                                                        )
+    
+    print (validado, msj)
+
+    for key,value in dicc_rodales.items():
+        print(f"{key}   : {value}")
+        print()
 
 if __name__ == "__main__":
     test()

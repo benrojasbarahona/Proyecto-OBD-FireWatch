@@ -11,7 +11,9 @@
 # todo lo relacionado a tkinter, es lo que el USUARIO ve.
 
 import logica as log # se importa la capa de negocio
+import logica as log # se importa la capa de negocio
 import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 import re
@@ -20,6 +22,7 @@ consulta_abierta = False
 #limpiar_datos boton limpiar en main
 def main():
     root = tk.Tk() # crea ventana principal
+    root.title('OBD Firewatch') # título de la aplicación
     root.title('OBD Firewatch') # título de la aplicación
     root.columnconfigure([0, 1, 2, 3, 4, 5, 6], minsize = 50, weight = 1)
     root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
@@ -33,7 +36,7 @@ def main():
     img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
     img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
     img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
-    img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
+    img_background = tk.PhotoImage(file = "assets/iconos/Fondo_Ventana1.png")
     label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
 
     ventana_abierta = False
@@ -165,11 +168,20 @@ def main():
             nonlocal contador_exo
             nonlocal contador_prop
 
+            class IngresoNoValido (Exception):
+                pass
+
+            nonlocal contador_id
+            nonlocal contador_nat
+            nonlocal contador_exo
+            nonlocal contador_prop
+
             datos_rodal = {}
 
             try: #Si casillas bosques nativo o exotico no tiene solo numeros, levanta excepción ValueError
                 datos_rodal[str(entrada_rodal.get())] = {"b_nativo":int(entrada_nativo.get()),
                                                         "b_exotico": int(entrada_exotico.get()),
+                                                        "propietario":str(entrada_propietario.get()), 
                                                         "propietario":str(entrada_propietario.get()), 
                                                         "colindancias" : {'N' : entrada_norte.get(),
                                                         'NW' : entrada_noroeste.get(),
@@ -212,12 +224,57 @@ def main():
             except IngresoNoValido as msj:
                 msgbox.showerror("ERROR", msj, parent = ventana_ingr)
 
+                #INGRESE AQUI PASE DICC A LOG PARA VALIDAR
+                valido, msj = log.validar_ingreso(datos_rodal)
+                #AQUI IRIA PASE A LEVANTAR OTRA EXCEPCION SI NO VALIDADO
+                if (valido == False):
+                    raise IngresoNoValido (msj)
+
+                contador_id = 0 #Vuelta contadores texto temporal a 0
+                contador_nat = 0
+                contador_exo = 0
+                contador_prop = 0
+
+                entrada_rodal.delete(0,"end") #Borro lo que habia en las entradas
+                entrada_nativo.delete(0,"end")
+                entrada_exotico.delete(0,"end")
+                entrada_propietario.delete(0,"end")
+
+                ventana_ingr.focus_force() #cambio devuelta a la ventana de ingreso (para los widget)
+
+                entrada_rodal.insert(0,"Ejemplo: R1") #Vuelvo a ingresar los textos temporales a las casillas
+                entrada_nativo.insert(0,"Ejemplo: 80")
+                entrada_exotico.insert(0, "Ejemplo: 20")
+                entrada_propietario.insert(0, "Ejemplo: Inv. Rojas")
+
+                entrada_norte.config(values = log.retorna_lista_rodales())
+                entrada_noreste.config(values = log.retorna_lista_rodales())
+                entrada_noroeste.config(values = log.retorna_lista_rodales())
+                entrada_sur.config(values = log.retorna_lista_rodales())
+                entrada_sureste.config(values = log.retorna_lista_rodales())
+                entrada_suroeste.config(values = log.retorna_lista_rodales())
+
+                msgbox.showinfo("CORRECTO","Rodal ingresado correctamente", parent = ventana_ingr) #Aviso que todo se ingreso correctamente
+            
+            except IngresoNoValido as msj:
+                msgbox.showerror("ERROR", msj, parent = ventana_ingr)
+
             except ValueError:
+                msgbox.showerror("ERROR","Ingrese solo números en casillas bosque nativo y exótico", parent = ventana_ingr)
                 msgbox.showerror("ERROR","Ingrese solo números en casillas bosque nativo y exótico", parent = ventana_ingr)
 
             #ventana_ingreso_correcto()                
 
         #Entrada Rodal
+        tk.Label(ventana_ingr, text = "ID del Rodal", fg ="#EFD1D1", 
+                 bg = "#675F2A",font = F_entrada).grid(row=1,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: R1)",fg="#EFD1D1", 
+                 bg = "#675F2A", font = F_ejemplo).grid(row=1,column=2,sticky="w")
+        entrada_rodal = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, 
+                                 bg = "#FFEA9E", font = F_entry)
+        entrada_rodal.grid(row=2,column=1,columnspan=3, sticky = "nw")
+        entrada_rodal.bind("<FocusIn>", temp_rodal)
+        entrada_rodal.insert(0,"Ejemplo: R1")
         tk.Label(ventana_ingr, text = "ID del Rodal", fg ="#EFD1D1", 
                  bg = "#675F2A",font = F_entrada).grid(row=1,column=1,sticky="w")
         tk.Label(ventana_ingr, text = "(Ejemplo: R1)",fg="#EFD1D1", 
@@ -238,8 +295,26 @@ def main():
         entrada_nativo.grid(row=5,column=1,columnspan=3, sticky = "nw")
         entrada_nativo.bind("<FocusIn>", temp_nativo)
         entrada_nativo.insert(0,"Ejemplo: 80")
+        tk.Label(ventana_ingr, text = "% Bosque Nativo",fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_entrada).grid(row=4,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: 80)",fg="#EFD1D1",
+                 bg = "#675F2A", font = F_ejemplo).grid(row=4,column=2,sticky="w")
+        entrada_nativo = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, 
+                                  bg = "#FFEA9E", font = F_entry)
+        entrada_nativo.grid(row=5,column=1,columnspan=3, sticky = "nw")
+        entrada_nativo.bind("<FocusIn>", temp_nativo)
+        entrada_nativo.insert(0,"Ejemplo: 80")
 
         #Entrada Bosque Exótico
+        tk.Label(ventana_ingr, text = "% Bosque Exótico", fg ="#EFD1D1", 
+                 bg = "#675F2A", font = F_entrada).grid(row=7,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: 20)",fg="#EFD1D1",
+                 bg = "#675F2A", font = F_ejemplo).grid(row=7,column=2,sticky="w")
+        entrada_exotico = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, 
+                                   bg = "#FFEA9E", font = F_entry)
+        entrada_exotico.grid(row=8,column=1,columnspan=3, sticky = "nw")
+        entrada_exotico.bind("<FocusIn>", temp_exotico)
+        entrada_exotico.insert(0, "Ejemplo: 20")
         tk.Label(ventana_ingr, text = "% Bosque Exótico", fg ="#EFD1D1", 
                  bg = "#675F2A", font = F_entrada).grid(row=7,column=1,sticky="w")
         tk.Label(ventana_ingr, text = "(Ejemplo: 20)",fg="#EFD1D1",
@@ -260,7 +335,19 @@ def main():
         entrada_propietario.grid(row=11, column=1, columnspan=3, sticky = "nw")
         entrada_propietario.bind("<FocusIn>", temp_propietario)
         entrada_propietario.insert(0, "Ejemplo: Inv. Rojas")
+        tk.Label(ventana_ingr, text = "Nombre del Propietario", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_entrada).grid(row=10,column=1,sticky="w")
+        tk.Label(ventana_ingr, text = "(Ejemplo: Inv. Rojas)", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_ejemplo).grid(row=10,column=2,sticky="w")
+        entrada_propietario = tk.Entry(ventana_ingr, width = 40, borderwidth = 2, 
+                                       bg = "#FFEA9E", font = F_entry)
+        entrada_propietario.grid(row=11, column=1, columnspan=3, sticky = "nw")
+        entrada_propietario.bind("<FocusIn>", temp_propietario)
+        entrada_propietario.insert(0, "Ejemplo: Inv. Rojas")
 
+        #Setup Colindancias Combobox
+        tk.Label(panel_derecho, text = "Colindancias", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_entry).grid(row=0,column=1,sticky="e")
         #Setup Colindancias Combobox
         tk.Label(panel_derecho, text = "Colindancias", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_entry).grid(row=0,column=1,sticky="e")
@@ -268,6 +355,12 @@ def main():
         style.theme_use('clam')
         style.configure("TCombobox", fieldbackground= "#FFEA9E", background= "#EBD792")
 
+        #Colindancia al norte
+        tk.Label(panel_derecho, text = "Norte", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_col).grid(row=1,column=1,sticky="w",padx=10)
+        
+        entrada_norte = ttk.Combobox(panel_derecho, state = "readonly",
+                                      values = log.retorna_lista_rodales())
         #Colindancia al norte
         tk.Label(panel_derecho, text = "Norte", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=1,column=1,sticky="w",padx=10)
@@ -283,7 +376,21 @@ def main():
         entrada_noreste = ttk.Combobox(panel_derecho, state = "readonly",
                                        values = log.retorna_lista_rodales())
         entrada_noreste.grid(row=5,column=1,columnspan=3)
+        #Colindancia al NE
+        tk.Label(panel_derecho, text = "Noreste", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_col).grid(row=4,column=1,sticky="w",padx=10)
+        
+        entrada_noreste = ttk.Combobox(panel_derecho, state = "readonly",
+                                       values = log.retorna_lista_rodales())
+        entrada_noreste.grid(row=5,column=1,columnspan=3)
 
+        #Colindancia al NW
+        tk.Label(panel_derecho, text = "Noroeste", fg = "#EFD1D1",
+                  bg = "#675F2A", font = F_col).grid(row=7,column=1,sticky="w",padx=10)
+        
+        entrada_noroeste = ttk.Combobox(panel_derecho,state = "readonly", 
+                                        values = log.retorna_lista_rodales())
+        entrada_noroeste.grid(row=8,column=1,columnspan=3)
         #Colindancia al NW
         tk.Label(panel_derecho, text = "Noroeste", fg = "#EFD1D1",
                   bg = "#675F2A", font = F_col).grid(row=7,column=1,sticky="w",padx=10)
@@ -299,6 +406,13 @@ def main():
         entrada_sur = ttk.Combobox(panel_derecho,state = "readonly", 
                                    values = log.retorna_lista_rodales())
         entrada_sur.grid(row=11,column=1,columnspan=3)
+        #Colindancia al S
+        tk.Label(panel_derecho, text = "Sur",  fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_col).grid(row=10,column=1,sticky="w",padx=10)
+        
+        entrada_sur = ttk.Combobox(panel_derecho,state = "readonly", 
+                                   values = log.retorna_lista_rodales())
+        entrada_sur.grid(row=11,column=1,columnspan=3)
 
         #Colindancia al SE
         tk.Label(panel_derecho, text = "Sureste", fg = "#EFD1D1", 
@@ -307,7 +421,21 @@ def main():
         entrada_sureste = ttk.Combobox(panel_derecho,state = "readonly",
                                         values = log.retorna_lista_rodales())
         entrada_sureste.grid(row=14,column=1,columnspan=3)
+        #Colindancia al SE
+        tk.Label(panel_derecho, text = "Sureste", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_col).grid(row=13,column=1,sticky="w",padx=10)
+        
+        entrada_sureste = ttk.Combobox(panel_derecho,state = "readonly",
+                                        values = log.retorna_lista_rodales())
+        entrada_sureste.grid(row=14,column=1,columnspan=3)
 
+        #Colindancia al SW
+        tk.Label(panel_derecho, text = "Suroeste", fg = "#EFD1D1", 
+                 bg = "#675F2A", font = F_col).grid(row=16,column=1,sticky="w",padx=10)
+        
+        entrada_suroeste = ttk.Combobox(panel_derecho,state = "readonly",
+                                        values = log.retorna_lista_rodales())
+        entrada_suroeste.grid(row=17,column=1,columnspan=3)
         #Colindancia al SW
         tk.Label(panel_derecho, text = "Suroeste", fg = "#EFD1D1", 
                  bg = "#675F2A", font = F_col).grid(row=16,column=1,sticky="w",padx=10)
@@ -728,6 +856,7 @@ def main():
         consulta = tk.StringVar()
         consulta.set("Rodal")
         
+        
         def sel():
             nonlocal consulta_temp
             if consulta.get() == "Rodal":
@@ -743,6 +872,13 @@ def main():
                 consulta_temp.grid(row=1, column = 1, sticky="w")
 
             elif consulta.get() == "Bosque":
+
+                consulta_temp.destroy()
+
+                def temp_text(e):
+                    nonlocal consulta_temp
+                    consulta_temp.delete(0, "end")
+
 
                 consulta_temp.destroy()
 
@@ -803,7 +939,15 @@ def main():
 
         tk.Radiobutton(ventana_cons, text="Hectáreas y tipo de bosque", variable=consulta, value="Bosque", font=F_radiob,
                        command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=3, column=1, sticky="w")
+        tk.Radiobutton(ventana_cons, text="Hectáreas y tipo de bosque", variable=consulta, value="Bosque", font=F_radiob,
+                       command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=3, column=1, sticky="w")
 
+        tk.Radiobutton(ventana_cons, text="Propietario", variable=consulta,value="Propietario", font=F_radiob,
+                       command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=4, column=1, sticky="w")
+        
+        boton_consulta = tk.Button(ventana_cons, text = "Consultar", fg = "#343434", 
+                                bg = "#C4A11E", font = F_col, command=consultar) #Boton consulta
+        boton_consulta.grid(row=6,column=1,pady=20)
         tk.Radiobutton(ventana_cons, text="Propietario", variable=consulta,value="Propietario", font=F_radiob,
                        command=sel, bg="#675F2A", fg="#EFD1D1", selectcolor='Black').grid(row=4, column=1, sticky="w")
         
@@ -814,7 +958,10 @@ def main():
         # Columna al lado de consultar, con texto que explique cómo consultar
         info_frame = tk.Frame(ventana_cons, borderwidth=2, relief="groove", bg="#675F2A")
         info_frame.grid(row=1, column=3, rowspan=7, sticky="nsew")
+        info_frame = tk.Frame(ventana_cons, borderwidth=2, relief="groove", bg="#675F2A")
+        info_frame.grid(row=1, column=3, rowspan=7, sticky="nsew")
 
+        info_explicativo = tk.Label(info_frame, text="¿Cómo consultar?", bg="#675F2A", fg="white", font=F_texto)
         info_explicativo = tk.Label(info_frame, text="¿Cómo consultar?", bg="#675F2A", fg="white", font=F_texto)
         info_explicativo.grid(row=0, column=0, sticky="w", padx=(10, 10), pady=(10, 10))
 
@@ -828,10 +975,13 @@ def main():
 
         info_explicativo = tk.Label(info_frame, text=texto_explicativo, wraplength=300, justify="left", 
                                     bg="#675F2A", fg="white", font=F_texto)
+        info_explicativo = tk.Label(info_frame, text=texto_explicativo, wraplength=300, justify="left", 
+                                    bg="#675F2A", fg="white", font=F_texto)
         info_explicativo.grid(row=1, column=0, sticky="w", padx=(10, 10), pady=(10, 10))
 
 
 
+    root.mainloop()
     root.mainloop()
 
 if __name__ == "__main__":
