@@ -770,17 +770,23 @@ def main():
             if consulta_abierta == False:
                 if consulta.get() == "Rodal":
                     rodal_a_consultar = consulta_temp.get()
-                    datos_rodal = log.por_rodal(rodal_a_consultar)
-                    #[propietario, natividad, exotico]
-                    ventana_resultados_rodal(datos_rodal , rodal_a_consultar)
-                    consulta_abierta = True
+
+                    if rodal_a_consultar != "": #Verificar que sea un rodal distinto de vacío
+                        datos_rodal = log.por_rodal(rodal_a_consultar)
+                        ventana_resultados_rodal(datos_rodal , rodal_a_consultar)
+                        consulta_abierta = True
+                    else:
+                        msgbox.showerror("ERROR", "Ingrese un rodal válido, por favor.", parent=ventana_cons)
 
                 elif consulta.get() == "Propietario":
                     prop_a_consultar = consulta_temp.get()
-                    datos_rodales_propietario = log.por_propietario(prop_a_consultar)
-                    #[rodales_prop, natividad, exotico]
-                    ventana_resultados_propietario(datos_rodales_propietario, prop_a_consultar)
-                    consulta_abierta = True
+
+                    if prop_a_consultar != "": #Verificar que sea un propietario distinto de vacío
+                        datos_rodales_propietario = log.por_propietario(prop_a_consultar)
+                        ventana_resultados_propietario(datos_rodales_propietario, prop_a_consultar)
+                        consulta_abierta = True
+                    else:
+                        msgbox.showerror("ERROR", "Ingrese un propietario válido, por favor.", parent=ventana_cons)
 
                 elif consulta.get() == "Bosque":
                     rango_a_consultar = consulta_temp.get()
