@@ -9,23 +9,28 @@ class RodalYaExistenteError(Exception): pass
 class EspacioNoValidoError(Exception): pass
 
 global dicc_rodales
-#dicc_rodales = {}
-dicc_rodales = {
-    'R1'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R4', 'NW': 'R6', 'NE': 'R3', 'S': '', 'SE': 'R2', 'SW': ''}},
-    'R2'   : {'b_nativo': 12, 'b_exotico': 88, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R3', 'NW': 'R1', 'NE': '', 'S': '', 'SE': '', 'SW': ''}},
-    'R3'   : {'b_nativo': 98, 'b_exotico': 2, 'propietario': 'R. Maturana', 'colindancias': {'N': 'R5', 'NW': 'R4', 'NE': '', 'S': 'R2', 'SE': '', 'SW': 'R1'}},
-    'R4'   : {'b_nativo': 87, 'b_exotico': 13, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': 'R7', 'NE': 'R5', 'S': 'R1', 'SE': 'R3', 'SW': 'R6'}},
-    'R5'   : {'b_nativo': 90, 'b_exotico': 10, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R3', 'SE': '', 'SW': 'R4'}},
-    'R6'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'Inv. Lazo', 'colindancias': {'N': 'R7', 'NW': '', 'NE': 'R4', 'S': '', 'SE': 'R1', 'SW': ''}},
-    'R7'   : {'b_nativo': 50, 'b_exotico': 50, 'propietario': 'lucas reyes', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R6', 'SE': 'R4','SW':''}}
-}
+dicc_rodales = {}
+#dicc_rodales = {
+#    'R1'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R4', 'NW': 'R6', 'NE': 'R3', 'S': '', 'SE': 'R2', 'SW': ''}},
+#    'R2'   : {'b_nativo': 12, 'b_exotico': 88, 'propietario': 'F. Henriquez', 'colindancias': {'N': 'R3', 'NW': 'R1', 'NE': '', 'S': '', 'SE': '', 'SW': ''}},
+#    'R3'   : {'b_nativo': 98, 'b_exotico': 2, 'propietario': 'R. Maturana', 'colindancias': {'N': 'R5', 'NW': 'R4', 'NE': '', 'S': 'R2', 'SE': '', 'SW': 'R1'}},
+#    'R4'   : {'b_nativo': 87, 'b_exotico': 13, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': 'R7', 'NE': 'R5', 'S': 'R1', 'SE': 'R3', 'SW': 'R6'}},
+#    'R5'   : {'b_nativo': 90, 'b_exotico': 10, 'propietario': 'R. Maturana', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R3', 'SE': '', 'SW': 'R4'}},
+#    'R6'   : {'b_nativo': 40, 'b_exotico': 60, 'propietario': 'Inv. Lazo', 'colindancias': {'N': 'R7', 'NW': '', 'NE': 'R4', 'S': '', 'SE': 'R1', 'SW': ''}},
+#    'R7'   : {'b_nativo': 50, 'b_exotico': 50, 'propietario': 'lucas reyes', 'colindancias': {'N': '', 'NW': '', 'NE': '', 'S': 'R6', 'SE': 'R4','SW':''}}
+#}
 #dicc_rodales = file.construir_diccionario()
 
-def inicializar_diccionario(path: str = 'archivo'):
+def inicializar_diccionario(path: str = 'archivos'):
     global dicc_rodales
+    path = file.buscar_directorio()
 
     file.generar_archivos(path)
     dicc_rodales = file.construir_diccionario(path)
+
+
+def recordar_directorio(directorio: str):
+    file.guardar_directorio(directorio)
 
 
 # Metes una coordenada y te devuelve la opuesta
@@ -36,6 +41,63 @@ coordenada_opuesta = {
     "S" : "N",
     "SE" : "NW",
     "SW" : "NE"
+}
+
+# Referencias para validar las colindancias
+referencia_validacion = {
+    'N':{
+        'NE': 'SE',
+        'NW': 'SW',
+        'S':'S',
+        'SE': 'S',
+        'SW': 'S',
+        'N': 'S'
+    },
+                     
+    'NE':{
+        'SE': 'S',
+        'N': 'NW',
+        'NW': 'SW',
+        'SW': 'SW',
+        'S': 'SW',
+        'NE': 'SW'
+    },
+
+    'NW':{
+        'N': 'NE',
+        'SW': 'S',
+        'S': 'SE',
+        'SE': 'SE',
+        'NE': 'SE',
+        'NW': 'SE'
+    },
+
+    'S':{
+        'SE': 'NE',
+        'SW': 'NW',
+        'N': 'N',
+        'NE': 'N',
+        'NW': 'N',
+        'S': 'N'
+    },
+
+    'SE':{
+        'S': 'SW',
+        'NE':'SE',
+        'NW': 'NW',
+        'SW': 'NW',
+        'N': 'NW',
+        'SE': 'NW'
+    },
+
+    'SW':{
+        'S': 'SE',
+        'NW': 'N',
+        'N': 'NE',
+        'SE': 'NE',
+        'NE': 'NE',
+        'SW': 'NE'
+    }
 }
 
 # Funciones que ojalá se puedan reciclar
@@ -152,15 +214,16 @@ def asignar_colindancias(nuevo_rodal: str, rodal_referencia: str, direccion: str
             asignar_colindancias(nuevo_rodal, r_col_v2, vuelta_2_antihorario[direccion])
         )
 
+
 def colindancia_valida(rodal_colindante: str, direccion: str) -> bool:
     """Recorrer la lista de rodales, en el caso en que otro rodal tenga al rodal
     colindante de referencia en la misma dirección que el que está siendo creado
     se retorna True para continuar preguntando al usuario que ingrese un rodal válido"""
-    global dicc_rodales
-    if rodal_colindante != "":
-        for rodal, informacion in dicc_rodales.items():
+    for rodal, informacion in dicc_rodales.items():
+        if rodal != rodal_colindante:
             if informacion["colindancias"][direccion] == rodal_colindante:
                 return True
+
     return False
 
 
@@ -170,23 +233,6 @@ def guardar_diccionario() -> None:
     global dicc_rodales
 
     file.guardar_en_archivo(dicc_rodales)
-
-def ayudaporfavorquierosalirdeaqui(lista_colindancias: list, colindancia: str, direccion: str):
-    referencias_direccion = { 
-        "N" : ["NW","NE"],
-        "NE" : ["N","SE"],
-        "NW" : ["SW","N"],
-        "S" : ["SE","SW"],
-        "SE" : ["NE","S"],
-        "SW" : ["S","NW"]
-    }
-    global dicc_rodales
-
-    col_valida = lista_colindancias[0]
-    col_sospechosa = lista_colindancias[1]
-
-    for rodal in dicc_rodales.keys():
-        colidancias = dicc_rodales[rodal]["colindancias"]
     
 
 def validar_ingreso(D:dict) -> None:
@@ -222,16 +268,21 @@ def validar_ingreso(D:dict) -> None:
         if propietario == "" or propietario == "(Ejemplo: Inv. Rojas)":
             raise IngresoInvalido ("Casilla Propietario vacia")
         
-        #Validaciones Colindancias
-        colindantes = []
-        for direccion, rodal_col in colindancias.items():
-            if colindancia_valida(rodal_col, direccion):
-                raise IngresoInvalido ("Colindancias no validas")
-            if rodal_col != "":
-                colindantes.append(rodal_col)
-                if len(colindancias) > 1:
-                   if ayudaporfavorquierosalirdeaqui(rodal_col, colindancias, direccion):
-                       raise IngresoInvalido ("para la wea")
+        # Validaciones Colindancias
+        # 1. Se escoge un rodal que tenga una colindancia válida para buscar en torno a ese
+        for direct, colin in colindancias.items():
+            if not colindancia_valida(colin, direct) and colin != '':
+                colindante_valido = [colin, direct]
+
+        # 2. Se itera sobre las colindancias del rodal en creacion y se validan en torno a la válida
+        try:
+            for direct, colin in colindancias.items():
+                if colindante_valido[0] != colin:
+                    valido = colindancias_validas(colindante_valido[0], colin, colindante_valido[1], direct) # En linea: 334
+                    if not valido:
+                        raise IngresoInvalido(f"Colindancias Inválidas")
+        except UnboundLocalError: pass
+        
 
     except IngresoInvalido as msj:
             return validado, msj
@@ -260,6 +311,15 @@ def validar_ingreso(D:dict) -> None:
     return validado, "Ingreso correcto"
     
 
+def colindancias_validas (rodal_valido: str, rodal_a_validar: str, direccion_valido: str, direccion_a_validar: str):
+    if dicc_rodales[rodal_valido]['colindancias'][referencia_validacion[direccion_valido][direccion_a_validar]] != rodal_a_validar:
+        # Diccionario "referencia_validacion" en linea: 42
+        # La colindancia es invalida
+        return False
+    # La colindancia es valida
+    return True
+
+
 def retorna_lista_rodales() -> list:
     """Retorna una lista con las IDS de los rodales ya ingresados"""
     global dicc_rodales
@@ -267,19 +327,6 @@ def retorna_lista_rodales() -> list:
     rodales.append("")
     rodales.sort()
     return rodales
-
-
-# def retorna_lista_rodales(direccion: str) -> list:
-#     """Retorna una lista con las IDS de los rodales ya ingresados"""
-#     global dicc_rodales
-#     rodales = list(dicc_rodales.keys())
-
-#     for rodal in rodales:
-#         if dicc_rodales[rodal]['colindancias'][coordenada_opuesta[direccion]] != '':
-#             rodales.pop(rodal)
-            
-#     rodales.append("")
-#     return rodales
 
 
 def retorna_lista_propietarios() -> list:
@@ -355,8 +402,12 @@ def por_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
     for paso_rodal in split_str_rodales:
         if '-' in paso_rodal:
             temp = paso_rodal.replace('R', '').split('-')
-            for agregando in range(int(temp[0]), int(temp[-1])+1, 1):   # ingreso todos los radales que se estan
-                rodales_total.append(f'R{agregando}')                   # consultando a la lista rodales_total.
+            if int(temp[0]) > int(temp[-1]):
+                for agregando in range(int(temp[0]), int(temp[-1])-1, -1):  
+                    rodales_total.append(f'R{agregando}')
+            else:
+                for agregando in range(int(temp[0]), int(temp[-1])+1, 1):   # ingreso todos los radales que se estan
+                    rodales_total.append(f'R{agregando}')                   # consultando a la lista rodales_total.
         else:
             rodales_total.append(paso_rodal)
 
@@ -365,7 +416,7 @@ def por_hectarea(str_rodales: str) -> dict: # string del tipo: R1, R3-R9, R10
         try:
             _, natividad, exotico = dict_rodal[rodal].values()          # cálculo de los porcentajes de hectareas
             nativo_hectareas_total += (natividad/100)*10                # respecto a la natividad y lo exótico.
-            exotico_hectareas_total += (exotico/100)*10                 # uwu
+            exotico_hectareas_total += (exotico/100)*10                 
 
         except KeyError:
             ...
@@ -388,6 +439,15 @@ def cant_propietarios() -> tuple: # tupla de los porpietarios disponibles a cons
                             #                               'Simu Asociados', 'Toledo.s Rodales']
                             # tipo: lista de string's
 
+def rodales_colindancias(rodal:str) -> str: #imprimo R1:direccion, R2:direccion, etc para label de colindancias en consultar de obd_firewatch
+    #Consigo el string para imprimir en el label de colindancias, desde el dicc_rodales
+    global dicc_rodales
+    colindancias = dicc_rodales[rodal]['colindancias']
+    colindancias_str = ''
+    for direccion, rodal_col in colindancias.items():
+        if rodal_col != '':
+            colindancias_str += f'{rodal_col}:{direccion}, '
+    return colindancias_str[:-2]
 
 def simular_afectados(direccion_viento: str, rodal_inicial: str, afectados:set = set()) -> list: 
     #_________________________________INFORMACION_______________________________________
@@ -458,7 +518,7 @@ def suma_afectados(rodal_inicial: str, list_afectados:list) -> list:
             propietarios_afectados.add(dicc_rodales[rodal]['propietario'])
 
     hectareas_totales_afectadas = bosque_nativo_afectado + bosque_exotico_afectado
-    tupla_suma = (hectareas_totales_afectadas, bosque_nativo_afectado, bosque_exotico_afectado)
+    tupla_suma = (round(hectareas_totales_afectadas, 2), round(bosque_nativo_afectado, 2), round(bosque_exotico_afectado, 2))
     tupla_propietarios = tuple(propietarios_afectados)
     return tupla_suma, tupla_propietarios
 

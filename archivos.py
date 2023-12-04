@@ -18,6 +18,7 @@ def generar_archivos(directorio_archivos: str = 'archivos'):
             colindancias_generado = True
             print('< El archivo colindancias.csv ha sido generado >\n')
     except FileExistsError: colindancias_generado = False
+
     
     # Si el archivo rodales.csv fue recien generado, escribir headers
     if rodales_generado:
@@ -28,6 +29,39 @@ def generar_archivos(directorio_archivos: str = 'archivos'):
     if colindancias_generado:
         with open(f'{directorio_archivos}/colindancias.csv', 'w', encoding = 'utf-8') as archivo:
             archivo.write("# rodal_nuevo rodal_existente orientacion\n")
+
+
+def buscar_directorio() -> str:
+    # Generar el archivo config.csv en el caso de que no exista
+    try:
+        with open(f'archivos/config.csv', 'x', encoding = 'utf-8'):
+            print('< El archivo config.csv ha sido generado >')
+            config_generado = True
+    except FileExistsError: config_generado = False
+
+    # Si el archivo config.csv fue recien generado, escribir headers
+    if config_generado:
+        with open(f'archivos/config.csv', 'w', encoding = 'utf-8') as archivo:
+            archivo.write("# Direccion_archivos\n")
+
+    with open(f'archivos/config.csv', 'r', encoding = 'utf-8') as archivo:
+        directorio = archivo.read().splitlines()
+    
+    try: return directorio[1]
+    except IndexError: return 'archivos'
+
+
+def guardar_directorio(directorio: str):
+    with open(f'archivos/config.csv', 'r', encoding = 'utf-8') as archivo:
+        datos = archivo.read().splitlines()
+
+    try:
+        if datos[1] == directorio:
+            return
+    
+    except IndexError:
+        with open(f'archivos/config.csv', 'a', encoding = 'utf-8') as archivo:
+            archivo.write(f'{directorio}\n')
 
 
 def construir_diccionario(directorio_archivos: str = 'archivos') -> dict:
@@ -72,7 +106,10 @@ def construir_diccionario(directorio_archivos: str = 'archivos') -> dict:
         dicc_rodales[datos[0].strip("'")]['b_nativo'] = datos[1].strip()
         dicc_rodales[datos[0].strip("'")]['b_exotico'] = datos[2].strip()
         dicc_rodales[datos[0].strip("'")]['propietario'] = datos[3].strip("'").strip()
-        dicc_rodales[datos[0].strip("'")]['colindancias'] = temp_colindancias[datos[0].strip("'")]
+        try:
+            dicc_rodales[datos[0].strip("'")]['colindancias'] = temp_colindancias[datos[0].strip("'")]
+        except KeyError: 
+            dicc_rodales[datos[0].strip("'")]['colindancias'] = {'N': '', 'NW': '', 'NE': '', 'S': '', 'SW': '', 'SE': ''}
 
     return dicc_rodales
 

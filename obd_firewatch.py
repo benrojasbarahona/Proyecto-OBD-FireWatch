@@ -6,6 +6,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter import filedialog
+import re
 
 consulta_abierta = False
 #limpiar_datos boton limpiar en main
@@ -16,25 +17,29 @@ def main():
     root.rowconfigure([0, 1, 2, ], minsize = 100, weight = 1)
     root.resizable(False, False)
 
-   # log.inicializar_diccionario()
+    log.inicializar_diccionario()
 
-    #logo = tk.PhotoImage(file = "assets/iconos/logo.png")
-    #root.iconphoto(True, logo)
+    logo = tk.PhotoImage(file = "assets/iconos/logo.png")
+    root.iconphoto(True, logo)
 
     img_consulta = tk.PhotoImage(file = "assets/iconos/consultare.png").subsample(2,2)
     img_ingresar= tk.PhotoImage(file = "assets/iconos/1.png").subsample(2,2)
     img_incendio= tk.PhotoImage(file = "assets/iconos/2.png").subsample(2,2)
     img_background = tk.PhotoImage(file = "assets/iconos/fondo_ventana1.png")
     label_bg = tk.Label(root, image=img_background).place(x=-0,y=0)
-    img_nube = tk.PhotoImage(file = "assets/iconos/nube.png").subsample(25,25)
 
     ventana_abierta = False
 
     def cerrando_ventana(): #---------------------------------------------------------------------------------------------------
         nonlocal ventana_abierta
+        global direccion_archivo
         if msgbox.askokcancel("Quit", "¿Desea guardar y salir?"):
-            #log.guardar_diccionario()
-            root.destroy()
+            if direccion_archivo != "":
+                log.recordar_directorio(direccion_archivo)
+                root.destroy()
+            else:
+                log.guardar_diccionario()
+                root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", cerrando_ventana)
     
@@ -73,24 +78,21 @@ def main():
             msgbox.showerror("Error","Ya posee una ventana abierta")
 
     def dialogo_abrir_archivo():
+        global direccion_archivo
         direccion_archivo = filedialog.askdirectory(title="Abrir Carpeta")
-        if direccion_archivo:
-            carpeta_seleccionada.config(text=f"Carpeta Seleccionada: {direccion_archivo}")
-            #arr.generar_archivos(direccion_archivo)
+        if direccion_archivo != "":
+            log.inicializar_diccionario(direccion_archivo)
 
-    boton_abrir = tk.Button(root, text = "Abrir Carpeta", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
+    #Boton abrir carpeta archivo
+    tk.Button(root, text = "Abrir Carpeta", fg = "#343434", bg = "#C4A11E",font = ("Clear Sans", 10, "bold"),
                              command=dialogo_abrir_archivo).grid(row=0,column=0,columnspan=2,padx = 10,sticky = "w")
     
-    carpeta_seleccionada = tk.Label(root, text = "Carpeta Seleccionada: ",fg ="#EFD1D1", 
-                                    bg = "#675F2A", font=("Clear Sans", 10, "bold"))
-    
-    carpeta_seleccionada.grid(row=0, column= 2, columnspan=6,sticky="w")
+    #Botones ventanas
+    ttk.Button(root, image=img_ingresar, command=lambda:abrir_ingreso()).grid(row=1,column=1)
 
-    boton_ingreasr = ttk.Button(root, image=img_ingresar, command=lambda:abrir_ingreso()).grid(row=1,column=1)
+    ttk.Button(root, image=img_incendio, command=lambda:abrir_incendio()).grid(row=1,column=3)
 
-    boton_incendio = ttk.Button(root, image=img_incendio, command=lambda:abrir_incendio()).grid(row=1,column=3)
-
-    boton_consulta = ttk.Button(root, image=img_consulta, command=lambda:abrir_consulta()).grid(row=1,column=5)
+    ttk.Button(root, image=img_consulta, command=lambda:abrir_consulta()).grid(row=1,column=5)
 
     def ventana_ingresar(): #-------------------------------- Ventana Ingresar --------------------------------------------------
         ventana_ingr = tk.Toplevel(root) # crea ventana ingresar rodales
@@ -111,10 +113,15 @@ def main():
         panel_derecho.grid(row=1,column=6,rowspan=14)
         
         def cerrando_ventana():
+            global direccion_archivo
             nonlocal ventana_abierta
             ventana_abierta = False
-            log.guardar_diccionario() # TENTATIVO A CAMBIO --------------------------------------------------------
-            ventana_ingr.destroy()
+            if direccion_archivo != "":
+                log.recordar_directorio(direccion_archivo)
+                ventana_ingr.destroy()
+            else:
+                log.guardar_diccionario
+                ventana_ingr.destroy()
 
         ventana_ingr.protocol("WM_DELETE_WINDOW", cerrando_ventana)
 
@@ -519,8 +526,6 @@ def main():
             consulta_abierta = False
             ventana_res.destroy()
         
-        colindancias = ["muchas","pocas"]
-
         ventana_res.protocol("WM_DELETE_WINDOW", cerrando_consulta)
         
         tk.Label (ventana_res, text = "Rodal Consultado:", fg = "#EFD1D1", bg = "#675F2A", 
@@ -545,8 +550,10 @@ def main():
         
         tk.Label (ventana_res, text = "Rodales colindantes: ", fg = "#EFD1D1", bg = "#675F2A", 
                     font = ("Clear Sans", 13, "bold")).grid(row=5, column=1, sticky="w")
-        tk.Label (ventana_res, text = colindancias, fg = "#EFD1D1", bg = "#675F2A", 
-                    font = ("Clear Sans", 13)).grid(row=6, column=1, sticky="w", pady=(0,10))
+
+        rodales_colindancias = log.rodales_colindancias(rodal)
+        tk.Label (ventana_res, text = rodales_colindancias, fg = "#EFD1D1", bg = "#675F2A",
+                    font = ("Clear Sans", 13)).grid(row=6, column=1, sticky="w")
         
 
         canvas = tk.Canvas(ventana_res, width=270, height=270, bg = "#675F2A")
@@ -698,8 +705,9 @@ def main():
         ventana_cons = tk.Toplevel()
         ventana_cons.title('OBD Firewatch - Consultar')
         ventana_cons.resizable(False, False)
-        ventana_cons.columnconfigure([0, 1, 2, 3], minsize = 25, weight = 1)
+        ventana_cons.columnconfigure([0, 1, 2, 3, 4], minsize = 25, weight = 1)
         ventana_cons.rowconfigure([0, 1, 5,6,7,8], minsize = 25, weight = 1)
+        ventana_cons.resizable(False, False)
 
         label_bg = tk.Label(ventana_cons, image=img_background)
         label_bg.place(x=-0,y=0)
@@ -719,7 +727,7 @@ def main():
 
         # Configuro Radiobuttons de consulta
         mensaje = tk.Label(ventana_cons, text="Consultar por:", bg="#675F2A", fg="#EFD1D1", font= F_radiob)
-        mensaje.grid(row=0, column=1, sticky="sw")
+        mensaje.grid(row=0, column=1, sticky="sw",pady=(45,0))
 
         style= ttk.Style()
         style.theme_use('clam')
@@ -727,7 +735,7 @@ def main():
 
         consulta_temp= ttk.Combobox(ventana_cons,state = "readonly",width = 29, font= F_rango,
                                         values = log.retorna_lista_rodales())
-        consulta_temp.grid(row=1, column = 1, columnspan = 2)
+        consulta_temp.grid(row=1, column = 1)
         consulta = tk.StringVar()
         consulta.set("Rodal")
         
@@ -737,13 +745,13 @@ def main():
                 consulta_temp.destroy()
                 consulta_temp = ttk.Combobox(ventana_cons,state = "readonly",width = 29, font= F_rango,
                                         values = log.retorna_lista_rodales())
-                consulta_temp.grid(row=1, column = 1, columnspan = 2, sticky="w")
+                consulta_temp.grid(row=1, column = 1, sticky="w")
 
             elif consulta.get() == "Propietario":
                 consulta_temp.destroy()
                 consulta_temp = ttk.Combobox(ventana_cons,state = "readonly",width = 29, font= F_rango,
                                         values = log.retorna_lista_propietarios())
-                consulta_temp.grid(row=1, column = 1, columnspan = 2, sticky="w")
+                consulta_temp.grid(row=1, column = 1, sticky="w")
 
             elif consulta.get() == "Bosque":
 
@@ -757,7 +765,7 @@ def main():
                 consulta_temp = tk.Entry(ventana_cons, width=30, borderwidth=2, bg="white", 
                                             fg="black", font= F_rango)
                 consulta_temp.bind("<FocusIn>", temp_text)
-                consulta_temp.grid(row=1, column=1, columnspan= 2, sticky="w")
+                consulta_temp.grid(row=1, column=1, sticky="w")
                 consulta_temp.insert(0, texto_temporal)
 
             ventana_cons.focus_set()
@@ -769,27 +777,36 @@ def main():
             if consulta_abierta == False:
                 if consulta.get() == "Rodal":
                     rodal_a_consultar = consulta_temp.get()
-                    datos_rodal = log.por_rodal(rodal_a_consultar)
-                    #[propietario, natividad, exotico]
-                    ventana_resultados_rodal(datos_rodal , rodal_a_consultar)
-                    consulta_abierta = True
 
-                if consulta.get() == "Propietario":
+                    if rodal_a_consultar != "": #Verificar que sea un rodal distinto de vacío
+                        datos_rodal = log.por_rodal(rodal_a_consultar)
+                        ventana_resultados_rodal(datos_rodal , rodal_a_consultar)
+                        consulta_abierta = True
+                    else:
+                        msgbox.showerror("ERROR", "Ingrese un rodal válido, por favor.", parent=ventana_cons)
+
+                elif consulta.get() == "Propietario":
                     prop_a_consultar = consulta_temp.get()
-                    datos_rodales_propietario = log.por_propietario(prop_a_consultar)
-                    #[rodales_prop, natividad, exotico]
-                    ventana_resultados_propietario(datos_rodales_propietario, prop_a_consultar)
-                    consulta_abierta = True
 
-                if consulta.get() == "Bosque":
+                    if prop_a_consultar != "": #Verificar que sea un propietario distinto de vacío
+                        datos_rodales_propietario = log.por_propietario(prop_a_consultar)
+                        ventana_resultados_propietario(datos_rodales_propietario, prop_a_consultar)
+                        consulta_abierta = True
+                    else:
+                        msgbox.showerror("ERROR", "Ingrese un propietario válido, por favor.", parent=ventana_cons)
+
+                elif consulta.get() == "Bosque":
                     rango_a_consultar = consulta_temp.get()
-                    lista_hect = log.por_hectarea(rango_a_consultar)
-                    #[round(nativo_hectareas_total, 2), round(exotico_hectareas_total, 2)]
-                    ventana_resultado_rango(lista_hect, rango_a_consultar)
-                    consulta_abierta = True
+                    validar_entrada = re.match(r'^R\d+(-R\d+)?(, R\d+(-R\d+)?)*$', rango_a_consultar) #Si se escribe un string inválido, sale un error
+                    if validar_entrada:
+                        lista_hect = log.por_hectarea(rango_a_consultar)
+                        ventana_resultado_rango(lista_hect, rango_a_consultar)
+                        consulta_abierta = True
+
+                    else:
+                        msgbox.showerror("ERROR", "Ingreso inválido. Siga las instrucciones, por favor.", parent=ventana_cons)
             else:
                 msgbox.showerror("ERROR", "Ya posee una ventana de consulta abierta", parent = ventana_cons)
-
         
         #Radiobotones para especificar consulta
         tk.Radiobutton(ventana_cons, text="Rodal", variable=consulta, value="Rodal", font=F_radiob, 
